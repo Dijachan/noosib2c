@@ -1,0 +1,76 @@
+import React from 'react';
+import { View, Text, StyleSheet, Dimensions, SafeAreaView } from 'react-native';
+import { useFonts, Baloo2_400Regular, Baloo2_700Bold } from '@expo-google-fonts/baloo-2';
+import { Image } from 'expo-image';
+
+const { width, height } = Dimensions.get('window');
+
+export default function Splash1Screen({ navigation }: any) {
+  const [fontsLoaded] = useFonts({
+    Baloo2_400Regular,
+    Baloo2_700Bold,
+  });
+
+  React.useEffect(() => {
+    if (fontsLoaded) {
+      const timer = setTimeout(() => {
+        navigation.replace('Splash2');
+      }, 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [fontsLoaded, navigation]);
+
+  if (!fontsLoaded) return null;
+
+  return (
+    <View style={styles.container}>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.content}>
+          <View style={styles.logoContainer}>
+            <Image 
+              source={require('../../../assets/images/splash/logo_text.png')} 
+              style={styles.logo}
+              contentFit="contain"
+            />
+          </View>
+          <Text style={styles.tagline}>
+            Noosi, your Robo nurse for medication Management
+          </Text>
+        </View>
+      </SafeAreaView>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#0463DD',
+  },
+  safeArea: {
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 60,
+  },
+  logoContainer: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  logo: {
+    width: width * 0.6,
+    height: width * 0.6,
+  },
+  tagline: {
+    fontFamily: 'Baloo2_400Regular',
+    fontSize: 16,
+    color: '#FFFFFF',
+    textAlign: 'center',
+    lineHeight: 24,
+    paddingHorizontal: 40,
+    marginBottom: 20,
+  }
+});
