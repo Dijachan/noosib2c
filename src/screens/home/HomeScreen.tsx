@@ -12,7 +12,8 @@ import {
   Image,
   Platform,
 } from 'react-native';
-import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
@@ -37,21 +38,17 @@ const InsightCard = ({
   return (
     <View style={[styles.insightCard, { backgroundColor: color }]}>
       <View style={styles.insightHeader}>
-        <Text style={styles.insightTitle}>{title}</Text>
         <View style={styles.insightIconContainer}>
-          <Feather name={icon as any} size={20} color="rgba(4, 9, 33, 0.4)" />
+          <Ionicons name={icon as any} size={22} color="#0F172A" />
         </View>
+        <Text style={styles.insightStatus}>{status.toUpperCase()}</Text>
       </View>
       <View style={styles.insightBody}>
+        <Text style={styles.insightCardTitle}>{title}</Text>
         <View style={styles.valueRow}>
           <Text style={styles.insightValue}>{value}</Text>
           <Text style={styles.insightUnit}>{unit}</Text>
         </View>
-        <Text style={styles.insightStatus}>{status}</Text>
-      </View>
-      {/* Subtle Background Pattern Mock */}
-      <View style={styles.insightPattern}>
-        <Feather name="activity" size={80} color="rgba(255, 255, 255, 0.2)" />
       </View>
     </View>
   );
@@ -81,7 +78,7 @@ const MedicationCard = ({
     <View style={[styles.medCard, status === 'Pending' && styles.medCardActive]}>
       <View style={[styles.medIndexContainer, status === 'Taken' ? styles.medIndexTaken : styles.medIndexPending]}>
         <Text style={[styles.medIndex, status === 'Taken' ? styles.medIndexTextTaken : styles.medIndexTextPending]}>
-          {status === 'Taken' ? <Feather name="check" size={16} /> : index}
+          {status === 'Taken' ? <Ionicons name="checkmark" size={18} color="#10B981" /> : index}
         </Text>
       </View>
       <View style={styles.medContent}>
@@ -89,14 +86,14 @@ const MedicationCard = ({
         <Text style={styles.medSubtitle}>{subtitle}</Text>
         <View style={styles.medMetaRows}>
           <View style={styles.metaRow}>
-            <Feather name="box" size={12} color="#F59E0B" />
+            <Ionicons name="cube-outline" size={14} color="#F59E0B" />
             <Text style={styles.metaText}>{dispenser}</Text>
           </View>
         </View>
       </View>
       <View style={[styles.statusBadge, status === 'Taken' ? styles.statusBadgeTaken : styles.statusBadgePending]}>
         <Text style={[styles.statusBadgeText, status === 'Taken' ? styles.statusBadgeTextTaken : styles.statusBadgeTextPending]}>
-          {status}
+          {status.toUpperCase()}
         </Text>
       </View>
     </View>
@@ -116,88 +113,67 @@ export default function HomeScreen() {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          {/* Top Greeting */}
-          <View style={styles.greetingSection}>
-            <Text style={styles.greetingText}>Good morning, Khadijah</Text>
-            <Text style={styles.dateText}>Friday, May 24</Text>
-          </View>
-
-          {/* Search Header */}
-          <View style={styles.searchHeader}>
-            <View style={styles.profileCircle}>
-              <Text style={styles.profileInitial}>JB</Text>
+          {/* Top Greeting & Monitoring Badge */}
+          <View style={styles.greetingHeader}>
+            <View>
+              <Text style={styles.greetingText}>Good morning, John! 🌱</Text>
+              <View style={styles.monitoringBadge}>
+                <Ionicons name="eye-outline" size={14} color="#6B4EFF" />
+                <Text style={styles.monitoringText}>Caring for Khadijah</Text>
+              </View>
             </View>
-            <View style={styles.searchContainer}>
-              <Feather name="search" size={18} color="rgba(4, 9, 33, 0.3)" />
-              <TextInput 
-                style={styles.searchInput}
-                placeholder="search"
-                placeholderTextColor="rgba(4, 9, 33, 0.3)"
-              />
-            </View>
-            <TouchableOpacity style={styles.bellBtn}>
-              <Feather name="bell" size={22} color="#0F172A" />
-              <View style={styles.bellDot} />
+            <TouchableOpacity style={styles.profileBtn}>
+               <Image 
+                 source={{ uri: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=100' }} 
+                 style={styles.profileImg} 
+               />
             </TouchableOpacity>
           </View>
 
           {/* Health Insights Section */}
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Health Insights</Text>
-            <TouchableOpacity>
-              <Text style={styles.seeAllText}>See all</Text>
-            </TouchableOpacity>
           </View>
 
-          <ScrollView 
-            horizontal 
-            showsHorizontalScrollIndicator={false} 
-            style={styles.insightScroll}
-            contentContainerStyle={styles.insightScrollContent}
-          >
+          <View style={styles.insightGrid}>
+            <InsightCard 
+              title="Daily Adherence" 
+              value="98" 
+              unit="%" 
+              icon="checkmark-circle-outline" 
+              color="#F5F3FF" // Pastel Purple
+              status="Optimal"
+            />
             <InsightCard 
               title="Body Temp" 
               value="36.8" 
               unit="°C" 
-              icon="thermometer" 
-              color="#EBF5FF"
+              icon="thermometer-outline" 
+              color="#EBF5FF" // Pastel Blue
               status="Normal"
             />
-            <InsightCard 
-              title="SpO2" 
-              value="98" 
-              unit="%" 
-              icon="wind" 
-              color="#F5F3FF"
-              status="Normal"
-            />
-            <InsightCard 
-              title="Smart Tray" 
-              value="Online" 
-              unit="" 
-              icon="cpu" 
-              color="#ECFDF5"
-              status="Synced"
-            />
-          </ScrollView>
+          </View>
 
           {/* Alerts Summary Card */}
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Alert Summary</Text>
+          </View>
           <TouchableOpacity style={styles.alertsBanner}>
             <View style={styles.alertsLeft}>
               <View style={styles.alertIconContainer}>
-                <Feather name="alert-circle" size={24} color="#EF4444" />
+                <Ionicons name="alert-circle-outline" size={26} color="#EF4444" />
               </View>
               <View>
                 <Text style={styles.alertCountText}>2 Critical Alerts</Text>
                 <Text style={styles.alertSubText}>Requires immediate attention</Text>
               </View>
             </View>
-            <Feather name="chevron-right" size={24} color="rgba(239, 68, 68, 0.4)" />
+            <Ionicons name="chevron-forward" size={22} color="rgba(239, 68, 68, 0.4)" />
           </TouchableOpacity>
 
-          {/* Medication Management Section */}
+          {/* Care Schedule Section */}
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Medication Management</Text>
+            <Text style={styles.sectionTitle}>Care Schedule</Text>
             <TouchableOpacity>
               <Text style={styles.seeAllText}>See all</Text>
             </TouchableOpacity>
@@ -228,25 +204,36 @@ export default function HomeScreen() {
         </ScrollView>
       </SafeAreaView>
 
-      {/* Floating Bottom Navigation */}
+      {/* Modern Bottom Navigation with Glass Effect */}
       <View style={styles.bottomNavContainer}>
-        <View style={styles.floatingNav}>
+        <BlurView 
+          intensity={Platform.OS === 'ios' ? 80 : 100} 
+          tint="light" 
+          style={StyleSheet.absoluteFill} 
+        />
+        <View style={styles.bottomNav}>
           <TouchableOpacity style={styles.navItem}>
-            <Feather name="home" size={22} color="#FFFFFF" />
+            <Ionicons name="grid" size={24} color="#0463DD" />
+            <Text style={[styles.navText, styles.navTextActive]}>Home</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.navItem}>
-            <Feather name="plus-square" size={22} color="rgba(255, 255, 255, 0.6)" />
+            <Ionicons name="medical-outline" size={24} color="rgba(15, 23, 42, 0.4)" />
+            <Text style={styles.navText}>Meds</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.navItem}>
-            <Feather name="bar-chart-2" size={22} color="rgba(255, 255, 255, 0.6)" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.navItem}>
-            <Feather name="crosshair" size={22} color="rgba(255, 255, 255, 0.6)" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.navItem}>
-            <View style={styles.navProfileCircle}>
-               <Feather name="user" size={14} color="#0463DD" />
+          
+          <TouchableOpacity style={styles.navFabContainer}>
+            <View style={styles.navFab}>
+              <Ionicons name="add" size={30} color="#FFFFFF" />
             </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.navItem}>
+            <Ionicons name="notifications-outline" size={24} color="rgba(15, 23, 42, 0.4)" />
+            <Text style={styles.navText}>Alerts</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.navItem}>
+            <Ionicons name="person-outline" size={24} color="rgba(15, 23, 42, 0.4)" />
+            <Text style={styles.navText}>Profile</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -268,76 +255,51 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 120,
   },
-  greetingSection: {
+  greetingHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 24,
     paddingTop: 20,
-    marginBottom: 16,
+    marginBottom: 24,
   },
   greetingText: {
     fontFamily: 'Baloo2_700Bold',
-    fontSize: 32, // Upscaled as requested
+    fontSize: 28,
     color: '#0F172A',
   },
-  searchHeader: {
+  monitoringBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 24,
-    marginBottom: 32,
-    gap: 12,
+    backgroundColor: 'rgba(107, 78, 255, 0.08)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    alignSelf: 'flex-start',
+    marginTop: 4,
+    gap: 6,
   },
-  profileCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#0463DD',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  profileInitial: {
-    fontFamily: 'Baloo2_700Bold',
-    fontSize: 16,
-    color: '#FFFFFF',
-  },
-  searchContainer: {
-    flex: 1,
-    height: 48,
-    backgroundColor: '#F3F4F6',
-    borderRadius: 24,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    gap: 8,
-  },
-  searchInput: {
-    flex: 1,
-    fontFamily: 'Baloo2_400Regular',
+  monitoringText: {
+    fontFamily: 'Baloo2_600SemiBold',
     fontSize: 14,
-    color: '#0F172A',
-    padding: 0,
+    color: '#6B4EFF',
   },
-  bellBtn: {
-    width: 48,
-    height: 48,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
+  profileBtn: {
+    width: 54,
+    height: 54,
+    borderRadius: 27,
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 2,
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  bellDot: {
-    position: 'absolute',
-    top: 14,
-    right: 14,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#EF4444',
-    borderWidth: 1.5,
-    borderColor: '#FFFFFF',
+  profileImg: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 27,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -356,50 +318,50 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: 'rgba(4, 9, 33, 0.4)',
   },
-  insightScroll: {
+  insightGrid: {
+    flexDirection: 'row',
+    paddingHorizontal: 24,
+    gap: 16,
     marginBottom: 32,
   },
-  insightScrollContent: {
-    paddingLeft: 24,
-    paddingRight: 12,
-    gap: 16,
-  },
   insightCard: {
-    width: 140,
+    flex: 1,
     height: 160,
     borderRadius: 32,
     padding: 20,
     justifyContent: 'space-between',
-    overflow: 'hidden',
-    position: 'relative',
+    borderWidth: 1,
+    borderColor: 'rgba(4, 99, 221, 0.05)',
+    shadowColor: '#0463DD',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.04,
+    shadowRadius: 15,
+    elevation: 2,
   },
   insightHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
   },
-  insightTitle: {
+  insightCardTitle: {
     fontFamily: 'Baloo2_600SemiBold',
     fontSize: 14,
-    color: 'rgba(15, 23, 42, 0.7)',
+    color: 'rgba(15, 23, 42, 0.5)',
     width: '65%',
   },
   insightIconContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    width: 36,
+    height: 36,
     alignItems: 'center',
     justifyContent: 'center',
   },
   insightBody: {
     gap: 4,
-    zIndex: 2,
   },
   valueRow: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    gap: 2,
+    gap: 4,
   },
   insightValue: {
     fontFamily: 'Baloo2_700Bold',
@@ -408,19 +370,23 @@ const styles = StyleSheet.create({
   },
   insightUnit: {
     fontFamily: 'Baloo2_700Bold',
-    fontSize: 14,
+    fontSize: 16,
     color: '#0F172A',
+    opacity: 0.5,
   },
   insightStatus: {
     fontFamily: 'Baloo2_700Bold',
-    fontSize: 14,
+    fontSize: 11,
     color: '#10B981',
+    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
+    overflow: 'hidden',
+    letterSpacing: 0.5,
   },
   insightPattern: {
-    position: 'absolute',
-    bottom: -20,
-    right: -20,
-    opacity: 0.1,
+    // This was removed as we are going for a cleaner medical look
   },
   medList: {
     paddingHorizontal: 24,
@@ -477,57 +443,77 @@ const styles = StyleSheet.create({
   medAction: {
     padding: 8,
   },
+  navFabContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
+  },
+  navFab: {
+    width: 54,
+    height: 54,
+    borderRadius: 27,
+    backgroundColor: '#0463DD',
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#0463DD',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 8,
+  },
   bottomNavContainer: {
     position: 'absolute',
-    bottom: 30,
+    bottom: 0,
     left: 0,
     right: 0,
-    alignItems: 'center',
+    height: 85,
+    backgroundColor: Platform.OS === 'ios' ? 'transparent' : 'rgba(255, 255, 255, 0.95)',
+    paddingBottom: Platform.OS === 'ios' ? 20 : 0,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.3)',
+    overflow: 'hidden',
   },
-  floatingNav: {
-    width: width * 0.85,
-    height: 64,
-    backgroundColor: '#0463DD', // Primary Blue to match the "John! 🌱" vibe
-    borderRadius: 32,
+  bottomNav: {
+    flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
     paddingHorizontal: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 20 },
-    shadowOpacity: 0.2,
-    shadowRadius: 30,
-    elevation: 15,
   },
   navItem: {
-    width: 44,
-    height: 44,
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 4,
+    flex: 1,
   },
-  navProfileCircle: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: '#FFFFFF',
-    alignItems: 'center',
-    justifyContent: 'center',
+  navText: {
+    fontFamily: 'Baloo2_600SemiBold',
+    fontSize: 12,
+    color: 'rgba(15, 23, 42, 0.4)',
+  },
+  navTextActive: {
+    color: '#0463DD',
   },
   dateText: {
-    fontFamily: 'Baloo2_400Regular',
-    fontSize: 16,
-    color: 'rgba(15, 23, 42, 0.6)',
+    // Obsolete
   },
   alertsBanner: {
-    backgroundColor: 'rgba(239, 68, 68, 0.05)',
+    backgroundColor: '#FFFFFF',
     marginHorizontal: 24,
-    borderRadius: 32,
-    padding: 24,
+    borderRadius: 20,
+    padding: 20,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    borderWidth: 1,
-    borderColor: 'rgba(239, 68, 68, 0.1)',
+    borderLeftWidth: 6,
+    borderLeftColor: '#EF4444',
+    shadowColor: '#EF4444',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.08,
+    shadowRadius: 20,
+    elevation: 4,
     marginBottom: 32,
   },
   alertsLeft: {
@@ -563,13 +549,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(16, 185, 129, 0.1)',
   },
   medIndexPending: {
-    backgroundColor: 'rgba(107, 78, 255, 0.1)',
+    backgroundColor: 'rgba(4, 99, 221, 0.1)',
   },
   medIndexTextTaken: {
-    color: '#10B981',
+    color: '#059669',
   },
   medIndexTextPending: {
-    color: '#6B4EFF',
+    color: '#0463DD',
   },
   medSubtitle: {
     fontFamily: 'Baloo2_400Regular',
@@ -583,20 +569,25 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   statusBadgeTaken: {
-    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    backgroundColor: 'rgba(5, 150, 105, 0.06)',
+    borderWidth: 1,
+    borderColor: 'rgba(5, 150, 105, 0.1)',
   },
   statusBadgePending: {
-    backgroundColor: 'rgba(107, 78, 255, 0.1)',
+    backgroundColor: 'rgba(4, 99, 221, 0.06)',
+    borderWidth: 1,
+    borderColor: 'rgba(4, 99, 221, 0.1)',
   },
   statusBadgeText: {
     fontFamily: 'Baloo2_700Bold',
-    fontSize: 12,
+    fontSize: 11,
     textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   statusBadgeTextTaken: {
-    color: '#10B981',
+    color: '#059669', // Emerald Green
   },
   statusBadgeTextPending: {
-    color: '#6B4EFF',
+    color: '#0463DD', // Noosi Blue
   },
 });
