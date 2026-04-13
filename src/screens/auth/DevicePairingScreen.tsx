@@ -22,6 +22,7 @@ export default function DevicePairingScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const [deviceId, setDeviceId] = useState('');
   const [scanned, setScanned] = useState(false);
+  const [cameraReady, setCameraReady] = useState(false);
   const [permission, requestPermission] = useCameraPermissions();
 
   // Animations
@@ -109,22 +110,22 @@ export default function DevicePairingScreen() {
             <View style={styles.navPlaceholder} />
           </View>
 
-          {/* Header Section */}
-          <View style={styles.header}>
-            <View style={styles.headerIconContainer}>
-              <Feather name="smartphone" size={32} color="#0463DD" />
+          {/* Main Content (Centered) */}
+          <View style={styles.mainContent}>
+            {/* Header Section */}
+            <View style={styles.header}>
+              <Text style={styles.title}>Pair Your Device</Text>
+              <Text style={styles.subtitle}>
+                Scan the QR code on your Noosi device or enter the ID manually to connect.
+              </Text>
             </View>
-            <Text style={styles.title}>Pair Your Device</Text>
-            <Text style={styles.subtitle}>
-              Scan the QR code on your Noosi device or enter the ID manually to connect.
-            </Text>
-          </View>
 
-          {/* QR Scanner Mock */}
+            {/* QR Scanner */}
             <View style={styles.scannerContainer}>
               {permission.granted ? (
                 <CameraView
-                  style={StyleSheet.absoluteFillObject}
+                  style={[StyleSheet.absoluteFillObject, { opacity: cameraReady ? 1 : 0 }]}
+                  onCameraReady={() => setCameraReady(true)}
                   onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
                   barcodeScannerSettings={{
                     barcodeTypes: ['qr'],
@@ -148,30 +149,25 @@ export default function DevicePairingScreen() {
 
               {/* Scan Line */}
               <Animated.View style={[styles.scanLine, { transform: [{ translateY }] }]} />
-              
-              {!permission.granted && (
-                <View style={styles.scannerPlaceholder}>
-                  <Feather name="maximize" size={120} color="rgba(4, 99, 221, 0.12)" />
-                </View>
-              )}
             </View>
 
-          {/* Manual Input Section */}
-          <View style={styles.manualInputSection}>
-            <View style={styles.divider}>
-              <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>OR</Text>
-              <View style={styles.dividerLine} />
-            </View>
+            {/* Manual Input Section */}
+            <View style={styles.manualInputSection}>
+              <View style={styles.divider}>
+                <View style={styles.dividerLine} />
+                <Text style={styles.dividerText}>OR</Text>
+                <View style={styles.dividerLine} />
+              </View>
 
-            <Input
-              label="Device ID"
-              placeholder="Enter 8-digit device ID"
-              value={deviceId}
-              onChangeText={setDeviceId}
-              keyboardType="number-pad"
-              autoCapitalize="characters"
-            />
+              <Input
+                label="Device ID"
+                placeholder="Enter 8-digit device ID"
+                value={deviceId}
+                onChangeText={setDeviceId}
+                keyboardType="number-pad"
+                autoCapitalize="characters"
+              />
+            </View>
           </View>
         </ScrollView>
 
@@ -217,7 +213,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 60,
     paddingBottom: 40,
+  },
+  mainContent: {
+    flex: 1,
     alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
   },
   header: {
     alignItems: 'center',
@@ -244,15 +245,6 @@ const styles = StyleSheet.create({
   navPlaceholder: {
     width: 42,
     height: 42,
-  },
-  headerIconContainer: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: '#F0F7FF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 24,
   },
   title: {
     fontFamily: 'Baloo2_700Bold',
@@ -286,12 +278,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
-  },
-  scannerPlaceholder: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    opacity: 0.5,
   },
   scanLine: {
     position: 'absolute',
