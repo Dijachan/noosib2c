@@ -12,9 +12,11 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useMedication } from '../../../context/MedicationContext';
 
 export default function ReviewSyncScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
+  const { addMedication } = useMedication();
   const route = useRoute<any>();
   const { finalData } = route.params || { 
     finalData: { 
@@ -37,6 +39,13 @@ export default function ReviewSyncScreen() {
     setTimeout(() => {
       setIsSyncing(false);
       setIsSuccess(true);
+      
+      // Save to global state
+      addMedication({
+        id: Math.random().toString(36).substr(2, 9),
+        ...finalData,
+        status: 'Pending'
+      });
     }, 2500);
   };
 

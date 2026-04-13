@@ -17,22 +17,23 @@ import { BlurView } from 'expo-blur';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import BottomNav from '../../components/navigation/BottomNav';
+import { useMedication } from '../../context/MedicationContext';
 
 const { width } = Dimensions.get('window');
 
 // Health Insight Card Component
-const InsightCard = ({ 
-  title, 
-  value, 
-  unit, 
-  icon, 
-  color, 
-  status 
-}: { 
-  title: string; 
-  value: string; 
-  unit: string; 
-  icon: string; 
+const InsightCard = ({
+  title,
+  value,
+  unit,
+  icon,
+  color,
+  status
+}: {
+  title: string;
+  value: string;
+  unit: string;
+  icon: string;
   color: string;
   status: string;
 }) => {
@@ -56,22 +57,22 @@ const InsightCard = ({
 };
 
 // Medication Card Component
-const MedicationCard = ({ 
+const MedicationCard = ({
   index,
   title,
   subtitle,
   dispenser,
   caregiver,
-  date, 
+  date,
   time,
-  status 
-}: { 
-  index: number; 
-  title: string; 
+  status
+}: {
+  index: number;
+  title: string;
   subtitle: string;
-  dispenser: string; 
-  caregiver: string; 
-  date: string; 
+  dispenser: string;
+  caregiver: string;
+  date: string;
   time: string;
   status: 'Taken' | 'Pending';
 }) => {
@@ -86,6 +87,10 @@ const MedicationCard = ({
         <Text style={styles.medTitle}>{title}</Text>
         <Text style={styles.medSubtitle}>{subtitle}</Text>
         <View style={styles.medMetaRows}>
+          <View style={styles.metaRow}>
+            <Ionicons name="calendar-outline" size={14} color="#0463DD" />
+            <Text style={styles.metaText}>{date} • {time}</Text>
+          </View>
           <View style={styles.metaRow}>
             <Ionicons name="cube-outline" size={14} color="#F59E0B" />
             <Text style={styles.metaText}>{dispenser}</Text>
@@ -103,36 +108,31 @@ const MedicationCard = ({
 
 export default function HomeScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
+  const { medications } = useMedication();
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
-      
+
       <SafeAreaView style={styles.safeArea}>
-        <ScrollView 
-          style={styles.scrollView} 
+        <ScrollView
+          style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          {/* Top Greeting & Monitoring Badge */}
-          <View style={styles.greetingHeader}>
+          <View style={{ paddingHorizontal: 24, paddingTop: 20, marginBottom: 24 }}>
             <View>
-              <Text style={styles.greetingText}>Good morning, John! 🌱</Text>
+              <Text style={styles.greetingText}>Good morning! 🌱</Text>
               <View style={styles.monitoringBadge}>
-                <Image 
-                  source={{ uri: 'https://images.unsplash.com/photo-1512316609839-ce289d3eba0a?auto=format&fit=crop&q=80&w=100' }} 
-                  style={styles.patientAvatar} 
+                <Image
+                  source={{ uri: 'https://images.unsplash.com/photo-1512316609839-ce289d3eba0a?auto=format&fit=crop&q=80&w=100' }}
+                  style={styles.patientAvatar}
                 />
                 <Text style={styles.monitoringText}>Caring for Mummy K ❤️</Text>
               </View>
             </View>
-            <TouchableOpacity style={styles.profileBtn}>
-               <Image 
-                 source={{ uri: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=100' }} 
-                 style={styles.profileImg} 
-               />
-            </TouchableOpacity>
           </View>
+          {/* Profile btn removed per request */}
 
           {/* Health Insights Section */}
           <View style={styles.sectionHeader}>
@@ -140,19 +140,19 @@ export default function HomeScreen() {
           </View>
 
           <View style={styles.insightGrid}>
-            <InsightCard 
-              title="Daily Adherence" 
-              value="98" 
-              unit="%" 
-              icon="checkmark-circle-outline" 
+            <InsightCard
+              title="Daily Adherence"
+              value="98"
+              unit="%"
+              icon="checkmark-circle-outline"
               color="#F5F3FF" // Pastel Purple
               status="Optimal"
             />
-            <InsightCard 
-              title="Body Temp" 
-              value="36.8" 
-              unit="°C" 
-              icon="thermometer-outline" 
+            <InsightCard
+              title="Body Temp"
+              value="36.8"
+              unit="°C"
+              icon="thermometer-outline"
               color="#EBF5FF" // Pastel Blue
               status="Normal"
             />
@@ -184,26 +184,23 @@ export default function HomeScreen() {
           </View>
 
           <View style={styles.medList}>
-            <MedicationCard 
-              index={1}
-              title="Morning Dose (8:00 AM)"
-              subtitle="Metformin 500mg"
-              dispenser="Dispenser 1"
-              caregiver="By nurse kiki"
-              date="May 24th"
-              time="08:00"
-              status="Taken"
-            />
-            <MedicationCard 
-              index={2}
-              title="Afternoon Dose (1:00 PM)"
-              subtitle="Lisinopril 10mg"
-              dispenser="Dispenser 2"
-              caregiver="By caregiver"
-              date="May 24th"
-              time="13:00"
-              status="Pending"
-            />
+            {medications.length > 0 ? medications.map((med, idx) => (
+              <MedicationCard
+                key={med.id}
+                index={idx + 1}
+                title={med.name}
+                subtitle={`${med.dosage} • ${med.time}`}
+                dispenser={`Slot ${med.slot}`}
+                caregiver="By Noosi"
+                date="Today"
+                time={med.time}
+                status={med.status === 'Taken' ? 'Taken' : 'Pending'}
+              />
+            )) : (
+              <View style={styles.emptySchedule}>
+                <Text style={styles.emptyScheduleText}>No medications scheduled for today.</Text>
+              </View>
+            )}
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -554,5 +551,19 @@ const styles = StyleSheet.create({
   },
   statusBadgeTextPending: {
     color: '#0463DD', // Noosi Blue
+  },
+  emptySchedule: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 32,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.03)',
+  },
+  emptyScheduleText: {
+    fontFamily: 'Baloo2_500Medium',
+    fontSize: 14,
+    color: '#94A3B8',
   },
 });

@@ -23,6 +23,7 @@ import DrugDetailScreen from './src/screens/medications/add/DrugDetailScreen';
 import SlotMappingScreen from './src/screens/medications/add/SlotMappingScreen';
 import ScheduleScreen from './src/screens/medications/add/ScheduleScreen';
 import ReviewSyncScreen from './src/screens/medications/add/ReviewSyncScreen';
+import { MedicationProvider } from './src/context/MedicationContext';
 
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -50,28 +51,30 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Splash1" component={Splash1Screen} />
-        <Stack.Screen name="Splash2" component={Splash2Screen} />
-        <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-        <Stack.Screen name="SignUp" component={SignUpScreen} />
-        <Stack.Screen name="CreatePatientProfile" component={CreatePatientProfileScreen} />
-        <Stack.Screen name="SignIn" component={SignInScreen} />
-        <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
-        <Stack.Screen name="VerifyCode" component={VerifyCodeScreen} />
-        <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
-        <Stack.Screen name="ResetSuccess" component={ResetSuccessScreen} />
-        <Stack.Screen name="Consent" component={ConsentScreen} />
-        <Stack.Screen name="DevicePairing" component={DevicePairingScreen} />
-        <Stack.Screen name="Home" component={HomeScreen} options={{ animation: 'none' }} />
-        <Stack.Screen name="MedsTray" component={MedsTrayScreen} options={{ animation: 'none' }} />
-        <Stack.Screen name="SearchDrug" component={SearchDrugScreen} />
-        <Stack.Screen name="DrugDetail" component={DrugDetailScreen} />
-        <Stack.Screen name="SlotMapping" component={SlotMappingScreen} />
-        <Stack.Screen name="Schedule" component={ScheduleScreen} />
-        <Stack.Screen name="ReviewSync" component={ReviewSyncScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <MedicationProvider>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Splash1" component={Splash1Screen} />
+          <Stack.Screen name="Splash2" component={Splash2Screen} />
+          <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+          <Stack.Screen name="SignUp" component={SignUpScreen} />
+          <Stack.Screen name="CreatePatientProfile" component={CreatePatientProfileScreen} />
+          <Stack.Screen name="SignIn" component={SignInScreen} />
+          <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+          <Stack.Screen name="VerifyCode" component={VerifyCodeScreen} />
+          <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
+          <Stack.Screen name="ResetSuccess" component={ResetSuccessScreen} />
+          <Stack.Screen name="Consent" component={ConsentScreen} />
+          <Stack.Screen name="DevicePairing" component={DevicePairingScreen} />
+          <Stack.Screen name="Home" component={HomeScreen} options={{ animation: 'none' }} />
+          <Stack.Screen name="MedsTray" component={MedsTrayScreen} options={{ animation: 'none' }} />
+          <Stack.Screen name="SearchDrug" component={SearchDrugScreen} />
+          <Stack.Screen name="DrugDetail" component={DrugDetailScreen} />
+          <Stack.Screen name="SlotMapping" component={SlotMappingScreen} />
+          <Stack.Screen name="Schedule" component={ScheduleScreen} />
+          <Stack.Screen name="ReviewSync" component={ReviewSyncScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </MedicationProvider>
   );
 }

@@ -22,7 +22,7 @@ export default function SlotMappingScreen() {
 
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
 
-  // Mock occupied slots (1, 2, 4, 8, 9 are taken based on SmartTrayScreen mock)
+  // Mock occupied slots (1, 2, 4, 8, 9 are taken based on MedsTrayScreen mock)
   const occupiedSlots = [1, 2, 4, 8, 9];
 
   const renderSlot = (id: number) => {
@@ -73,7 +73,11 @@ export default function SlotMappingScreen() {
         </Text>
 
         <View style={styles.grid}>
-          {Array.from({ length: 14 }, (_, i) => renderSlot(i + 1))}
+          {Array.from({ length: 12 }, (_, i) => renderSlot(i + 1))}
+          <View style={styles.flushRow}>
+             {renderSlot(13)}
+             {renderSlot(14)}
+          </View>
         </View>
 
         <View style={styles.legend}>
@@ -163,7 +167,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   slot: {
-    width: (width - 48 - 32) / 3, // 3 columns for easier selection
+    width: (width - 48 - 16) / 2, // 2 columns for 2x7 grid
     height: 100,
     borderRadius: 20,
     backgroundColor: '#F8FAFC',
@@ -243,5 +247,12 @@ const styles = StyleSheet.create({
     fontFamily: 'Baloo2_700Bold',
     fontSize: 16,
     color: '#FFFFFF',
+  },
+  flushRow: {
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'center',
+    gap: 0,
+    marginTop: 0,
   },
 });

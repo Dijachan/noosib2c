@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import BottomNav from '../../components/navigation/BottomNav';
+import { useMedication } from '../../context/MedicationContext';
 
 const { width } = Dimensions.get('window');
 
@@ -21,12 +22,14 @@ const TraySlotBox = ({
   id, 
   status, 
   medName, 
-  time 
+  time, 
+  onPress
 }: { 
   id: number; 
   status: 'Empty' | 'Occupied' | 'Missed' | 'Next'; 
   medName?: string;
   time?: string;
+  onPress?: () => void;
 }) => {
   const getStatusColors = () => {
     switch (status) {
@@ -41,6 +44,7 @@ const TraySlotBox = ({
 
   return (
     <TouchableOpacity 
+      onPress={onPress}
       style={[
         styles.slotBox, 
         { backgroundColor: colors.bg, borderColor: colors.border },
@@ -74,6 +78,14 @@ const TraySlotBox = ({
 
 export default function MedsTrayScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
+  const { getSlotStatus, getMedicationBySlot } = useMedication();
+
+  const handleSlotPress = (slotId: number) => {
+    const status = getSlotStatus(slotId);
+    if (status === 'Empty') {
+      navigation.navigate('SearchDrug', { slot: slotId });
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -104,11 +116,16 @@ export default function MedsTrayScreen() {
                 <Text style={styles.heroSubtitle}>She's on track with 4 doses today!</Text>
               </View>
             </View>
-            <View style={styles.progressContainer}>
-               <View style={styles.progressBar}>
+            <View style={styles.progressSection}>
+              <View style={styles.progressLeft}>
+                <Text style={styles.progressCount}>10/14</Text>
+                <Text style={styles.progressLabel}>Filled Slots</Text>
+              </View>
+              <View style={styles.progressBarWrapper}>
+                <View style={styles.progressBar}>
                   <View style={[styles.progressFill, { width: '70%' }]} />
-               </View>
-               <Text style={styles.progressText}>10/14 Filled Slots</Text>
+                </View>
+              </View>
             </View>
           </View>
 
@@ -119,14 +136,21 @@ export default function MedsTrayScreen() {
           </View>
 
           <View style={styles.trayGrid}>
-            <TraySlotBox id={1} status="Occupied" medName="Metformin" time="08:00 AM" />
-            <TraySlotBox id={2} status="Occupied" medName="Lisinopril" time="01:00 PM" />
-            <TraySlotBox id={3} status="Next" medName="Vitamin C" time="08:00 PM" />
-            <TraySlotBox id={4} status="Missed" medName="Aspirin" time="12:00 PM" />
-            
-            {Array.from({ length: 10 }, (_, i) => (
-              <TraySlotBox key={i + 5} id={i + 5} status="Empty" />
-            ))}
+            {Array.from({ length: 14 }, (_, i) => {
+              const slotId = i + 1;
+              const status = getSlotStatus(slotId);
+              const med = getMedicationBySlot(slotId);
+              return (
+                <TraySlotBox 
+                  key={slotId} 
+                  id={slotId} 
+                  status={status} 
+                  medName={med?.name} 
+                  time={med?.time}
+                  onPress={() => handleSlotPress(slotId)}
+                />
+              );
+            })}
           </View>
 
           {/* Recent Activity Timeline */}
@@ -240,25 +264,42 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: 'rgba(255, 255, 255, 0.8)',
   },
-  progressContainer: {
-    gap: 10,
+  progressSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  progressLeft: {
+    // Aligns visually with the heart icon above
+    width: 64, 
+    alignItems: 'center',
+  },
+  progressCount: {
+    fontFamily: 'Baloo2_800ExtraBold',
+    fontSize: 14,
+    color: '#FFFFFF',
+    lineHeight: 18,
+  },
+  progressLabel: {
+    fontFamily: 'Baloo2_600SemiBold',
+    fontSize: 8,
+    color: 'rgba(255, 255, 255, 0.6)',
+    textTransform: 'uppercase',
+  },
+  progressBarWrapper: {
+    flex: 1,
+    paddingRight: 8,
   },
   progressBar: {
-    height: 8,
+    height: 10,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 4,
+    borderRadius: 5,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
     backgroundColor: '#FFFFFF',
-    borderRadius: 4,
-  },
-  progressText: {
-    fontFamily: 'Baloo2_600SemiBold',
-    fontSize: 12,
-    color: '#FFFFFF',
-    textAlign: 'right',
+    borderRadius: 5,
   },
   sectionHeader: {
     paddingHorizontal: 24,
