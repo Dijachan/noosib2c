@@ -8,21 +8,20 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Image,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Input from '../../components/inputs/Input';
 
-export default function SignUpScreen() {
+export default function ResetPasswordScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const [form, setForm] = useState({
-    fullName: '',
-    email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
   });
+
+  const isFormValid = form.password.length > 0 && form.confirmPassword.length > 0;
 
   const handleChange = (field: keyof typeof form, value: string) => {
     setForm(prev => ({ ...prev, [field]: value }));
@@ -40,41 +39,30 @@ export default function SignUpScreen() {
           showsVerticalScrollIndicator={false}
           bounces={false}
         >
+          {/* Custom Navigation Bar */}
+          <View style={styles.navBar}>
+            <TouchableOpacity 
+              style={styles.backButton} 
+              onPress={() => navigation.goBack()}
+            >
+              <Feather name="arrow-left" size={20} color="rgba(4,9,33,0.76)" />
+            </TouchableOpacity>
+            <Text style={styles.navTitle}>Reset Password</Text>
+            <View style={styles.navPlaceholder} />
+          </View>
+
           {/* Header Section */}
           <View style={styles.header}>
-            <Image 
-              source={require('../../../assets/logomark-colored 2 2.png')} 
-              style={styles.logo} 
-              resizeMode="contain"
-            />
-            <Text style={styles.title}>Join as Caregiver</Text>
+            <Text style={styles.title}>New Password</Text>
             <Text style={styles.subtitle}>
-              Create your account to manage your loved one's health and coordinate care seamlessly.
+              Type your new password below.
             </Text>
           </View>
 
           {/* Form Fields */}
           <View style={styles.formContainer}>
             <Input 
-              label="Full Name"
-              placeholder="Enter your full name"
-              autoCapitalize="words"
-              value={form.fullName}
-              onChangeText={(text) => handleChange('fullName', text)}
-            />
-
-            <Input 
-              label="Email Address"
-              icon="mail"
-              placeholder="Enter your email address"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              value={form.email}
-              onChangeText={(text) => handleChange('email', text)}
-            />
-
-            <Input 
-              label="Password"
+              label="New Password"
               placeholder="xxxxxxxxxxx"
               isPassword
               value={form.password}
@@ -82,7 +70,7 @@ export default function SignUpScreen() {
             />
 
             <Input 
-              label="Confirm Password"
+              label="Confirm New Password"
               placeholder="xxxxxxxxxxx"
               isPassword
               value={form.confirmPassword}
@@ -91,22 +79,16 @@ export default function SignUpScreen() {
           </View>
         </ScrollView>
 
-        {/* Sign Up Button (Fixed at bottom) */}
+        {/* Action Button (Fixed at bottom) */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity 
-            style={styles.primaryButton}
-            onPress={() => navigation.navigate('CreatePatientProfile')}
+            style={[styles.primaryButton, !isFormValid && styles.disabledButton]}
+            disabled={!isFormValid}
+            onPress={() => navigation.navigate('ResetSuccess')}
           >
-            <Text style={styles.buttonText}>Sign Up</Text>
-            <Feather name="arrow-right" size={20} color="#FFFFFF" strokeWidth={3} />
+            <Text style={[styles.buttonText, !isFormValid && styles.disabledButtonText]}>Reset Password</Text>
+            <Feather name="arrow-right" size={20} color={isFormValid ? "#FFFFFF" : "#9CA3AF"} strokeWidth={3} />
           </TouchableOpacity>
-
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>Already have an account? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('SignIn')}>
-              <Text style={styles.footerLink}>Sign In</Text>
-            </TouchableOpacity>
-          </View>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -127,20 +109,39 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: 16,
-    paddingTop: 60,
+    paddingTop: 20,
     paddingBottom: 120,
+  },
+  navBar: {
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 40,
+    paddingHorizontal: 16,
+    width: '100%',
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  navTitle: {
+    fontFamily: 'Baloo2_700Bold',
+    fontSize: 20,
+    color: 'rgba(4,9,33,0.76)',
+  },
+  navPlaceholder: {
+    width: 40,
+    height: 40,
   },
   header: {
-    alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 32,
+    paddingHorizontal: 16,
     width: '100%',
-    maxWidth: 361,
-  },
-  logo: {
-    width: 64,
-    height: 64,
-    marginBottom: 24,
   },
   title: {
     fontFamily: 'Baloo2_700Bold',
@@ -148,20 +149,16 @@ const styles = StyleSheet.create({
     lineHeight: 40,
     color: 'rgba(4,9,33,0.76)',
     marginBottom: 8,
-    textAlign: 'center',
   },
   subtitle: {
     fontFamily: 'Baloo2_400Regular',
     fontSize: 16,
     lineHeight: 24,
     color: 'rgba(4,9,33,0.76)',
-    textAlign: 'center',
-    paddingHorizontal: 20,
   },
   formContainer: {
     width: '100%',
-    maxWidth: 361,
-    gap: 16,
+    paddingHorizontal: 16,
     marginBottom: 20,
   },
   buttonContainer: {
@@ -183,25 +180,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 12,
   },
+  disabledButton: {
+    backgroundColor: '#E5E7EB',
+  },
   buttonText: {
     fontFamily: 'Baloo2_700Bold',
     fontSize: 20,
     color: '#FFFFFF',
   },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  footerText: {
-    fontFamily: 'Baloo2_400Regular',
-    fontSize: 16,
-    color: 'rgba(4,9,33,0.76)',
-  },
-  footerLink: {
-    fontFamily: 'Baloo2_600SemiBold',
-    fontSize: 16,
-    color: '#0463DD',
-    textDecorationLine: 'underline',
+  disabledButtonText: {
+    color: '#9CA3AF',
   },
 });

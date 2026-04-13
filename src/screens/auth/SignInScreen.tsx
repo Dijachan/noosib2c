@@ -15,14 +15,14 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Input from '../../components/inputs/Input';
 
-export default function SignUpScreen() {
+export default function SignInScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const [form, setForm] = useState({
-    fullName: '',
     email: '',
     password: '',
-    confirmPassword: ''
   });
+
+  const isFormValid = form.email.length > 0 && form.password.length > 0;
 
   const handleChange = (field: keyof typeof form, value: string) => {
     setForm(prev => ({ ...prev, [field]: value }));
@@ -47,22 +47,14 @@ export default function SignUpScreen() {
               style={styles.logo} 
               resizeMode="contain"
             />
-            <Text style={styles.title}>Join as Caregiver</Text>
+            <Text style={styles.title}>Welcome Back!</Text>
             <Text style={styles.subtitle}>
-              Create your account to manage your loved one's health and coordinate care seamlessly.
+              Log in to continue your health journey.
             </Text>
           </View>
 
           {/* Form Fields */}
           <View style={styles.formContainer}>
-            <Input 
-              label="Full Name"
-              placeholder="Enter your full name"
-              autoCapitalize="words"
-              value={form.fullName}
-              onChangeText={(text) => handleChange('fullName', text)}
-            />
-
             <Input 
               label="Email Address"
               icon="mail"
@@ -80,31 +72,30 @@ export default function SignUpScreen() {
               value={form.password}
               onChangeText={(text) => handleChange('password', text)}
             />
-
-            <Input 
-              label="Confirm Password"
-              placeholder="xxxxxxxxxxx"
-              isPassword
-              value={form.confirmPassword}
-              onChangeText={(text) => handleChange('confirmPassword', text)}
-            />
           </View>
         </ScrollView>
 
-        {/* Sign Up Button (Fixed at bottom) */}
+        {/* Sign In Button (Fixed at bottom) */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity 
-            style={styles.primaryButton}
-            onPress={() => navigation.navigate('CreatePatientProfile')}
+            style={[styles.primaryButton, !isFormValid && styles.disabledButton]}
+            disabled={!isFormValid}
+            onPress={() => console.log('Log User In:', form)}
           >
-            <Text style={styles.buttonText}>Sign Up</Text>
-            <Feather name="arrow-right" size={20} color="#FFFFFF" strokeWidth={3} />
+            <Text style={[styles.buttonText, !isFormValid && styles.disabledButtonText]}>Sign In</Text>
+            <Feather name="arrow-right" size={20} color={isFormValid ? "#FFFFFF" : "#9CA3AF"} strokeWidth={3} />
           </TouchableOpacity>
 
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>Already have an account? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('SignIn')}>
-              <Text style={styles.footerLink}>Sign In</Text>
+          <View style={styles.footerContainer}>
+            <View style={styles.footer}>
+              <Text style={styles.footerText}>Don't have an account? </Text>
+              <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+                <Text style={styles.footerLinkDark}>Sign Up</Text>
+              </TouchableOpacity>
+            </View>
+            
+            <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')} style={styles.forgotPassword}>
+              <Text style={styles.footerLinkBlue}>Forgot your password?</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -183,10 +174,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 12,
   },
+  disabledButton: {
+    backgroundColor: '#E5E7EB',
+  },
   buttonText: {
     fontFamily: 'Baloo2_700Bold',
     fontSize: 20,
     color: '#FFFFFF',
+  },
+  disabledButtonText: {
+    color: '#9CA3AF',
+  },
+  footerContainer: {
+    alignItems: 'center',
+    gap: 16,
   },
   footer: {
     flexDirection: 'row',
@@ -198,10 +199,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'rgba(4,9,33,0.76)',
   },
-  footerLink: {
+  footerLinkDark: {
+    fontFamily: 'Baloo2_600SemiBold',
+    fontSize: 16,
+    color: 'rgba(4,9,33,0.76)',
+    textDecorationLine: 'underline',
+  },
+  forgotPassword: {
+    paddingVertical: 8,
+  },
+  footerLinkBlue: {
     fontFamily: 'Baloo2_600SemiBold',
     fontSize: 16,
     color: '#0463DD',
-    textDecorationLine: 'underline',
   },
 });
