@@ -17,6 +17,12 @@ import ResetSuccessScreen from './src/screens/auth/ResetSuccessScreen';
 import ConsentScreen from './src/screens/auth/ConsentScreen';
 import DevicePairingScreen from './src/screens/auth/DevicePairingScreen';
 import HomeScreen from './src/screens/home/HomeScreen';
+import MedsTrayScreen from './src/screens/medications/MedsTrayScreen';
+import SearchDrugScreen from './src/screens/medications/add/SearchDrugScreen';
+import DrugDetailScreen from './src/screens/medications/add/DrugDetailScreen';
+import SlotMappingScreen from './src/screens/medications/add/SlotMappingScreen';
+import ScheduleScreen from './src/screens/medications/add/ScheduleScreen';
+import ReviewSyncScreen from './src/screens/medications/add/ReviewSyncScreen';
 
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -59,6 +65,12 @@ export default function App() {
         <Stack.Screen name="Consent" component={ConsentScreen} />
         <Stack.Screen name="DevicePairing" component={DevicePairingScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="MedsTray" component={MedsTrayScreen} />
+        <Stack.Screen name="SearchDrug" component={SearchDrugScreen} />
+        <Stack.Screen name="DrugDetail" component={DrugDetailScreen} />
+        <Stack.Screen name="SlotMapping" component={SlotMappingScreen} />
+        <Stack.Screen name="Schedule" component={ScheduleScreen} />
+        <Stack.Screen name="ReviewSync" component={ReviewSyncScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

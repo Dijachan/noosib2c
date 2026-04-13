@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import BottomNav from '../../components/navigation/BottomNav';
 
 const { width } = Dimensions.get('window');
 
@@ -207,39 +208,7 @@ export default function HomeScreen() {
         </ScrollView>
       </SafeAreaView>
 
-      {/* Modern Bottom Navigation with Glass Effect */}
-      <View style={styles.bottomNavContainer}>
-        <BlurView 
-          intensity={Platform.OS === 'ios' ? 80 : 100} 
-          tint="light" 
-          style={StyleSheet.absoluteFill} 
-        />
-        <View style={styles.bottomNav}>
-          <TouchableOpacity style={styles.navItem}>
-            <Ionicons name="grid" size={24} color="#0463DD" />
-            <Text style={[styles.navText, styles.navTextActive]}>Home</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.navItem}>
-            <Ionicons name="medical-outline" size={24} color="rgba(15, 23, 42, 0.4)" />
-            <Text style={styles.navText}>Meds</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.navFabContainer}>
-            <View style={styles.navFab}>
-              <Ionicons name="add" size={30} color="#FFFFFF" />
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.navItem}>
-            <Ionicons name="notifications-outline" size={24} color="rgba(15, 23, 42, 0.4)" />
-            <Text style={styles.navText}>Alerts</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.navItem}>
-            <Ionicons name="person-outline" size={24} color="rgba(15, 23, 42, 0.4)" />
-            <Text style={styles.navText}>Profile</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+      <BottomNav activeTab="Home" />
     </View>
   );
 }
