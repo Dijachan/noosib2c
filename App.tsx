@@ -1,6 +1,8 @@
-import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import * as SplashScreen from 'expo-splash-screen';
+import { useFonts, Baloo2_400Regular, Baloo2_500Medium, Baloo2_600SemiBold, Baloo2_700Bold, Baloo2_800ExtraBold } from '@expo-google-fonts/baloo-2';
+import { useEffect } from 'react';
 
 import Splash1Screen from './src/screens/auth/Splash1Screen';
 import Splash2Screen from './src/screens/auth/Splash2Screen';
@@ -14,10 +16,33 @@ import ResetPasswordScreen from './src/screens/auth/ResetPasswordScreen';
 import ResetSuccessScreen from './src/screens/auth/ResetSuccessScreen';
 import ConsentScreen from './src/screens/auth/ConsentScreen';
 import DevicePairingScreen from './src/screens/auth/DevicePairingScreen';
+import HomeScreen from './src/screens/home/HomeScreen';
+
+
+// Prevent the splash screen from auto-hiding before asset loading is complete.
+SplashScreen.preventAutoHideAsync();
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  const [fontsLoaded, fontError] = useFonts({
+    Baloo2_400Regular,
+    Baloo2_500Medium,
+    Baloo2_600SemiBold,
+    Baloo2_700Bold,
+    Baloo2_800ExtraBold,
+  });
+
+  useEffect(() => {
+    if (fontsLoaded || fontError) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded, fontError]);
+
+  if (!fontsLoaded && !fontError) {
+    return null;
+  }
+
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -33,6 +58,7 @@ export default function App() {
         <Stack.Screen name="ResetSuccess" component={ResetSuccessScreen} />
         <Stack.Screen name="Consent" component={ConsentScreen} />
         <Stack.Screen name="DevicePairing" component={DevicePairingScreen} />
+        <Stack.Screen name="Home" component={HomeScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

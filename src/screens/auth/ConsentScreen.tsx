@@ -243,14 +243,14 @@ const styles = StyleSheet.create({
   },
   auditTitle: {
     fontFamily: 'Baloo2_700Bold',
-    fontSize: 10,
+    fontSize: 14,
     color: 'rgba(4,9,33,0.76)',
     letterSpacing: 1,
     marginBottom: 4,
   },
   auditText: {
     fontFamily: 'Baloo2_400Regular',
-    fontSize: 10,
+    fontSize: 14,
     color: 'rgba(4,9,33,0.5)',
     lineHeight: 14,
   },

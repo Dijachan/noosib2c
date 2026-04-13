@@ -176,7 +176,7 @@ export default function DevicePairingScreen() {
           <TouchableOpacity
             style={[styles.primaryButton, !deviceId && styles.disabledButton]}
             disabled={!deviceId}
-            onPress={() => console.log('Connect to Device:', deviceId)}
+            onPress={() => navigation.navigate('Home')}
           >
             <Text style={styles.buttonText}>Continue</Text>
             <Feather name="arrow-right" size={20} color="#FFFFFF" />
