@@ -118,8 +118,11 @@ export default function HomeScreen() {
             <View>
               <Text style={styles.greetingText}>Good morning, John! 🌱</Text>
               <View style={styles.monitoringBadge}>
-                <Ionicons name="eye-outline" size={14} color="#6B4EFF" />
-                <Text style={styles.monitoringText}>Caring for Khadijah</Text>
+                <Image 
+                  source={{ uri: 'https://images.unsplash.com/photo-1512316609839-ce289d3eba0a?auto=format&fit=crop&q=80&w=100' }} 
+                  style={styles.patientAvatar} 
+                />
+                <Text style={styles.monitoringText}>Caring for Mummy K ❤️</Text>
               </View>
             </View>
             <TouchableOpacity style={styles.profileBtn}>
@@ -271,18 +274,31 @@ const styles = StyleSheet.create({
   monitoringBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(107, 78, 255, 0.08)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 24,
     alignSelf: 'flex-start',
-    marginTop: 4,
-    gap: 6,
+    marginTop: 8,
+    gap: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.02,
+    shadowRadius: 15,
+    elevation: 2,
+  },
+  patientAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderColor: 'rgba(4, 99, 221, 0.1)',
   },
   monitoringText: {
     fontFamily: 'Baloo2_600SemiBold',
     fontSize: 14,
-    color: '#6B4EFF',
+    color: '#0463DD', // Noosi Blue as requested
+    marginRight: 4,
   },
   profileBtn: {
     width: 54,
@@ -291,9 +307,9 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#FFFFFF',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.03,
+    shadowRadius: 20,
     elevation: 4,
   },
   profileImg: {
@@ -333,9 +349,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(4, 99, 221, 0.05)',
     shadowColor: '#0463DD',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.04,
-    shadowRadius: 15,
+    shadowOffset: { width: 0, height: 15 },
+    shadowOpacity: 0.02,
+    shadowRadius: 25,
     elevation: 2,
   },
   insightHeader: {
@@ -345,9 +361,9 @@ const styles = StyleSheet.create({
   },
   insightCardTitle: {
     fontFamily: 'Baloo2_600SemiBold',
-    fontSize: 14,
+    fontSize: 13,
     color: 'rgba(15, 23, 42, 0.5)',
-    width: '65%',
+    marginBottom: 4,
   },
   insightIconContainer: {
     width: 36,
@@ -399,9 +415,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.05,
-    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 20 },
+    shadowOpacity: 0.02,
+    shadowRadius: 30,
     elevation: 3,
   },
   medIndexContainer: {
@@ -450,18 +466,20 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   navFab: {
-    width: 54,
-    height: 54,
-    borderRadius: 27,
+    width: 58,
+    height: 58,
+    borderRadius: 29,
     backgroundColor: '#0463DD',
-    bottom: 0,
+    marginTop: -25, // Extrude out of the nav bar
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#0463DD',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.2,
+    shadowRadius: 15,
+    elevation: 10,
+    borderWidth: 4,
+    borderColor: '#FFFFFF',
   },
   bottomNavContainer: {
     position: 'absolute',
@@ -473,7 +491,7 @@ const styles = StyleSheet.create({
     paddingBottom: Platform.OS === 'ios' ? 20 : 0,
     borderTopWidth: 1,
     borderTopColor: 'rgba(255, 255, 255, 0.3)',
-    overflow: 'hidden',
+    overflow: 'visible', // Allow FAB to extrude
   },
   bottomNav: {
     flex: 1,
@@ -510,9 +528,9 @@ const styles = StyleSheet.create({
     borderLeftWidth: 6,
     borderLeftColor: '#EF4444',
     shadowColor: '#EF4444',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.08,
-    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 15 },
+    shadowOpacity: 0.03,
+    shadowRadius: 25,
     elevation: 4,
     marginBottom: 32,
   },
