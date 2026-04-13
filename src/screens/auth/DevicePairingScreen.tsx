@@ -12,6 +12,7 @@ import {
   Easing,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { CameraView, useCameraPermissions, BarcodeScanningResult } from 'expo-camera';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Input from '../../components/inputs/Input';
@@ -20,7 +21,9 @@ import OnboardingBg from '../../components/OnboardingBg';
 export default function DevicePairingScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const [deviceId, setDeviceId] = useState('');
-  
+  const [scanned, setScanned] = useState(false);
+  const [permission, requestPermission] = useCameraPermissions();
+
   // Animations
   const pulseAnim = useState(new Animated.Value(1))[0];
   const scanLineAnim = useState(new Animated.Value(0))[0];
@@ -67,22 +70,45 @@ export default function DevicePairingScreen() {
     outputRange: [0, 240], // Height of the scanner area
   });
 
+  const handleBarCodeScanned = ({ type, data }: BarcodeScanningResult) => {
+    setScanned(true);
+    setDeviceId(data);
+    // Vibrate or play sound could be added here
+    setTimeout(() => setScanned(false), 2000); // Allow scanning again after 2 seconds
+  };
+
+  if (!permission) {
+    // Camera permissions are still loading.
+    return <View style={styles.container} />;
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.bgContainer}>
         <OnboardingBg width={600} height={600} />
       </View>
 
-      <KeyboardAvoidingView 
+      <KeyboardAvoidingView
         style={styles.keyboardView}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <ScrollView 
+        <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
           bounces={false}
         >
+          {/* Custom Navigation Bar */}
+          <View style={styles.navBar}>
+            <TouchableOpacity 
+              style={styles.backButton} 
+              onPress={() => navigation.goBack()}
+            >
+              <Feather name="arrow-left" size={20} color="rgba(4,9,33,0.76)" />
+            </TouchableOpacity>
+            <View style={styles.navPlaceholder} />
+          </View>
+
           {/* Header Section */}
           <View style={styles.header}>
             <View style={styles.headerIconContainer}>
@@ -95,28 +121,40 @@ export default function DevicePairingScreen() {
           </View>
 
           {/* QR Scanner Mock */}
-          <View style={styles.scannerWrapper}>
             <View style={styles.scannerContainer}>
+              {permission.granted ? (
+                <CameraView
+                  style={StyleSheet.absoluteFillObject}
+                  onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
+                  barcodeScannerSettings={{
+                    barcodeTypes: ['qr'],
+                  }}
+                />
+              ) : (
+                <View style={styles.permissionContainer}>
+                  <Feather name="camera-off" size={40} color="rgba(4,9,33,0.3)" />
+                  <Text style={styles.permissionText}>Camera access is required to scan QR codes</Text>
+                  <TouchableOpacity style={styles.permissionBtn} onPress={requestPermission}>
+                    <Text style={styles.permissionBtnText}>Enable Camera</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+              
               {/* Corner Accents */}
               <View style={[styles.corner, styles.topLeft]} />
               <View style={[styles.corner, styles.topRight]} />
               <View style={[styles.corner, styles.bottomLeft]} />
               <View style={[styles.corner, styles.bottomRight]} />
-              
+
               {/* Scan Line */}
               <Animated.View style={[styles.scanLine, { transform: [{ translateY }] }]} />
               
-              <View style={styles.scannerPlaceholder}>
-                <Feather name="maximize" size={120} color="rgba(255,255,255,0.2)" />
-              </View>
+              {!permission.granted && (
+                <View style={styles.scannerPlaceholder}>
+                  <Feather name="maximize" size={120} color="rgba(4, 99, 221, 0.12)" />
+                </View>
+              )}
             </View>
-
-            {/* Connection Status Indicator */}
-            <View style={styles.statusIndicator}>
-              <Animated.View style={[styles.statusDot, { transform: [{ scale: pulseAnim }] }]} />
-              <Text style={styles.statusText}>Searching for device...</Text>
-            </View>
-          </View>
 
           {/* Manual Input Section */}
           <View style={styles.manualInputSection}>
@@ -126,7 +164,7 @@ export default function DevicePairingScreen() {
               <View style={styles.dividerLine} />
             </View>
 
-            <Input 
+            <Input
               label="Device ID"
               placeholder="Enter 8-digit device ID"
               value={deviceId}
@@ -139,7 +177,7 @@ export default function DevicePairingScreen() {
 
         {/* Action Button (Fixed at bottom) */}
         <View style={styles.buttonContainer}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.primaryButton, !deviceId && styles.disabledButton]}
             disabled={!deviceId}
             onPress={() => console.log('Connect to Device:', deviceId)}
@@ -178,13 +216,34 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: 24,
     paddingTop: 60,
-    paddingBottom: 120,
+    paddingBottom: 40,
     alignItems: 'center',
   },
   header: {
     alignItems: 'center',
     marginBottom: 40,
     width: '100%',
+  },
+  navBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 32,
+    width: '100%',
+  },
+  backButton: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    borderWidth: 1.5,
+    borderColor: 'rgba(4,9,33,0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+  },
+  navPlaceholder: {
+    width: 42,
+    height: 42,
   },
   headerIconContainer: {
     width: 64,
@@ -209,7 +268,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     textAlign: 'center',
   },
-  scannerWrapper: {
+  scannerContainer: {
     width: '100%',
     aspectRatio: 1,
     maxWidth: 280,
@@ -217,27 +276,16 @@ const styles = StyleSheet.create({
     borderRadius: 48,
     borderWidth: 4,
     borderColor: 'rgba(4, 99, 221, 0.1)',
-    backgroundColor: '#000000',
+    backgroundColor: '#FFFFFF',
     overflow: 'hidden',
     shadowColor: '#0463DD',
     shadowOffset: { width: 0, height: 20 },
     shadowOpacity: 0.1,
     shadowRadius: 30,
     elevation: 10,
-    alignItems: 'center',
-  },
-  scannerContainer: {
-    flex: 1,
-    padding: 30,
-    position: 'relative',
-    width: 250,
-    height: 250,
-    borderRadius: 24,
-    backgroundColor: 'rgba(0,0,0,0.05)',
-    borderWidth: 1,
-    borderColor: 'rgba(4,9,33,0.1)',
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'relative',
   },
   scannerPlaceholder: {
     flex: 1,
@@ -289,25 +337,6 @@ const styles = StyleSheet.create({
     borderRightWidth: 4,
     borderBottomRightRadius: 16,
   },
-  statusIndicator: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 20,
-    gap: 8,
-  },
-  statusDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#10B981',
-  },
-  statusText: {
-    fontFamily: 'Baloo2_600SemiBold',
-    fontSize: 14,
-    color: 'rgba(4,9,33,0.5)',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-  },
   manualInputSection: {
     width: '100%',
     marginBottom: 40,
@@ -354,6 +383,30 @@ const styles = StyleSheet.create({
   buttonText: {
     fontFamily: 'Baloo2_700Bold',
     fontSize: 18,
+    color: '#FFFFFF',
+  },
+  permissionContainer: {
+    padding: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  permissionText: {
+    fontFamily: 'Baloo2_400Regular',
+    fontSize: 14,
+    color: 'rgba(4,9,33,0.6)',
+    textAlign: 'center',
+    marginTop: 12,
+    marginBottom: 20,
+  },
+  permissionBtn: {
+    backgroundColor: '#0463DD',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+  },
+  permissionBtnText: {
+    fontFamily: 'Baloo2_600SemiBold',
+    fontSize: 14,
     color: '#FFFFFF',
   },
 });

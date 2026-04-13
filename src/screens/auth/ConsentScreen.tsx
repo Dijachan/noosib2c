@@ -30,6 +30,17 @@ export default function ConsentScreen() {
         showsVerticalScrollIndicator={false}
         bounces={false}
       >
+        {/* Custom Navigation Bar */}
+        <View style={styles.navBar}>
+          <TouchableOpacity 
+            style={styles.backButton} 
+            onPress={() => navigation.goBack()}
+          >
+            <Feather name="arrow-left" size={20} color="rgba(4,9,33,0.76)" />
+          </TouchableOpacity>
+          <View style={styles.navPlaceholder} />
+        </View>
+
         {/* Header Section */}
         <View style={styles.header}>
           <Image 
@@ -131,13 +142,34 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: 24,
     paddingTop: 60,
-    paddingBottom: 120,
+    paddingBottom: 40,
     alignItems: 'center',
   },
   header: {
     alignItems: 'center',
     marginBottom: 32,
     width: '100%',
+  },
+  navBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 32,
+    width: '100%',
+  },
+  backButton: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    borderWidth: 1.5,
+    borderColor: 'rgba(4,9,33,0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+  },
+  navPlaceholder: {
+    width: 42,
+    height: 42,
   },
   logo: {
     width: 64,

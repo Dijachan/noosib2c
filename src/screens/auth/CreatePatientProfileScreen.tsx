@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: 24,
     paddingTop: 60,
-    paddingBottom: 120,
+    paddingBottom: 40,
     alignItems: 'center',
   },
   navBar: {

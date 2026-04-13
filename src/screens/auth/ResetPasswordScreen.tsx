@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: 16,
     paddingTop: 20,
-    paddingBottom: 120,
+    paddingBottom: 40,
   },
   navBar: {
     flexDirection: 'row',
