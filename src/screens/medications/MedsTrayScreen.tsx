@@ -100,7 +100,7 @@ export default function MedsTrayScreen() {
                  <Ionicons name="heart" size={32} color="#FFFFFF" />
               </View>
               <View style={styles.heroTextContainer}>
-                <Text style={styles.heroTitle}>Mummy K is protected ❤️</Text>
+                <Text style={styles.heroTitle} numberOfLines={1} adjustsFontSizeToFit>Mummy K ❤️ is protected</Text>
                 <Text style={styles.heroSubtitle}>She's on track with 4 doses today!</Text>
               </View>
             </View>
@@ -280,11 +280,17 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     paddingHorizontal: 24,
     justifyContent: 'space-between',
-    gap: 12,
+    gap: 16,
     marginBottom: 40,
   },
+  traySlotRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: 16,
+  },
   slotBox: {
-    width: (width - 48 - 24) / 3, // 3 column grid
+    width: (width - 48 - 16) / 2, // 2 column grid
     height: 120,
     borderRadius: 24,
     borderWidth: 1.5,

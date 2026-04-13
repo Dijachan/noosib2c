@@ -64,8 +64,8 @@ export default function App() {
         <Stack.Screen name="ResetSuccess" component={ResetSuccessScreen} />
         <Stack.Screen name="Consent" component={ConsentScreen} />
         <Stack.Screen name="DevicePairing" component={DevicePairingScreen} />
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="MedsTray" component={MedsTrayScreen} />
+        <Stack.Screen name="Home" component={HomeScreen} options={{ animation: 'none' }} />
+        <Stack.Screen name="MedsTray" component={MedsTrayScreen} options={{ animation: 'none' }} />
         <Stack.Screen name="SearchDrug" component={SearchDrugScreen} />
         <Stack.Screen name="DrugDetail" component={DrugDetailScreen} />
         <Stack.Screen name="SlotMapping" component={SlotMappingScreen} />

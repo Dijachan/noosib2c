@@ -29,12 +29,12 @@ export default function BottomNav({ activeTab }: BottomNavProps) {
       />
       <View style={styles.navBar}>
         <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Home')}>
-          <Ionicons name="grid" size={24} color={getActiveColor('Home')} />
+          <Ionicons name={activeTab === 'Home' ? "grid" : "grid-outline"} size={24} color={getActiveColor('Home')} />
           <Text style={[styles.navText, activeTab === 'Home' && styles.navTextActive]}>Home</Text>
         </TouchableOpacity>
         
         <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('MedsTray')}>
-          <Ionicons name="medical-outline" size={24} color={getActiveColor('Meds')} />
+          <Ionicons name={activeTab === 'Meds' ? "medical" : "medical-outline"} size={24} color={getActiveColor('Meds')} />
           <Text style={[styles.navText, activeTab === 'Meds' && styles.navTextActive]}>Meds</Text>
         </TouchableOpacity>
         
@@ -48,12 +48,12 @@ export default function BottomNav({ activeTab }: BottomNavProps) {
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="notifications-outline" size={24} color={getActiveColor('Alerts')} />
+          <Ionicons name={activeTab === 'Alerts' ? "notifications" : "notifications-outline"} size={24} color={getActiveColor('Alerts')} />
           <Text style={[styles.navText, activeTab === 'Alerts' && styles.navTextActive]}>Alerts</Text>
         </TouchableOpacity>
         
         <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="person-outline" size={24} color={getActiveColor('Profile')} />
+          <Ionicons name={activeTab === 'Profile' ? "person" : "person-outline"} size={24} color={getActiveColor('Profile')} />
           <Text style={[styles.navText, activeTab === 'Profile' && styles.navTextActive]}>Profile</Text>
         </TouchableOpacity>
       </View>
