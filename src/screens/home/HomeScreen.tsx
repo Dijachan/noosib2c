@@ -28,7 +28,8 @@ const InsightCard = ({
   unit,
   icon,
   color,
-  status
+  status,
+  onPress
 }: {
   title: string;
   value: string;
@@ -36,9 +37,16 @@ const InsightCard = ({
   icon: string;
   color: string;
   status: string;
+  onPress?: () => void;
 }) => {
+  const CardContainer = onPress ? TouchableOpacity : View;
+  
   return (
-    <View style={[styles.insightCard, { backgroundColor: color }]}>
+    <CardContainer 
+      style={[styles.insightCard, { backgroundColor: color }]}
+      onPress={onPress}
+      activeOpacity={0.8}
+    >
       <View style={styles.insightHeader}>
         <View style={styles.insightIconContainer}>
           <Ionicons name={icon as any} size={22} color="#0F172A" />
@@ -52,20 +60,23 @@ const InsightCard = ({
           <Text style={styles.insightUnit}>{unit}</Text>
         </View>
       </View>
-    </View>
+    </CardContainer>
   );
 };
 
 // Medication Card Component
 const MedicationCard = ({ 
+  id,
   index,
   title,
   quantity,
   date, 
   time,
   slot,
-  status 
+  status,
+  onPress 
 }: { 
+  id: string;
   index: number; 
   title: string; 
   quantity: string;
@@ -73,9 +84,14 @@ const MedicationCard = ({
   time: string;
   slot: string;
   status: 'Taken' | 'Pending';
+  onPress: (id: string) => void;
 }) => {
   return (
-    <View style={[styles.medCard, status === 'Pending' && styles.medCardActive]}>
+    <TouchableOpacity 
+      style={[styles.medCard, status === 'Pending' && styles.medCardActive]}
+      onPress={() => onPress(id)}
+      activeOpacity={0.7}
+    >
       <View style={[styles.medIndexContainer, status === 'Taken' ? styles.medIndexTaken : styles.medIndexPending]}>
         <Text style={[styles.medIndex, status === 'Taken' ? styles.medIndexTextTaken : styles.medIndexTextPending]}>
           {status === 'Taken' ? <Ionicons name="checkmark" size={18} color="#10B981" /> : index}
@@ -92,7 +108,7 @@ const MedicationCard = ({
             <Text style={styles.metaText}>{time} • {date}</Text>
           </View>
           <View style={styles.metaRow}>
-            <Ionicons name="cube-outline" size={14} color="#F59E0B" />
+            <Ionicons name="cube-outline" size={14} color="#6366F1" />
             <Text style={styles.metaText}>Slot {slot}</Text>
           </View>
         </View>
@@ -102,7 +118,7 @@ const MedicationCard = ({
           {status.toUpperCase()}
         </Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -122,7 +138,7 @@ export default function HomeScreen() {
         >
           <View style={{ paddingHorizontal: 24, paddingTop: 20, marginBottom: 24 }}>
             <View>
-              <Text style={styles.greetingText}>Good morning! 🌱</Text>
+              <Text style={styles.greetingText}>Good morning, Dija! 🌱</Text>
               <View style={styles.monitoringBadge}>
                 <Image
                   source={{ uri: 'https://images.unsplash.com/photo-1512316609839-ce289d3eba0a?auto=format&fit=crop&q=80&w=100' }}
@@ -141,12 +157,13 @@ export default function HomeScreen() {
 
           <View style={styles.insightGrid}>
             <InsightCard
-              title="Daily Adherence"
+              title="Meds Adherence"
               value="98"
               unit="%"
               icon="checkmark-circle-outline"
               color="#F5F3FF" // Pastel Purple
               status="Optimal"
+              onPress={() => navigation.navigate('AdherenceDetails')}
             />
             <InsightCard
               title="Body Temp"
@@ -155,6 +172,7 @@ export default function HomeScreen() {
               icon="thermometer-outline"
               color="#EBF5FF" // Pastel Blue
               status="Normal"
+              onPress={() => navigation.navigate('TempDetails')}
             />
           </View>
 
@@ -187,6 +205,7 @@ export default function HomeScreen() {
             {medications.length > 0 ? medications.map((med, idx) => (
               <MedicationCard
                 key={med.id}
+                id={med.id}
                 index={idx + 1}
                 title={med.name}
                 quantity={med.dosage}
@@ -194,6 +213,7 @@ export default function HomeScreen() {
                 time={med.time}
                 slot={med.slot.toString()}
                 status={med.status === 'Taken' ? 'Taken' : 'Pending'}
+                onPress={(id) => navigation.navigate('MedicationDetails', { medId: id })}
               />
             )) : (
               <View style={styles.emptySchedule}>
