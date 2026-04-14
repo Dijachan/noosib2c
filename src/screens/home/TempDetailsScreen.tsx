@@ -94,7 +94,7 @@ export default function TempDetailsScreen() {
       status: 'Taken',
       time: '08:02 AM',
       date: 'Today',
-      snapshot: 'https://images.unsplash.com/photo-1550831107-1553da8c8464?auto=format&fit=crop&q=80&w=200',
+      snapshot: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&q=80&w=600',
     },
     {
       id: '2',
@@ -102,7 +102,7 @@ export default function TempDetailsScreen() {
       status: 'Taken',
       time: '01:15 PM',
       date: 'Today',
-      snapshot: 'https://images.unsplash.com/photo-1576091160550-217359f42f8c?auto=format&fit=crop&q=80&w=200',
+      snapshot: 'https://images.unsplash.com/photo-1576091160550-217359f42f8c?auto=format&fit=crop&q=80&w=600',
     },
     {
       id: '3',
@@ -117,7 +117,7 @@ export default function TempDetailsScreen() {
       status: 'Taken',
       time: '08:05 AM',
       date: 'Yesterday',
-      snapshot: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&q=80&w=200',
+      snapshot: 'https://images.unsplash.com/photo-1588674593465-983637e754ef?auto=format&fit=crop&q=80&w=600',
     },
   ];
 
@@ -136,17 +136,17 @@ export default function TempDetailsScreen() {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Real-Time Vitals HUD */}
         <LinearGradient
-          colors={['#0F172A', '#1E293B']}
+          colors={['#0463DD', '#0352B8']}
           style={styles.vitalsHud}
         >
           <View style={styles.hudHeader}>
             <View style={styles.probeStatus}>
-              <Ionicons name="bluetooth" size={14} color="#10B981" />
-              <Text style={styles.probeStatusText}>PROBE CONNECTED</Text>
+              <Ionicons name="bluetooth" size={14} color="#FFFFFF" />
+              <Text style={styles.probeStatusWhite}>PROBE CONNECTED</Text>
             </View>
             <View style={styles.probeStatus}>
-              <Ionicons name="battery-full" size={14} color="#10B981" />
-              <Text style={styles.probeStatusText}>98%</Text>
+              <Ionicons name="battery-full" size={14} color="#FFFFFF" />
+              <Text style={styles.probeStatusWhite}>98%</Text>
             </View>
           </View>
 
@@ -159,7 +159,7 @@ export default function TempDetailsScreen() {
               <Text style={styles.tempLarge}>36.8</Text>
               <Text style={styles.tempUnit}>°C</Text>
             </View>
-            <Text style={styles.hudStatus}>Normal Body Temperature</Text>
+            <Text style={styles.hudStatusWhite}>Normal Body Temperature</Text>
           </View>
           <View style={styles.vitalsFooter}>
             <View style={styles.vitalsStat}>
@@ -249,7 +249,7 @@ export default function TempDetailsScreen() {
                      <View style={styles.snapshotOverlay}>
                         <View style={styles.recContainer}>
                           <Animated.View style={[styles.recDot, { opacity: recAnim }]} />
-                          <Text style={styles.recText}>[REC] UNIT_CAM_01</Text>
+                          <Text style={styles.recText}>[REC] MUMMY K CAM</Text>
                         </View>
                         <Text style={styles.timestampText}>{log.time} GMT</Text>
                      </View>
@@ -300,33 +300,31 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 24,
   },
-    backgroundColor: '#0F172A',
+  vitalsHud: {
     borderRadius: 32,
     overflow: 'hidden',
     marginTop: 10,
     marginBottom: 32,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   hudHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 24,
-    paddingTop: 20,
+    paddingTop: 24,
   },
   probeStatus: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 8,
   },
-  probeStatusText: {
+  probeStatusWhite: {
     fontFamily: 'Baloo2_700Bold',
     fontSize: 10,
-    color: '#10B981',
+    color: '#FFFFFF',
     letterSpacing: 0.5,
   },
   hudOverlay: {
@@ -370,10 +368,10 @@ const styles = StyleSheet.create({
     fontSize: 28,
     color: 'rgba(255, 255, 255, 0.5)',
   },
-  hudStatus: {
+  hudStatusWhite: {
     fontFamily: 'Baloo2_600SemiBold',
     fontSize: 16,
-    color: '#10B981',
+    color: '#FFFFFF',
     marginTop: -8,
   },
   vitalsFooter: {
@@ -418,10 +416,10 @@ const styles = StyleSheet.create({
   },
   sectionSubtitle: {
     fontFamily: 'Baloo2_500Medium',
-    fontSize: 14,
+    fontSize: 15,
     color: '#64748B',
-    marginTop: -16,
-    marginBottom: 20,
+    marginTop: -12,
+    marginBottom: 24,
   },
   intervalPicker: {
     flexDirection: 'row',
@@ -495,15 +493,15 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   barTrack: {
-    width: 8,
-    height: 100,
+    width: 12,
+    height: 120,
     backgroundColor: '#E2E8F0',
-    borderRadius: 4,
+    borderRadius: 6,
     justifyContent: 'flex-end',
   },
   barFill: {
     width: '100%',
-    borderRadius: 4,
+    borderRadius: 6,
   },
   barLabel: {
     fontFamily: 'Baloo2_500Medium',
@@ -516,14 +514,18 @@ const styles = StyleSheet.create({
   logCard: {
     backgroundColor: '#F8FAFC',
     borderRadius: 24,
-    padding: 16,
+    padding: 0,
+    paddingTop: 16,
     borderWidth: 1,
     borderColor: '#E2E8F0',
+    overflow: 'hidden',
   },
   logHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingHorizontal: 16,
+    marginBottom: 12,
   },
   logInfoLeft: {
     flexDirection: 'row',
@@ -556,9 +558,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   snapshotContainer: {
-    marginTop: 16,
-    borderRadius: 16,
-    overflow: 'hidden',
+    width: '100%',
     aspectRatio: 16 / 9,
     position: 'relative',
   },
