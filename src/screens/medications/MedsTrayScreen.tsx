@@ -23,12 +23,14 @@ const TraySlotBox = ({
   status, 
   medName, 
   time, 
+  date,
   onPress
 }: { 
   id: number; 
   status: 'Empty' | 'Occupied' | 'Missed' | 'Next'; 
   medName?: string;
   time?: string;
+  date?: string;
   onPress?: () => void;
 }) => {
   const getStatusColors = () => {
@@ -60,7 +62,7 @@ const TraySlotBox = ({
         {medName ? (
           <>
             <Text style={styles.slotMedName} numberOfLines={1}>{medName}</Text>
-            <Text style={styles.slotTime}>{time}</Text>
+            <Text style={styles.slotTime}>{time} • {date}</Text>
           </>
         ) : (
           <Text style={styles.slotEmptyText}>Empty</Text>
@@ -147,6 +149,7 @@ export default function MedsTrayScreen() {
                   status={status} 
                   medName={med?.name} 
                   time={med?.time}
+                  date={med?.date}
                   onPress={() => handleSlotPress(slotId)}
                 />
               );

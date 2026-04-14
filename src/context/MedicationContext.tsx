@@ -11,6 +11,7 @@ export interface Medication {
   slot: number;
   frequency: string;
   time: string;
+  date: string;
   instructions?: string;
   status: 'Taken' | 'Pending' | 'Missed';
 }
@@ -43,6 +44,7 @@ export const MedicationProvider = ({ children }: { children: ReactNode }) => {
       slot: 1,
       frequency: 'Daily',
       time: '08:00 AM',
+      date: 'Today',
       status: 'Taken',
     },
     {
@@ -54,6 +56,7 @@ export const MedicationProvider = ({ children }: { children: ReactNode }) => {
       slot: 2,
       frequency: 'Daily',
       time: '01:00 PM',
+      date: 'Today',
       status: 'Taken',
     },
     {
@@ -65,6 +68,7 @@ export const MedicationProvider = ({ children }: { children: ReactNode }) => {
       slot: 3,
       frequency: 'Daily',
       time: '08:00 PM',
+      date: 'Today',
       status: 'Pending',
     },
     {
@@ -76,6 +80,7 @@ export const MedicationProvider = ({ children }: { children: ReactNode }) => {
       slot: 4,
       frequency: 'Daily',
       time: '12:00 PM',
+      date: 'Today',
       status: 'Missed',
     },
   ]);

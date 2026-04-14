@@ -26,7 +26,8 @@ export default function ReviewSyncScreen() {
       dosageAmount: '1',
       slot: 3,
       frequency: 'Daily',
-      time: '08:00 AM'
+      time: '08:00 AM',
+      date: 'Today'
     } 
   };
 
@@ -71,9 +72,9 @@ export default function ReviewSyncScreen() {
                 <Text style={styles.receiptValue}>Slot {finalData.slot}</Text>
              </View>
              <View style={styles.receiptRow}>
-                <Text style={styles.receiptLabel}>Schedule</Text>
-                <Text style={styles.receiptValue}>{finalData.time} • {finalData.frequency}</Text>
-             </View>
+                 <Text style={styles.receiptLabel}>Schedule</Text>
+                 <Text style={styles.receiptValue}>{finalData.time} • {finalData.date}</Text>
+              </View>
           </View>
         </View>
 
@@ -127,6 +128,10 @@ export default function ReviewSyncScreen() {
             <View style={styles.infoItem}>
               <Text style={styles.infoLabel}>Time</Text>
               <Text style={styles.infoValue}>{finalData.time}</Text>
+            </View>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>Date</Text>
+              <Text style={styles.infoValue}>{finalData.date}</Text>
             </View>
             <View style={styles.infoItem}>
               <Text style={styles.infoLabel}>Frequency</Text>

@@ -57,23 +57,21 @@ const InsightCard = ({
 };
 
 // Medication Card Component
-const MedicationCard = ({
+const MedicationCard = ({ 
   index,
   title,
-  subtitle,
-  dispenser,
-  caregiver,
-  date,
+  quantity,
+  date, 
   time,
-  status
-}: {
-  index: number;
-  title: string;
-  subtitle: string;
-  dispenser: string;
-  caregiver: string;
-  date: string;
+  slot,
+  status 
+}: { 
+  index: number; 
+  title: string; 
+  quantity: string;
+  date: string; 
   time: string;
+  slot: string;
   status: 'Taken' | 'Pending';
 }) => {
   return (
@@ -84,16 +82,18 @@ const MedicationCard = ({
         </Text>
       </View>
       <View style={styles.medContent}>
-        <Text style={styles.medTitle}>{title}</Text>
-        <Text style={styles.medSubtitle}>{subtitle}</Text>
+        <View style={styles.medTitleRow}>
+          <Text style={styles.medTitle}>{title}</Text>
+          <Text style={styles.medQuantity}> • {quantity}</Text>
+        </View>
         <View style={styles.medMetaRows}>
           <View style={styles.metaRow}>
-            <Ionicons name="calendar-outline" size={14} color="#0463DD" />
-            <Text style={styles.metaText}>{date} • {time}</Text>
+            <Ionicons name="time-outline" size={14} color="#0463DD" />
+            <Text style={styles.metaText}>{time} • {date}</Text>
           </View>
           <View style={styles.metaRow}>
             <Ionicons name="cube-outline" size={14} color="#F59E0B" />
-            <Text style={styles.metaText}>{dispenser}</Text>
+            <Text style={styles.metaText}>Slot {slot}</Text>
           </View>
         </View>
       </View>
@@ -189,11 +189,10 @@ export default function HomeScreen() {
                 key={med.id}
                 index={idx + 1}
                 title={med.name}
-                subtitle={`${med.dosage} • ${med.time}`}
-                dispenser={`Slot ${med.slot}`}
-                caregiver="By Noosi"
-                date="Today"
+                quantity={med.dosage}
+                date={med.date}
                 time={med.time}
+                slot={med.slot.toString()}
                 status={med.status === 'Taken' ? 'Taken' : 'Pending'}
               />
             )) : (
@@ -389,14 +388,23 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 16,
   },
+  medTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
   medTitle: {
     fontFamily: 'Baloo2_700Bold',
-    fontSize: 18, // Upscaled for legibility
+    fontSize: 18,
     color: '#0F172A',
-    marginBottom: 8,
+  },
+  medQuantity: {
+    fontFamily: 'Baloo2_500Medium',
+    fontSize: 16,
+    color: 'rgba(15, 23, 42, 0.5)',
   },
   medMetaRows: {
-    gap: 4,
+    gap: 6,
   },
   metaRow: {
     flexDirection: 'row',

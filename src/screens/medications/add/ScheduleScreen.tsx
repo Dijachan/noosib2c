@@ -19,6 +19,7 @@ export default function ScheduleScreen() {
 
   const [frequency, setFrequency] = useState('Daily');
   const [time, setTime] = useState('08:00 AM');
+  const [date, setDate] = useState('Today');
 
   const frequencies = ['Daily', 'Every 8 hours', 'Twice a day', 'Weekly'];
 
@@ -58,14 +59,24 @@ export default function ScheduleScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.label}>Intake Time</Text>
-          <TouchableOpacity style={styles.timePickerBtn}>
-            <View style={styles.timeInfo}>
-               <Ionicons name="time-outline" size={24} color="#0463DD" />
-               <Text style={styles.timeLabel}>Reminder Time</Text>
-            </View>
-            <Text style={styles.timeValue}>{time}</Text>
-          </TouchableOpacity>
+          <Text style={styles.label}>Intake Time and Date</Text>
+          <View style={styles.pickerGroup}>
+            <TouchableOpacity style={styles.pickerBtn}>
+              <View style={styles.timeInfo}>
+                <Ionicons name="time-outline" size={24} color="#0463DD" />
+                <Text style={styles.timeLabel}>Reminder Time</Text>
+              </View>
+              <Text style={styles.timeValue}>{time}</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity style={styles.pickerBtn}>
+              <View style={styles.timeInfo}>
+                <Ionicons name="calendar-outline" size={24} color="#0463DD" />
+                <Text style={styles.timeLabel}>Reminder Date</Text>
+              </View>
+              <Text style={styles.timeValue}>{date}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         <View style={styles.tipBox}>
@@ -80,7 +91,7 @@ export default function ScheduleScreen() {
         <TouchableOpacity 
           style={styles.primaryBtn}
           onPress={() => navigation.navigate('ReviewSync', { 
-            finalData: { ...drugData, frequency, time } 
+            finalData: { ...drugData, frequency, time, date } 
           })}
         >
           <Text style={styles.primaryBtnText}>Review & Sync</Text>
@@ -172,7 +183,10 @@ const styles = StyleSheet.create({
   freqTextSelected: {
     color: '#0463DD',
   },
-  timePickerBtn: {
+  pickerGroup: {
+    gap: 12,
+  },
+  pickerBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
