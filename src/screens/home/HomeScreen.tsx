@@ -136,7 +136,7 @@ export default function HomeScreen() {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          <View style={{ paddingHorizontal: 24, paddingTop: 20, marginBottom: 24 }}>
+          <View style={styles.headerContainer}>
             <View>
               <Text style={styles.greetingText}>Good morning, Dija! 🌱</Text>
               <View style={styles.monitoringBadge}>
@@ -147,6 +147,13 @@ export default function HomeScreen() {
                 <Text style={styles.monitoringText}>Caring for Mummy K ❤️</Text>
               </View>
             </View>
+            <TouchableOpacity 
+              style={styles.hubActionBtn}
+              onPress={() => navigation.navigate('PharmacyHub')}
+            >
+              <Ionicons name="bag-handle-outline" size={26} color="#0463DD" />
+              <View style={styles.hubBadge} />
+            </TouchableOpacity>
           </View>
           {/* Profile btn removed per request */}
 
@@ -242,6 +249,47 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: 120,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    paddingHorizontal: 24,
+    paddingTop: 20,
+    marginBottom: 24,
+  },
+  hubActionBtn: {
+    width: 48,
+    height: 48,
+    borderRadius: 16,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(4, 99, 221, 0.1)',
+    position: 'relative',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.05,
+        shadowRadius: 10,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
+  },
+  hubBadge: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#EF4444',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
   },
   greetingHeader: {
     flexDirection: 'row',

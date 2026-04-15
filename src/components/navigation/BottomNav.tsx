@@ -12,7 +12,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 interface BottomNavProps {
-  activeTab: 'Home' | 'Meds' | 'Alerts' | 'Profile' | 'Hub';
+  activeTab: 'Home' | 'Meds' | 'Pharmacy' | 'Profile' | 'Hub';
 }
 
 export default function BottomNav({ activeTab }: BottomNavProps) {
@@ -47,12 +47,18 @@ export default function BottomNav({ activeTab }: BottomNavProps) {
           </View>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.navItem}>
-          <Ionicons name={activeTab === 'Alerts' ? "notifications" : "notifications-outline"} size={24} color={getActiveColor('Alerts')} />
-          <Text style={[styles.navText, activeTab === 'Alerts' && styles.navTextActive]}>Alerts</Text>
+        <TouchableOpacity 
+          style={styles.navItem}
+          onPress={() => navigation.navigate('PharmacyHub')}
+        >
+          <Ionicons name={activeTab === 'Pharmacy' ? "bag-handle" : "bag-handle-outline"} size={24} color={getActiveColor('Pharmacy')} />
+          <Text style={[styles.navText, activeTab === 'Pharmacy' && styles.navTextActive]}>Pharmacy</Text>
         </TouchableOpacity>
         
-        <TouchableOpacity style={styles.navItem}>
+        <TouchableOpacity 
+          style={styles.navItem} 
+          onPress={() => navigation.navigate('Profile')}
+        >
           <Ionicons name={activeTab === 'Profile' ? "person" : "person-outline"} size={24} color={getActiveColor('Profile')} />
           <Text style={[styles.navText, activeTab === 'Profile' && styles.navTextActive]}>Profile</Text>
         </TouchableOpacity>

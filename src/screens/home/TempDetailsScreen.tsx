@@ -23,7 +23,7 @@ export default function TempDetailsScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const { medications } = useMedication();
   
-  const [activeInterval, setActiveInterval] = useState('7d');
+  const [timeRange, setTimeRange] = useState('Weekly');
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const recAnim = useRef(new Animated.Value(1)).current;
 
@@ -62,10 +62,17 @@ export default function TempDetailsScreen() {
     ).start();
   }, []);
 
-  const intervals = ['7d', '30d', '90d'];
+  const ranges = ['Daily', 'Weekly', 'Monthly', 'Quarterly', 'Yearly'];
   
   const trendData: Record<string, { label: string; value: number }[]> = {
-    '7d': [
+    Daily: [
+      { label: '6am', value: 36.6 },
+      { label: '10am', value: 36.8 },
+      { label: '2pm', value: 37.2 },
+      { label: '6pm', value: 36.9 },
+      { label: '10pm', value: 36.7 },
+    ],
+    Weekly: [
       { label: 'Mon', value: 36.6 },
       { label: 'Tue', value: 36.8 },
       { label: 'Wed', value: 37.2 },
@@ -74,16 +81,22 @@ export default function TempDetailsScreen() {
       { label: 'Sat', value: 36.8 },
       { label: 'Sun', value: 36.8 },
     ],
-    '30d': [
+    Monthly: [
       { label: 'W1', value: 36.8 },
       { label: 'W2', value: 37.1 },
       { label: 'W3', value: 36.8 },
       { label: 'W4', value: 36.7 },
     ],
-    '90d': [
+    Quarterly: [
       { label: 'Jan', value: 36.9 },
       { label: 'Feb', value: 36.7 },
       { label: 'Mar', value: 36.8 },
+    ],
+    Yearly: [
+      { label: 'Q1', value: 36.8 },
+      { label: 'Q2', value: 37.0 },
+      { label: 'Q3', value: 36.7 },
+      { label: 'Q4', value: 36.9 },
     ],
   };
 
@@ -94,7 +107,7 @@ export default function TempDetailsScreen() {
       status: 'Taken',
       time: '08:02 AM',
       date: 'Today',
-      snapshot: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&q=80&w=600',
+      snapshot: 'file:///Users/mac/.gemini/antigravity/brain/47238e4b-79a1-45b7-9f28-1f37f71562f1/metformin_white_tablet_1776167059083.png',
     },
     {
       id: '2',
@@ -102,7 +115,7 @@ export default function TempDetailsScreen() {
       status: 'Taken',
       time: '01:15 PM',
       date: 'Today',
-      snapshot: 'https://images.unsplash.com/photo-1576091160550-217359f42f8c?auto=format&fit=crop&q=80&w=600',
+      snapshot: 'file:///Users/mac/.gemini/antigravity/brain/47238e4b-79a1-45b7-9f28-1f37f71562f1/lisinopril_pills_clinical_1776167073050.png',
     },
     {
       id: '3',
@@ -117,7 +130,7 @@ export default function TempDetailsScreen() {
       status: 'Taken',
       time: '08:05 AM',
       date: 'Yesterday',
-      snapshot: 'https://images.unsplash.com/photo-1588674593465-983637e754ef?auto=format&fit=crop&q=80&w=600',
+      snapshot: 'file:///Users/mac/.gemini/antigravity/brain/47238e4b-79a1-45b7-9f28-1f37f71562f1/metformin_white_tablet_1776167059083.png',
     },
   ];
 
@@ -134,83 +147,75 @@ export default function TempDetailsScreen() {
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Real-Time Vitals HUD */}
-        <LinearGradient
-          colors={['#0463DD', '#0352B8']}
-          style={styles.vitalsHud}
-        >
+        {/* Real-Time Vitals HUD - Redesigned to Light Theme */}
+        <View style={styles.vitalsHud}>
           <View style={styles.hudHeader}>
             <View style={styles.probeStatus}>
-              <Ionicons name="bluetooth" size={14} color="#FFFFFF" />
-              <Text style={styles.probeStatusWhite}>PROBE CONNECTED</Text>
+              <Ionicons name="bluetooth" size={14} color="#0463DD" />
+              <Text style={styles.probeStatusText}>PROBE CONNECTED</Text>
             </View>
             <View style={styles.probeStatus}>
-              <Ionicons name="battery-full" size={14} color="#FFFFFF" />
-              <Text style={styles.probeStatusWhite}>98%</Text>
+              <Ionicons name="battery-full" size={14} color="#0463DD" />
+              <Text style={styles.probeStatusText}>98%</Text>
             </View>
           </View>
 
           <View style={styles.hudOverlay}>
             <View style={styles.liveIndicatorRow}>
-              <Animated.View style={[styles.pulseDot, { transform: [{ scale: pulseAnim }] }]} />
+              <Animated.View style={[styles.pulseDot, { transform: [{ scale: pulseAnim }], backgroundColor: '#0463DD' }]} />
               <Text style={styles.liveText}>REAL-TIME</Text>
             </View>
             <View style={styles.tempRow}>
               <Text style={styles.tempLarge}>36.8</Text>
               <Text style={styles.tempUnit}>°C</Text>
             </View>
-            <Text style={styles.hudStatusWhite}>Normal Body Temperature</Text>
+            <Text style={styles.hudStatus}>Normal Body Temperature</Text>
           </View>
           <View style={styles.vitalsFooter}>
             <View style={styles.vitalsStat}>
               <Text style={styles.vitalsStatLabel}>Today High</Text>
               <Text style={styles.vitalsStatValue}>37.2°C</Text>
             </View>
-            <View style={styles.statDivider} />
+            <View style={styles.vitalsStatDivider} />
             <View style={styles.vitalsStat}>
               <Text style={styles.vitalsStatLabel}>Today Low</Text>
               <Text style={styles.vitalsStatValue}>36.5°C</Text>
             </View>
           </View>
-        </LinearGradient>
+        </View>
 
         {/* History Logs Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>History Logs</Text>
-            <View style={styles.intervalPicker}>
-              {intervals.map((int) => (
-                <TouchableOpacity
-                  key={int}
-                  onPress={() => setActiveInterval(int)}
-                  style={[styles.intervalBtn, activeInterval === int && styles.intervalBtnActive]}
-                >
-                  <Text style={[styles.intervalText, activeInterval === int && styles.intervalTextActive]}>
-                    {int}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
           </View>
 
-          <View style={styles.chartContainer}>
-            {/* Chart Reference Lines */}
-            <View style={styles.refLines}>
-               <View style={[styles.refLine, { bottom: '75%' }]}>
-                 <Text style={styles.refLabel}>37.5° FEVER</Text>
-               </View>
-               <View style={[styles.refLine, { bottom: '25%' }]}>
-                 <Text style={styles.refLabel}>36.5° BASE</Text>
-               </View>
-            </View>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false} 
+            contentContainerStyle={styles.rangeSelector}
+          >
+            {ranges.map((range) => (
+              <TouchableOpacity
+                key={range}
+                onPress={() => setTimeRange(range)}
+                style={[styles.rangeItem, timeRange === range && styles.rangeItemSelected]}
+              >
+                <Text style={[styles.rangeText, timeRange === range && styles.rangeTextSelected]}>
+                  {range}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
 
+          <View style={styles.chartContainer}>
             <View style={styles.chartBars}>
-              {trendData[activeInterval].map((item, index) => (
+              {trendData[timeRange].map((item, index) => (
                 <View key={index} style={styles.barItem}>
                    <View style={styles.barTrack}>
                      <View style={[styles.barFill, { 
                        height: `${((item.value - 36) / 2) * 100}%`,
-                       backgroundColor: item.value > 37.2 ? '#EF4444' : '#10B981'
+                       backgroundColor: item.value > 37.2 ? '#EF4444' : '#0463DD'
                      }]} />
                    </View>
                    <Text style={styles.barLabel}>{item.label}</Text>
@@ -301,10 +306,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   vitalsHud: {
+    backgroundColor: '#FFFFFF',
     borderRadius: 32,
     overflow: 'hidden',
     marginTop: 10,
     marginBottom: 32,
+    borderWidth: 1,
+    borderColor: '#F1F5F9',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#0F172A',
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.05,
+        shadowRadius: 15,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
   },
   hudHeader: {
     flexDirection: 'row',
@@ -316,15 +335,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: 'rgba(4, 99, 221, 0.05)',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 8,
   },
-  probeStatusWhite: {
+  probeStatusText: {
     fontFamily: 'Baloo2_700Bold',
     fontSize: 10,
-    color: '#FFFFFF',
+    color: '#0463DD',
     letterSpacing: 0.5,
   },
   hudOverlay: {
@@ -335,22 +354,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: 'rgba(4, 99, 221, 0.05)',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
     marginBottom: 20,
   },
   pulseDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: '#EF4444',
+    width: 6,
+    height: 6,
+    borderRadius: 3,
   },
   liveText: {
-    fontFamily: 'Baloo2_700Bold',
+    fontFamily: 'Baloo2_800ExtraBold',
     fontSize: 12,
-    color: '#FFFFFF',
+    color: '#0463DD',
     letterSpacing: 1,
   },
   tempRow: {
@@ -359,27 +377,28 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   tempLarge: {
-    fontFamily: 'Baloo2_800ExtraBold',
+    fontFamily: 'Baloo2_700Bold',
     fontSize: 72,
-    color: '#FFFFFF',
+    color: '#0F172A',
+    lineHeight: 80,
   },
   tempUnit: {
-    fontFamily: 'Baloo2_700Bold',
+    fontFamily: 'Baloo2_600SemiBold',
     fontSize: 28,
-    color: 'rgba(255, 255, 255, 0.5)',
+    color: '#0463DD',
   },
-  hudStatusWhite: {
+  hudStatus: {
     fontFamily: 'Baloo2_600SemiBold',
     fontSize: 16,
-    color: '#FFFFFF',
+    color: '#10B981',
     marginTop: -8,
   },
   vitalsFooter: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    padding: 20,
+    backgroundColor: '#F8FAFC',
+    paddingVertical: 16,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.1)',
+    borderTopColor: '#F1F5F9',
   },
   vitalsStat: {
     flex: 1,
@@ -388,17 +407,17 @@ const styles = StyleSheet.create({
   vitalsStatLabel: {
     fontFamily: 'Baloo2_500Medium',
     fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.5)',
+    color: '#64748B',
   },
   vitalsStatValue: {
     fontFamily: 'Baloo2_700Bold',
-    fontSize: 18,
-    color: '#FFFFFF',
+    fontSize: 16,
+    color: '#0F172A',
   },
-  statDivider: {
+  vitalsStatDivider: {
     width: 1,
-    height: '100%',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    height: 24,
+    backgroundColor: '#E2E8F0',
   },
   section: {
     marginBottom: 32,
@@ -418,35 +437,29 @@ const styles = StyleSheet.create({
     fontFamily: 'Baloo2_500Medium',
     fontSize: 15,
     color: '#64748B',
-    marginTop: -12,
+    marginTop: 4,
     marginBottom: 24,
   },
-  intervalPicker: {
-    flexDirection: 'row',
+  rangeSelector: {
+    paddingBottom: 20,
+    gap: 12,
+  },
+  rangeItem: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
     backgroundColor: '#F1F5F9',
-    padding: 4,
-    borderRadius: 12,
   },
-  intervalBtn: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
+  rangeItemSelected: {
+    backgroundColor: '#0463DD',
   },
-  intervalBtnActive: {
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 15,
-    elevation: 2,
-  },
-  intervalText: {
+  rangeText: {
     fontFamily: 'Baloo2_600SemiBold',
-    fontSize: 13,
+    fontSize: 14,
     color: '#64748B',
   },
-  intervalTextActive: {
-    color: '#0F172A',
+  rangeTextSelected: {
+    color: '#FFFFFF',
   },
   chartContainer: {
     height: 180,

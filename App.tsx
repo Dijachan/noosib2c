@@ -19,6 +19,8 @@ import DevicePairingScreen from './src/screens/auth/DevicePairingScreen';
 import HomeScreen from './src/screens/home/HomeScreen';
 import AdherenceDetailsScreen from './src/screens/home/AdherenceDetailsScreen';
 import TempDetailsScreen from './src/screens/home/TempDetailsScreen';
+import ProfileScreen from './src/screens/settings/ProfileScreen';
+import PharmacyHubScreen from './src/screens/health/PharmacyHubScreen';
 import MedsTrayScreen from './src/screens/medications/MedsTrayScreen';
 import MedicationDetailsScreen from './src/screens/medications/MedicationDetailsScreen';
 import SearchDrugScreen from './src/screens/medications/add/SearchDrugScreen';
@@ -72,6 +74,8 @@ export default function App() {
           <Stack.Screen name="Home" component={HomeScreen} options={{ animation: 'none' }} />
           <Stack.Screen name="AdherenceDetails" component={AdherenceDetailsScreen} />
           <Stack.Screen name="TempDetails" component={TempDetailsScreen} />
+          <Stack.Screen name="Profile" component={ProfileScreen} />
+          <Stack.Screen name="PharmacyHub" component={PharmacyHubScreen} />
           <Stack.Screen name="MedsTray" component={MedsTrayScreen} options={{ animation: 'none' }} />
           <Stack.Screen name="MedicationDetails" component={MedicationDetailsScreen} />
           <Stack.Screen name="SearchDrug" component={SearchDrugScreen} />
