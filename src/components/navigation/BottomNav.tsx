@@ -52,7 +52,7 @@ export default function BottomNav({ activeTab }: BottomNavProps) {
           onPress={() => navigation.navigate('PharmacyHub')}
         >
           <Ionicons name={activeTab === 'Pharmacy' ? "bag-handle" : "bag-handle-outline"} size={24} color={getActiveColor('Pharmacy')} />
-          <Text style={[styles.navText, activeTab === 'Pharmacy' && styles.navTextActive]}>Pharmacy</Text>
+          <Text style={[styles.navText, activeTab === 'Pharmacy' && styles.navTextActive]}>Pharm</Text>
         </TouchableOpacity>
         
         <TouchableOpacity 

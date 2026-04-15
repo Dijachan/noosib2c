@@ -149,9 +149,9 @@ export default function HomeScreen() {
             </View>
             <TouchableOpacity 
               style={styles.hubActionBtn}
-              onPress={() => navigation.navigate('PharmacyHub')}
+              onPress={() => navigation.navigate('Notifications')}
             >
-              <Ionicons name="bag-handle-outline" size={26} color="#0463DD" />
+              <Ionicons name="notifications-outline" size={26} color="#0463DD" />
               <View style={styles.hubBadge} />
             </TouchableOpacity>
           </View>
