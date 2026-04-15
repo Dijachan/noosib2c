@@ -47,7 +47,7 @@ export default function Splash2Screen() {
         <View style={styles.content}>
           <View style={styles.centerSection}>
             <Image 
-              source={require('../../../assets/images/splash/logo_icon.png')} 
+              source={require('../../../assets/images/splash/logo_text_v2.png')} 
               style={styles.logo}
               contentFit="contain"
             />
@@ -92,8 +92,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   logo: {
-    width: 100,
-    height: 100,
+    width: width * 0.42,
+    height: width * 0.21,
     marginBottom: 24,
   },
   title: {

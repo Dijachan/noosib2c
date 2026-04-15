@@ -28,7 +28,7 @@ export default function Splash1Screen({ navigation }: any) {
         <View style={styles.content}>
           <View style={styles.logoContainer}>
             <Image 
-              source={require('../../../assets/images/splash/logo_text.png')} 
+              source={require('../../../assets/images/splash/logo_full_v2.png')} 
               style={styles.logo}
               contentFit="contain"
             />
@@ -61,8 +61,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   logo: {
-    width: width * 0.6,
-    height: width * 0.6,
+    width: width * 0.45,
+    height: width * 0.2,
   },
   tagline: {
     fontFamily: 'Baloo2_400Regular',

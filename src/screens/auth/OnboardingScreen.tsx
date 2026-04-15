@@ -22,9 +22,9 @@ const { width, height } = Dimensions.get('window');
 const CARD_WIDTH = 361;
 
 const ONBOARDING_DATA = [
-  { id: '1', title: 'Medication\nMistakes Happen.', subtitle: 'Patients miss doses,\ncaregivers struggle.', image: require('../../../assets/images/onboarding/new_slide1.png') },
-  { id: '2', title: 'Meet Noosi,\nYour Assistant.', subtitle: 'Automates dispensing\nand tracks in real-time.', image: require('../../../assets/images/onboarding/new_slide2.png') },
-  { id: '3', title: 'Safe, Secure\n& Reliable.', subtitle: 'Encrypted health data\nwith offline support.', image: require('../../../assets/images/onboarding/new_slide3.png') },
+  { id: '1', title: 'Medication\nMistakes Happen.', subtitle: 'Patients miss doses,\ncaregivers struggle.', image: require('../../../assets/images/onboarding/onboarding_device_view1.jpg') },
+  { id: '2', title: 'Meet Noosi,\nYour Assistant.', subtitle: 'Automates dispensing\nand tracks in real-time.', image: require('../../../assets/images/onboarding/onboarding_device_view2.jpg') },
+  { id: '3', title: 'Safe, Secure\n& Reliable.', subtitle: 'Encrypted health data\nwith offline support.', image: require('../../../assets/images/onboarding/onboarding_device_view3.jpg') },
 ];
 
 export default function OnboardingScreen() {
@@ -118,7 +118,7 @@ export default function OnboardingScreen() {
             renderItem={({ item }) => (
               <View style={styles.slide}>
                 <View style={styles.imageContainer}>
-                  <Image source={item.image} style={styles.slideImage} resizeMode="cover" />
+                  <Image source={item.image} style={styles.slideImage} resizeMode="contain" />
                 </View>
                 <View style={styles.textContainer}>
                   <Text style={styles.title}>{item.title}</Text>
