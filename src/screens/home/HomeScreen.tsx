@@ -138,22 +138,26 @@ export default function HomeScreen() {
       const { data } = await supabase
         .from('vital_logs')
         .select('value')
+        .eq('patient_id', demoPatientId)
         .order('captured_at', { ascending: false })
-        .limit(1);
+        .limit(1)
+        .single();
       
-      if (data && data.length > 0) {
-        setLatestTemp(Number(data[0].value).toFixed(1));
+      if (data) {
+        setLatestTemp(Number(data.value).toFixed(1));
       }
     };
 
-    fetchLatest();
+    fetchInitialTemp();
 
+    // 2. Real-time subscription
     const subscription = supabase
       .channel('home-vitals')
       .on('postgres_changes', { 
         event: 'INSERT', 
         schema: 'public', 
-        table: 'vital_logs' 
+        table: 'vital_logs',
+        filter: `patient_id=eq.${demoPatientId}`
       }, (payload) => {
         setLatestTemp(Number(payload.new.value).toFixed(1));
       })
@@ -162,9 +166,9 @@ export default function HomeScreen() {
     return () => {
       subscription.unsubscribe();
     };
-  }, [user]);
+  }, [demoPatientId]);
 
-  const firstName = user?.user_metadata?.full_name?.split(' ')[0] || 'Caregiver';
+  const firstName = user?.user_metadata?.full_name?.split(' ')[0] || 'Dija';
 
   return (
     <View style={styles.container}>

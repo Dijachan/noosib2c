@@ -24,26 +24,43 @@ const { width } = Dimensions.get('window');
 export default function TempDetailsScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const { medications } = useMedication();
-  const { user } = useAuth();
+  const { user, demoPatientId } = useAuth();
   
   const [timeRange, setTimeRange] = useState('Weekly');
   const [currentTemp, setCurrentTemp] = useState(36.8);
   const [highTemp, setHighTemp] = useState(37.2);
   const [lowTemp, setLowTemp] = useState(36.5);
   const [realHistory, setRealHistory] = useState<{ label: string; value: number }[]>([]);
+  const [isSimulating, setIsSimulating] = useState(false);
 
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const recAnim = useRef(new Animated.Value(1)).current;
 
+  const simulateTemp = async () => {
+    setIsSimulating(true);
+    const newVal = (36 + Math.random() * 2).toFixed(1);
+    
+    // Push a fake log to Supabase as if the hardware sent it
+    const { error } = await supabase
+      .from('vital_logs')
+      .insert({
+        patient_id: demoPatientId,
+        value: newVal,
+        type: 'temperature',
+        unit: '°C'
+      });
+    
+    setTimeout(() => setIsSimulating(false), 800);
+  };
+
   // Real-time vitals sync
   useEffect(() => {
-    if (!user) return;
-
-    // 1. Fetch initial latest readings
+    // 1. Fetch initial latest readings for this specific demo patient
     const fetchVitals = async () => {
       const { data, error } = await supabase
         .from('vital_logs')
         .select('*')
+        .eq('patient_id', demoPatientId)
         .order('captured_at', { ascending: false })
         .limit(10);
       
@@ -52,7 +69,7 @@ export default function TempDetailsScreen() {
         // Simple mock trend from latest 5-10 logs for now
         const converted = data.reverse().map((log: any) => ({
           label: new Date(log.captured_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          value: Number(log.value)
+          value: Number(Number(log.value).toFixed(1))
         }));
         setRealHistory(converted);
       }
@@ -60,13 +77,14 @@ export default function TempDetailsScreen() {
 
     fetchVitals();
 
-    // 2. Subscribe to new logs
+    // 2. Subscribe to new logs for this specific demo patient
     const subscription = supabase
-      .channel('live-vitals')
+      .channel('live-vitals-detail')
       .on('postgres_changes', { 
         event: 'INSERT', 
         schema: 'public', 
-        table: 'vital_logs' 
+        table: 'vital_logs',
+        filter: `patient_id=eq.${demoPatientId}`
       }, (payload) => {
         const newVal = Number(payload.new.value);
         setCurrentTemp(newVal);
@@ -75,7 +93,7 @@ export default function TempDetailsScreen() {
         
         setRealHistory(prev => [...prev.slice(-9), {
           label: new Date(payload.new.captured_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          value: newVal
+          value: Number(newVal.toFixed(1))
         }]);
       })
       .subscribe();
@@ -83,7 +101,7 @@ export default function TempDetailsScreen() {
     return () => {
       subscription.unsubscribe();
     };
-  }, [user]);
+  }, [demoPatientId]);
 
   // Pulse animation for the "Live" indicator and REC dot
   useEffect(() => {
@@ -218,10 +236,15 @@ export default function TempDetailsScreen() {
             </View>
           </View>
 
-          <View style={styles.hudOverlay}>
+          <TouchableOpacity 
+            style={styles.hudOverlay}
+            onLongPress={simulateTemp}
+            delayLongPress={2000} // Require a 2s press to avoid accidental triggers
+            activeOpacity={0.9}
+          >
             <View style={styles.liveIndicatorRow}>
               <Animated.View style={[styles.pulseDot, { transform: [{ scale: pulseAnim }], backgroundColor: '#0463DD' }]} />
-              <Text style={styles.liveText}>REAL-TIME</Text>
+              <Text style={styles.liveText}>{isSimulating ? 'SYNCING...' : 'REAL-TIME'}</Text>
             </View>
             <View style={styles.tempRow}>
               <Text style={styles.tempLarge}>{currentTemp.toFixed(1)}</Text>
@@ -230,7 +253,7 @@ export default function TempDetailsScreen() {
             <Text style={styles.hudStatus}>
               {currentTemp > 37.5 ? 'Slight Fever Detected' : 'Normal Body Temperature'}
             </Text>
-          </View>
+          </TouchableOpacity>
           <View style={styles.vitalsFooter}>
             <View style={styles.vitalsStat}>
               <Text style={styles.vitalsStatLabel}>Today High</Text>

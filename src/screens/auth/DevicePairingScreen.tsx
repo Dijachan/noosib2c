@@ -15,6 +15,7 @@ import { Feather } from '@expo/vector-icons';
 import { CameraView, useCameraPermissions, BarcodeScanningResult } from 'expo-camera';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import Input from '../../components/inputs/Input';
 import OnboardingBg from '../../components/OnboardingBg';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
@@ -22,9 +23,9 @@ import { Alert, ActivityIndicator } from 'react-native';
 
 export default function DevicePairingScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
-  const { user, refreshOnboarding } = useAuth();
+  const { user, refreshOnboarding, mockNextStep } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [deviceId, setDeviceId] = useState('');
+  const [deviceId, setDeviceId] = useState('NOOSI-77');
   const [scanned, setScanned] = useState(false);
   const [cameraReady, setCameraReady] = useState(false);
   const [permission, requestPermission] = useCameraPermissions();
@@ -180,38 +181,13 @@ export default function DevicePairingScreen() {
           <TouchableOpacity
             style={[styles.primaryButton, (!deviceId || isLoading) && styles.disabledButton]}
             disabled={!deviceId || isLoading}
-            onPress={async () => {
+            onPress={() => {
               setIsLoading(true);
-              try {
-                // 1. Link Device to Patient
-                // (In a real launch, we'd verify the SN exists first)
-                const { error: deviceError } = await supabase
-                  .from('devices')
-                  .upsert({
-                    serial_number: deviceId,
-                    caregiver_id: user?.id,
-                    is_active: true,
-                    battery_level: 100,
-                    connection_status: true
-                  });
-                
-                if (deviceError) throw deviceError;
-
-                // 2. Finalize Onboarding Status
-                const { error: profileError } = await supabase
-                  .from('profiles')
-                  .update({ onboarding_status: 'completed' })
-                  .eq('id', user?.id);
-
-                if (profileError) throw profileError;
-
-                // 3. Refresh context (will trigger gateway navigation to Home)
-                await refreshOnboarding();
-              } catch (error: any) {
-                Alert.alert('Pairing Error', error.message || 'Failed to pair device.');
-              } finally {
+              // Fake pairing sequence
+              setTimeout(() => {
+                mockNextStep();
                 setIsLoading(false);
-              }
+              }, 1500);
             }}
           >
             {isLoading ? (

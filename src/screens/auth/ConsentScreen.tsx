@@ -8,15 +8,19 @@ import {
   ScrollView,
   Image,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import OnboardingBg from '../../components/OnboardingBg';
+import { useAuth } from '../../context/AuthContext';
 
 export default function ConsentScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
+  const { mockNextStep } = useAuth();
   const [isChecked, setIsChecked] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -83,10 +87,24 @@ export default function ConsentScreen() {
             </View>
 
             <View style={styles.auditLog}>
-              <Text style={styles.auditTitle}>AUDIT LOG ENTRY</Text>
-              <Text style={styles.auditText}>TIMESTAMP: {new Date().toISOString().replace('T', ' ').split('.')[0]} UTC</Text>
-              <Text style={styles.auditText}>VERSION: 2.1.0-NDPR</Text>
-              <Text style={styles.auditText}>STATUS: PENDING_APPROVAL</Text>
+              <View style={styles.auditHeader}>
+                <Text style={styles.auditTitle}>AUDIT LOG ENTRY</Text>
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>ENCRYPTED</Text>
+                </View>
+              </View>
+              <View style={styles.auditRow}>
+                <Text style={styles.auditLabel}>TIMESTAMP:</Text>
+                <Text style={styles.auditValue}>{new Date().toISOString().replace('T', ' ').split('.')[0]} UTC</Text>
+              </View>
+              <View style={styles.auditRow}>
+                <Text style={styles.auditLabel}>VERSION:</Text>
+                <Text style={styles.auditValue}>2.1.0-NDPR</Text>
+              </View>
+              <View style={styles.auditRow}>
+                <Text style={styles.auditLabel}>STATUS:</Text>
+                <Text style={styles.auditValue}>PENDING_APPROVAL</Text>
+              </View>
             </View>
           </ScrollView>
         </View>
@@ -108,14 +126,25 @@ export default function ConsentScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity 
-          style={[styles.primaryButton, !isChecked && styles.disabledButton]}
-          disabled={!isChecked}
+          style={[styles.primaryButton, (!isChecked || isLoading) && styles.disabledButton]}
+          disabled={!isChecked || isLoading}
           onPress={() => {
-            mockNextStep();
+            setIsLoading(true);
+            setTimeout(() => {
+              mockNextStep();
+              setIsLoading(false);
+              navigation.navigate('DevicePairing');
+            }, 1000);
           }}
         >
-          <Text style={[styles.buttonText, !isChecked && styles.disabledButtonText]}>Confirm & Continue</Text>
-          <Feather name="arrow-right" size={20} color={isChecked ? "#FFFFFF" : "#9CA3AF"} strokeWidth={3} />
+          {isLoading ? (
+            <ActivityIndicator color="#FFFFFF" />
+          ) : (
+            <>
+              <Text style={[styles.buttonText, !isChecked && styles.disabledButtonText]}>Confirm & Continue</Text>
+              <Feather name="arrow-right" size={20} color={isChecked ? "#FFFFFF" : "#9CA3AF"} strokeWidth={3} />
+            </>
+          )}
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -237,24 +266,55 @@ const styles = StyleSheet.create({
     fontFamily: 'Baloo2_700Bold',
   },
   auditLog: {
-    backgroundColor: 'rgba(4, 99, 221, 0.05)',
-    padding: 16,
+    backgroundColor: 'rgba(44, 110, 245, 0.05)',
+    padding: 20,
     borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(4, 99, 221, 0.1)',
     borderLeftWidth: 4,
     borderLeftColor: '#0463DD',
+    marginTop: 8,
+  },
+  auditHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(4, 99, 221, 0.1)',
+    paddingBottom: 8,
   },
   auditTitle: {
     fontFamily: 'Baloo2_700Bold',
-    fontSize: 14,
-    color: 'rgba(4,9,33,0.76)',
-    letterSpacing: 1,
-    marginBottom: 4,
+    fontSize: 12,
+    color: '#0463DD',
+    letterSpacing: 2,
   },
-  auditText: {
-    fontFamily: 'Baloo2_400Regular',
-    fontSize: 14,
-    color: 'rgba(4,9,33,0.5)',
-    lineHeight: 14,
+  badge: {
+    backgroundColor: '#0463DD',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  badgeText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontFamily: 'Baloo2_700Bold',
+  },
+  auditRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
+  auditLabel: {
+    fontFamily: 'Baloo2_600SemiBold',
+    fontSize: 12,
+    color: 'rgba(4,9,33,0.4)',
+  },
+  auditValue: {
+    fontFamily: 'Baloo2_500Medium',
+    fontSize: 12,
+    color: 'rgba(4,9,33,0.7)',
   },
   buttonContainer: {
     width: '100%',

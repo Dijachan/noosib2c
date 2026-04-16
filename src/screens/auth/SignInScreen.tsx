@@ -15,10 +15,12 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Input from '../../components/inputs/Input';
 import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../context/AuthContext';
 import { Alert, ActivityIndicator } from 'react-native';
 
 export default function SignInScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
+  const { mockLogin } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [form, setForm] = useState({
     email: '',
@@ -32,25 +34,12 @@ export default function SignInScreen() {
   };
 
   const handleSignIn = async () => {
-    if (!isFormValid) return;
-    
     setIsLoading(true);
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: form.email,
-        password: form.password,
-      });
-
-      if (error) throw error;
-      
-      // Navigation will be handled by AuthContext state change 
-      // which App.tsx stack can eventually use to toggle screens.
-      // For now, let stack handle naturally if user is redirected elsewhere.
-    } catch (error: any) {
-      Alert.alert('Sign In Error', error.message || 'Check your credentials and try again.');
-    } finally {
+    // Fake "Verifying" delay for demo realism
+    setTimeout(() => {
+      mockLogin();
       setIsLoading(false);
-    }
+    }, 1500);
   };
 
   return (

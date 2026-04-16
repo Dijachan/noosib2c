@@ -8,6 +8,8 @@ interface AuthContextType {
   isLoading: boolean;
   onboardingStatus: 'not_started' | 'profile_created' | 'paired' | 'completed' | null;
   isLocked: boolean;
+  demoPatientId: string;
+  demoDeviceId: string;
   signOut: () => Promise<void>;
   unlock: (password: string) => Promise<void>;
   refreshOnboarding: () => Promise<void>;
@@ -26,9 +28,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // DEMO USER ID (consistent for hardware link)
   const DEMO_USER_ID = '00000000-0000-0000-0000-000000000000';
+  const DEMO_PATIENT_ID = '11111111-1111-1111-1111-111111111111';
+  const DEMO_DEVICE_ID = '77777777-7777-7777-7777-777777777777';
 
   const mockLogin = () => {
-    setUser({ id: DEMO_USER_ID, email: 'demo@noosi.com' } as any);
+    setUser({ 
+      id: DEMO_USER_ID, 
+      email: 'demo@noosi.com',
+      user_metadata: { full_name: 'Dija' }
+    } as any);
     setOnboardingStatus('not_started');
   };
 
@@ -59,6 +67,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       isLoading, 
       onboardingStatus, 
       isLocked, 
+      demoPatientId: DEMO_PATIENT_ID,
+      demoDeviceId: DEMO_DEVICE_ID,
       signOut, 
       unlock, 
       refreshOnboarding,

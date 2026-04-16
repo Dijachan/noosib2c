@@ -21,7 +21,7 @@ import { Alert, ActivityIndicator } from 'react-native';
 
 export default function CreatePatientProfileScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
-  const { user, refreshOnboarding } = useAuth();
+  const { user, refreshOnboarding, mockNextStep } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [form, setForm] = useState({
     fullName: '',
@@ -35,14 +35,13 @@ export default function CreatePatientProfileScreen() {
     setForm(prev => ({ ...prev, [field]: value }));
   };
 
-  const { mockNextStep } = useAuth();
-
   const handleContinue = async () => {
     setIsLoading(true);
     // Fake processing for demo realism
     setTimeout(() => {
       mockNextStep();
       setIsLoading(false);
+      navigation.navigate('Consent');
     }, 1000);
   };
 
