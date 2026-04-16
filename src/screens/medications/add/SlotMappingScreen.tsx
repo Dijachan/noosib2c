@@ -12,18 +12,20 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useMedication } from '../../../context/MedicationContext';
 
 const { width } = Dimensions.get('window');
 
 export default function SlotMappingScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const route = useRoute<any>();
+  const { medications } = useMedication();
   const { drugData } = route.params || { drugData: { name: 'Metformin' } };
 
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
 
-  // Mock occupied slots (1, 2, 4, 8, 9 are taken based on MedsTrayScreen mock)
-  const occupiedSlots = [1, 2, 4, 8, 9];
+  // Derive occupied slots from real MedicationContext state
+  const occupiedSlots = medications.map(m => m.slot);
 
   const renderSlot = (id: number) => {
     const isOccupied = occupiedSlots.includes(id);

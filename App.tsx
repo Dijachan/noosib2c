@@ -22,6 +22,7 @@ import TempDetailsScreen from './src/screens/home/TempDetailsScreen';
 import ProfileScreen from './src/screens/settings/ProfileScreen';
 import PharmacyHubScreen from './src/screens/health/PharmacyHubScreen';
 import NotificationsScreen from './src/screens/alerts/NotificationsScreen';
+import { AuthProvider } from './src/context/AuthContext';
 import MedsTrayScreen from './src/screens/medications/MedsTrayScreen';
 import MedicationDetailsScreen from './src/screens/medications/MedicationDetailsScreen';
 import SearchDrugScreen from './src/screens/medications/add/SearchDrugScreen';
@@ -32,10 +33,98 @@ import ReviewSyncScreen from './src/screens/medications/add/ReviewSyncScreen';
 import { MedicationProvider } from './src/context/MedicationContext';
 
 
+import WelcomeBackScreen from './src/screens/auth/WelcomeBackScreen';
+import { useAuth } from './src/context/AuthContext';
+import { ActivityIndicator, View } from 'react-native';
+import { useState } from 'react';
+
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 const Stack = createNativeStackNavigator();
+
+const AuthStack = createNativeStackNavigator();
+function AuthNavigator() {
+  return (
+    <AuthStack.Navigator screenOptions={{ headerShown: false, animation: 'fade' }}>
+      <AuthStack.Screen name="Onboarding" component={OnboardingScreen} />
+      <AuthStack.Screen name="SignIn" component={SignInScreen} />
+      <AuthStack.Screen name="SignUp" component={SignUpScreen} />
+      <AuthStack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+      <AuthStack.Screen name="VerifyCode" component={VerifyCodeScreen} />
+      <AuthStack.Screen name="ResetPassword" component={ResetPasswordScreen} />
+      <AuthStack.Screen name="ResetSuccess" component={ResetSuccessScreen} />
+    </AuthStack.Navigator>
+  );
+}
+
+const OnboardingStack = createNativeStackNavigator();
+function OnboardingNavigator() {
+  return (
+    <OnboardingStack.Navigator screenOptions={{ headerShown: false, animation: 'fade' }}>
+      <OnboardingStack.Screen name="CreatePatientProfile" component={CreatePatientProfileScreen} />
+      <OnboardingStack.Screen name="Consent" component={ConsentScreen} />
+      <OnboardingStack.Screen name="DevicePairing" component={DevicePairingScreen} />
+    </OnboardingStack.Navigator>
+  );
+}
+
+const AppStack = createNativeStackNavigator();
+function AppNavigator() {
+  return (
+    <AppStack.Navigator screenOptions={{ headerShown: false, animation: 'fade' }}>
+      <AppStack.Screen name="Home" component={HomeScreen} />
+      <AppStack.Screen name="AdherenceDetails" component={AdherenceDetailsScreen} />
+      <AppStack.Screen name="TempDetails" component={TempDetailsScreen} />
+      <AppStack.Screen name="Profile" component={ProfileScreen} />
+      <AppStack.Screen name="PharmacyHub" component={PharmacyHubScreen} />
+      <AppStack.Screen name="Notifications" component={NotificationsScreen} />
+      <AppStack.Screen name="MedsTray" component={MedsTrayScreen} />
+      <AppStack.Screen name="MedicationDetails" component={MedicationDetailsScreen} />
+      <AppStack.Screen name="SearchDrug" component={SearchDrugScreen} />
+      <AppStack.Screen name="DrugDetail" component={DrugDetailScreen} />
+      <AppStack.Screen name="SlotMapping" component={SlotMappingScreen} />
+      <AppStack.Screen name="Schedule" component={ScheduleScreen} />
+      <AppStack.Screen name="ReviewSync" component={ReviewSyncScreen} />
+    </AppStack.Navigator>
+  );
+}
+
+function MainApp() {
+  const { isLoading, user, onboardingStatus, isLocked } = useAuth();
+  const [bootStep, setBootStep] = useState(0); // 0: Splash1, 1: Splash2, 2: Ready
+
+  // 1. Brand Intro Sequence
+  useEffect(() => {
+    if (!isLoading) {
+      if (bootStep === 0) {
+        const t1 = setTimeout(() => setBootStep(1), 1500);
+        return () => clearTimeout(t1);
+      } else if (bootStep === 1) {
+        const t2 = setTimeout(() => setBootStep(2), 1500);
+        return () => clearTimeout(t2);
+      }
+    }
+  }, [isLoading, bootStep]);
+
+  if (isLoading || bootStep < 2) {
+    if (bootStep === 1) return <Splash2Screen />;
+    return <Splash1Screen />; 
+  }
+
+  // 2. The Great Gateway (Visual Flow)
+  return (
+    <NavigationContainer>
+      {!user ? (
+        <AuthNavigator />
+      ) : onboardingStatus !== 'completed' ? (
+        <OnboardingNavigator />
+      ) : (
+        <AppNavigator />
+      )}
+    </NavigationContainer>
+  );
+}
 
 export default function App() {
   const [fontsLoaded, fontError] = useFonts({
@@ -52,41 +141,13 @@ export default function App() {
     }
   }, [fontsLoaded, fontError]);
 
-  if (!fontsLoaded && !fontError) {
-    return null;
-  }
+  if (!fontsLoaded && !fontError) return null;
 
   return (
-    <MedicationProvider>
-      <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false, animation: 'none' }}>
-          <Stack.Screen name="Splash1" component={Splash1Screen} />
-          <Stack.Screen name="Splash2" component={Splash2Screen} />
-          <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-          <Stack.Screen name="SignUp" component={SignUpScreen} />
-          <Stack.Screen name="CreatePatientProfile" component={CreatePatientProfileScreen} />
-          <Stack.Screen name="SignIn" component={SignInScreen} />
-          <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
-          <Stack.Screen name="VerifyCode" component={VerifyCodeScreen} />
-          <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
-          <Stack.Screen name="ResetSuccess" component={ResetSuccessScreen} />
-          <Stack.Screen name="Consent" component={ConsentScreen} />
-          <Stack.Screen name="DevicePairing" component={DevicePairingScreen} />
-          <Stack.Screen name="Home" component={HomeScreen} />
-          <Stack.Screen name="AdherenceDetails" component={AdherenceDetailsScreen} />
-          <Stack.Screen name="TempDetails" component={TempDetailsScreen} />
-          <Stack.Screen name="Profile" component={ProfileScreen} />
-          <Stack.Screen name="PharmacyHub" component={PharmacyHubScreen} />
-          <Stack.Screen name="Notifications" component={NotificationsScreen} />
-          <Stack.Screen name="MedsTray" component={MedsTrayScreen} />
-          <Stack.Screen name="MedicationDetails" component={MedicationDetailsScreen} />
-          <Stack.Screen name="SearchDrug" component={SearchDrugScreen} />
-          <Stack.Screen name="DrugDetail" component={DrugDetailScreen} />
-          <Stack.Screen name="SlotMapping" component={SlotMappingScreen} />
-          <Stack.Screen name="Schedule" component={ScheduleScreen} />
-          <Stack.Screen name="ReviewSync" component={ReviewSyncScreen} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </MedicationProvider>
+    <AuthProvider>
+      <MedicationProvider>
+        <MainApp />
+      </MedicationProvider>
+    </AuthProvider>
   );
 }

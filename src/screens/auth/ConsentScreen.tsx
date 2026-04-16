@@ -110,7 +110,9 @@ export default function ConsentScreen() {
         <TouchableOpacity 
           style={[styles.primaryButton, !isChecked && styles.disabledButton]}
           disabled={!isChecked}
-          onPress={() => navigation.navigate('DevicePairing')}
+          onPress={() => {
+            mockNextStep();
+          }}
         >
           <Text style={[styles.buttonText, !isChecked && styles.disabledButtonText]}>Confirm & Continue</Text>
           <Feather name="arrow-right" size={20} color={isChecked ? "#FFFFFF" : "#9CA3AF"} strokeWidth={3} />

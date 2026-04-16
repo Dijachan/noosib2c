@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useMedication } from '../../../context/MedicationContext';
+import { Alert } from 'react-native';
 
 export default function ReviewSyncScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
@@ -34,20 +35,23 @@ export default function ReviewSyncScreen() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const handleSync = () => {
+  const handleSync = async () => {
     setIsSyncing(true);
-    // Simulate sync with hardware
-    setTimeout(() => {
-      setIsSyncing(false);
-      setIsSuccess(true);
-      
-      // Save to global state
-      addMedication({
+    try {
+      // 1. Save to Supabase via Context
+      await addMedication({
         id: Math.random().toString(36).substr(2, 9),
         ...finalData,
         status: 'Pending'
       });
-    }, 2500);
+
+      // 2. Hardware "Sync" Success
+      setIsSuccess(true);
+    } catch (error: any) {
+      Alert.alert('Sync Error', error.message || 'Failed to sync with tray.');
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   if (isSuccess) {

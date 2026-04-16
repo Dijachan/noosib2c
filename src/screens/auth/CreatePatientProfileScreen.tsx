@@ -15,9 +15,14 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Input from '../../components/inputs/Input';
 import OnboardingBg from '../../components/OnboardingBg';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../context/AuthContext';
+import { Alert, ActivityIndicator } from 'react-native';
 
 export default function CreatePatientProfileScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
+  const { user, refreshOnboarding } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
   const [form, setForm] = useState({
     fullName: '',
     age: '',
@@ -28,6 +33,17 @@ export default function CreatePatientProfileScreen() {
 
   const handleChange = (field: keyof typeof form, value: string) => {
     setForm(prev => ({ ...prev, [field]: value }));
+  };
+
+  const { mockNextStep } = useAuth();
+
+  const handleContinue = async () => {
+    setIsLoading(true);
+    // Fake processing for demo realism
+    setTimeout(() => {
+      mockNextStep();
+      setIsLoading(false);
+    }, 1000);
   };
 
   return (
@@ -130,11 +146,18 @@ export default function CreatePatientProfileScreen() {
         {/* Action Button (Fixed at bottom) */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity 
-            style={styles.primaryButton}
-            onPress={() => navigation.navigate('Consent')}
+            style={[styles.primaryButton, isLoading && { opacity: 0.7 }]}
+            onPress={handleContinue}
+            disabled={isLoading}
           >
-            <Text style={styles.buttonText}>Continue</Text>
-            <Feather name="arrow-right" size={20} color="#FFFFFF" strokeWidth={3} />
+            {isLoading ? (
+              <ActivityIndicator color="#FFFFFF" />
+            ) : (
+              <>
+                <Text style={styles.buttonText}>Continue</Text>
+                <Feather name="arrow-right" size={20} color="#FFFFFF" strokeWidth={3} />
+              </>
+            )}
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>

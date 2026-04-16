@@ -14,9 +14,12 @@ import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Input from '../../components/inputs/Input';
+import { supabase } from '../../lib/supabase';
+import { Alert, ActivityIndicator } from 'react-native';
 
 export default function SignUpScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
+  const [isLoading, setIsLoading] = useState(false);
   const [form, setForm] = useState({
     fullName: '',
     email: '',
@@ -26,6 +29,17 @@ export default function SignUpScreen() {
 
   const handleChange = (field: keyof typeof form, value: string) => {
     setForm(prev => ({ ...prev, [field]: value }));
+  };
+
+  const { mockLogin } = useAuth();
+
+  const handleSignUp = async () => {
+    setIsLoading(true);
+    // Fake "Processing" delay for demo realism
+    setTimeout(() => {
+      mockLogin();
+      setIsLoading(false);
+    }, 1500);
   };
 
   return (
@@ -94,11 +108,18 @@ export default function SignUpScreen() {
         {/* Sign Up Button (Fixed at bottom) */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity 
-            style={styles.primaryButton}
-            onPress={() => navigation.navigate('CreatePatientProfile')}
+            style={[styles.primaryButton, isLoading && styles.primaryButtonDisabled]}
+            onPress={handleSignUp}
+            disabled={isLoading}
           >
-            <Text style={styles.buttonText}>Sign Up</Text>
-            <Feather name="arrow-right" size={20} color="#FFFFFF" strokeWidth={3} />
+            {isLoading ? (
+              <ActivityIndicator color="#FFFFFF" />
+            ) : (
+              <>
+                <Text style={styles.buttonText}>Sign Up</Text>
+                <Feather name="arrow-right" size={20} color="#FFFFFF" strokeWidth={3} />
+              </>
+            )}
           </TouchableOpacity>
 
           <View style={styles.footer}>
@@ -182,6 +203,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 12,
+  },
+  primaryButtonDisabled: {
+    backgroundColor: '#94A3B8',
   },
   buttonText: {
     fontFamily: 'Baloo2_700Bold',

@@ -14,9 +14,12 @@ import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Input from '../../components/inputs/Input';
+import { supabase } from '../../lib/supabase';
+import { Alert, ActivityIndicator } from 'react-native';
 
 export default function SignInScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
+  const [isLoading, setIsLoading] = useState(false);
   const [form, setForm] = useState({
     email: '',
     password: '',
@@ -26,6 +29,28 @@ export default function SignInScreen() {
 
   const handleChange = (field: keyof typeof form, value: string) => {
     setForm(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSignIn = async () => {
+    if (!isFormValid) return;
+    
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: form.email,
+        password: form.password,
+      });
+
+      if (error) throw error;
+      
+      // Navigation will be handled by AuthContext state change 
+      // which App.tsx stack can eventually use to toggle screens.
+      // For now, let stack handle naturally if user is redirected elsewhere.
+    } catch (error: any) {
+      Alert.alert('Sign In Error', error.message || 'Check your credentials and try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -78,12 +103,18 @@ export default function SignInScreen() {
         {/* Sign In Button (Fixed at bottom) */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity 
-            style={[styles.primaryButton, !isFormValid && styles.disabledButton]}
-            disabled={!isFormValid}
-            onPress={() => console.log('Log User In:', form)}
+            style={[styles.primaryButton, (!isFormValid || isLoading) && styles.disabledButton]}
+            disabled={!isFormValid || isLoading}
+            onPress={handleSignIn}
           >
-            <Text style={[styles.buttonText, !isFormValid && styles.disabledButtonText]}>Sign In</Text>
-            <Feather name="arrow-right" size={20} color={isFormValid ? "#FFFFFF" : "#9CA3AF"} strokeWidth={3} />
+            {isLoading ? (
+              <ActivityIndicator color="#FFFFFF" />
+            ) : (
+              <>
+                <Text style={[styles.buttonText, !isFormValid && styles.disabledButtonText]}>Sign In</Text>
+                <Feather name="arrow-right" size={20} color={isFormValid ? "#FFFFFF" : "#9CA3AF"} strokeWidth={3} />
+              </>
+            )}
           </TouchableOpacity>
 
           <View style={styles.footerContainer}>

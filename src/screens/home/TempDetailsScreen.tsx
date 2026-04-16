@@ -16,16 +16,74 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useMedication } from '../../context/MedicationContext';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../context/AuthContext';
 
 const { width } = Dimensions.get('window');
 
 export default function TempDetailsScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const { medications } = useMedication();
+  const { user } = useAuth();
   
   const [timeRange, setTimeRange] = useState('Weekly');
+  const [currentTemp, setCurrentTemp] = useState(36.8);
+  const [highTemp, setHighTemp] = useState(37.2);
+  const [lowTemp, setLowTemp] = useState(36.5);
+  const [realHistory, setRealHistory] = useState<{ label: string; value: number }[]>([]);
+
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const recAnim = useRef(new Animated.Value(1)).current;
+
+  // Real-time vitals sync
+  useEffect(() => {
+    if (!user) return;
+
+    // 1. Fetch initial latest readings
+    const fetchVitals = async () => {
+      const { data, error } = await supabase
+        .from('vital_logs')
+        .select('*')
+        .order('captured_at', { ascending: false })
+        .limit(10);
+      
+      if (data && data.length > 0) {
+        setCurrentTemp(Number(data[0].value));
+        // Simple mock trend from latest 5-10 logs for now
+        const converted = data.reverse().map((log: any) => ({
+          label: new Date(log.captured_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          value: Number(log.value)
+        }));
+        setRealHistory(converted);
+      }
+    };
+
+    fetchVitals();
+
+    // 2. Subscribe to new logs
+    const subscription = supabase
+      .channel('live-vitals')
+      .on('postgres_changes', { 
+        event: 'INSERT', 
+        schema: 'public', 
+        table: 'vital_logs' 
+      }, (payload) => {
+        const newVal = Number(payload.new.value);
+        setCurrentTemp(newVal);
+        if (newVal > highTemp) setHighTemp(newVal);
+        if (newVal < lowTemp) setLowTemp(newVal);
+        
+        setRealHistory(prev => [...prev.slice(-9), {
+          label: new Date(payload.new.captured_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          value: newVal
+        }]);
+      })
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [user]);
 
   // Pulse animation for the "Live" indicator and REC dot
   useEffect(() => {
@@ -166,20 +224,22 @@ export default function TempDetailsScreen() {
               <Text style={styles.liveText}>REAL-TIME</Text>
             </View>
             <View style={styles.tempRow}>
-              <Text style={styles.tempLarge}>36.8</Text>
+              <Text style={styles.tempLarge}>{currentTemp.toFixed(1)}</Text>
               <Text style={styles.tempUnit}>°C</Text>
             </View>
-            <Text style={styles.hudStatus}>Normal Body Temperature</Text>
+            <Text style={styles.hudStatus}>
+              {currentTemp > 37.5 ? 'Slight Fever Detected' : 'Normal Body Temperature'}
+            </Text>
           </View>
           <View style={styles.vitalsFooter}>
             <View style={styles.vitalsStat}>
               <Text style={styles.vitalsStatLabel}>Today High</Text>
-              <Text style={styles.vitalsStatValue}>37.2°C</Text>
+              <Text style={styles.vitalsStatValue}>{highTemp.toFixed(1)}°C</Text>
             </View>
             <View style={styles.vitalsStatDivider} />
             <View style={styles.vitalsStat}>
               <Text style={styles.vitalsStatLabel}>Today Low</Text>
-              <Text style={styles.vitalsStatValue}>36.5°C</Text>
+              <Text style={styles.vitalsStatValue}>{lowTemp.toFixed(1)}°C</Text>
             </View>
           </View>
         </View>
@@ -210,11 +270,11 @@ export default function TempDetailsScreen() {
 
           <View style={styles.chartContainer}>
             <View style={styles.chartBars}>
-              {trendData[timeRange].map((item, index) => (
+              {(realHistory.length > 0 ? realHistory : trendData[timeRange]).map((item, index) => (
                 <View key={index} style={styles.barItem}>
                    <View style={styles.barTrack}>
                      <View style={[styles.barFill, { 
-                       height: `${((item.value - 36) / 2) * 100}%`,
+                       height: `${Math.min(100, Math.max(10, ((item.value - 35) / 4) * 100))}%`,
                        backgroundColor: item.value > 37.2 ? '#EF4444' : '#0463DD'
                      }]} />
                    </View>

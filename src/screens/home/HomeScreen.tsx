@@ -18,6 +18,9 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import BottomNav from '../../components/navigation/BottomNav';
 import { useMedication } from '../../context/MedicationContext';
+import { useAuth } from '../../context/AuthContext';
+import { supabase } from '../../lib/supabase';
+import { useState, useEffect } from 'react';
 
 const { width } = Dimensions.get('window');
 
@@ -125,6 +128,43 @@ const MedicationCard = ({
 export default function HomeScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const { medications } = useMedication();
+  const { user } = useAuth();
+  const [latestTemp, setLatestTemp] = useState('36.8');
+
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchLatest = async () => {
+      const { data } = await supabase
+        .from('vital_logs')
+        .select('value')
+        .order('captured_at', { ascending: false })
+        .limit(1);
+      
+      if (data && data.length > 0) {
+        setLatestTemp(Number(data[0].value).toFixed(1));
+      }
+    };
+
+    fetchLatest();
+
+    const subscription = supabase
+      .channel('home-vitals')
+      .on('postgres_changes', { 
+        event: 'INSERT', 
+        schema: 'public', 
+        table: 'vital_logs' 
+      }, (payload) => {
+        setLatestTemp(Number(payload.new.value).toFixed(1));
+      })
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [user]);
+
+  const firstName = user?.user_metadata?.full_name?.split(' ')[0] || 'Caregiver';
 
   return (
     <View style={styles.container}>
@@ -138,7 +178,7 @@ export default function HomeScreen() {
         >
           <View style={styles.headerContainer}>
             <View>
-              <Text style={styles.greetingText}>Good morning, Dija! 🌱</Text>
+              <Text style={styles.greetingText}>Good morning, {firstName}! 🌱</Text>
               <View style={styles.monitoringBadge}>
                 <Image
                   source={{ uri: 'https://images.unsplash.com/photo-1512316609839-ce289d3eba0a?auto=format&fit=crop&q=80&w=100' }}
@@ -174,11 +214,11 @@ export default function HomeScreen() {
             />
             <InsightCard
               title="Body Temp"
-              value="36.8"
+              value={latestTemp}
               unit="°C"
               icon="thermometer-outline"
               color="#EBF5FF" // Pastel Blue
-              status="Normal"
+              status={Number(latestTemp) > 37.5 ? "Monitoring" : "Normal"}
               onPress={() => navigation.navigate('TempDetails')}
             />
           </View>

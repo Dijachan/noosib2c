@@ -3,32 +3,13 @@ import { View, Text, StyleSheet, Dimensions, SafeAreaView } from 'react-native';
 import { useFonts, Baloo2_400Regular, Baloo2_700Bold } from '@expo-google-fonts/baloo-2';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-
 import MoonSvg from '../../components/MoonSvg';
 import LoaderSvg from '../../components/LoaderSvg';
 
 const { width } = Dimensions.get('window');
 
 export default function Splash2Screen() {
-  const navigation = useNavigation<NativeStackNavigationProp<any>>();
-  const [fontsLoaded] = useFonts({
-    Baloo2_400Regular,
-    Baloo2_700Bold,
-  });
-
-  useEffect(() => {
-    if (fontsLoaded) {
-      const timer = setTimeout(() => {
-        navigation.replace('Onboarding');
-      }, 2500);
-      return () => clearTimeout(timer);
-    }
-  }, [fontsLoaded, navigation]);
-
-  if (!fontsLoaded) return null;
-
+  // Visual-only splash. Timing handled by App.tsx.
   return (
     <LinearGradient
       colors={['#0563DD', '#15F597']}

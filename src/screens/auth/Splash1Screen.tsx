@@ -5,23 +5,8 @@ import { Image } from 'expo-image';
 
 const { width, height } = Dimensions.get('window');
 
-export default function Splash1Screen({ navigation }: any) {
-  const [fontsLoaded] = useFonts({
-    Baloo2_400Regular,
-    Baloo2_700Bold,
-  });
-
-  React.useEffect(() => {
-    if (fontsLoaded) {
-      const timer = setTimeout(() => {
-        navigation.replace('Splash2');
-      }, 2500);
-      return () => clearTimeout(timer);
-    }
-  }, [fontsLoaded, navigation]);
-
-  if (!fontsLoaded) return null;
-
+export default function Splash1Screen() {
+  // Visual-only splash. Timing handled by App.tsx.
   return (
     <View style={styles.container}>
       <SafeAreaView style={styles.safeArea}>

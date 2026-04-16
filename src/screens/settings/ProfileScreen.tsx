@@ -16,6 +16,9 @@ import { BlurView } from 'expo-blur';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import BottomNav from '../../components/navigation/BottomNav';
+import { useAuth } from '../../context/AuthContext';
+import { supabase } from '../../lib/supabase';
+import { useState, useEffect } from 'react';
 
 const { width } = Dimensions.get('window');
 
@@ -46,6 +49,32 @@ const SettingItem = ({
 
 export default function ProfileScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
+  const { user, signOut } = useAuth();
+  const [deviceInfo, setDeviceInfo] = useState({ sn: 'PENDING', battery: 0, status: false });
+
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchDevice = async () => {
+      const { data } = await supabase
+        .from('devices')
+        .select('*')
+        .limit(1)
+        .single();
+      
+      if (data) {
+        setDeviceInfo({
+          sn: data.serial_number,
+          battery: data.battery_level,
+          status: data.connection_status
+        });
+      }
+    };
+
+    fetchDevice();
+  }, [user]);
+
+  const fullName = user?.user_metadata?.full_name || 'Caregiver';
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -62,9 +91,9 @@ export default function ProfileScreen() {
                 <View style={styles.onlineBadge} />
               </View>
               <View style={styles.nameContainer}>
-                <Text style={styles.profileName}>Dija</Text>
+                <Text style={styles.profileName}>{fullName}</Text>
                 <View style={styles.roleBadge}>
-                  <Text style={styles.roleText}>PRIMARY CAREGIVER</Text>
+                  <Text style={styles.roleText}>{user?.user_metadata?.role?.toUpperCase() || 'CAREGIVER'}</Text>
                 </View>
               </View>
             </View>
@@ -103,18 +132,20 @@ export default function ProfileScreen() {
                 <Ionicons name="bluetooth" size={24} color="#0463DD" />
               </View>
               <View>
-                <Text style={styles.hubTitle}>Noosi Smart Hub v2</Text>
-                <Text style={styles.hubId}>SN: NS-2024-0892</Text>
+                <Text style={styles.hubTitle}>{deviceInfo.status ? 'Noosi Smart Hub v2' : 'Hub Offline'}</Text>
+                <Text style={styles.hubId}>SN: {deviceInfo.sn}</Text>
               </View>
             </View>
             <View style={styles.hubStats}>
               <View style={styles.hubStat}>
-                <Ionicons name="cellular" size={16} color="#10B981" />
-                <Text style={styles.hubStatText}>Strong</Text>
+                <Ionicons name="cellular" size={16} color={deviceInfo.status ? "#10B981" : "#EF4444"} />
+                <Text style={[styles.hubStatText, !deviceInfo.status && { color: '#EF4444' }]}>
+                  {deviceInfo.status ? 'Strong' : 'No Signal'}
+                </Text>
               </View>
               <View style={styles.hubStat}>
-                <Ionicons name="battery-full" size={16} color="#10B981" />
-                <Text style={styles.hubStatText}>85%</Text>
+                <Ionicons name="battery-full" size={16} color={deviceInfo.battery > 20 ? "#10B981" : "#EF4444"} />
+                <Text style={[styles.hubStatText, deviceInfo.battery <= 20 && { color: '#EF4444' }]}>{deviceInfo.battery}%</Text>
               </View>
             </View>
           </View>
@@ -174,6 +205,7 @@ export default function ProfileScreen() {
               icon="log-out-outline" 
               title="Log Out" 
               type="danger" 
+              onPress={signOut}
             />
           </View>
 

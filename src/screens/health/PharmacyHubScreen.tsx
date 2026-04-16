@@ -308,7 +308,6 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   telehealthCard: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 24,
     padding: 24,
     flexDirection: 'row',

@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
+import { useAuth } from './AuthContext';
 
 export type MedStatus = 'Empty' | 'Occupied' | 'Missed' | 'Next';
 
@@ -34,59 +36,102 @@ export const useMedication = () => {
 };
 
 export const MedicationProvider = ({ children }: { children: ReactNode }) => {
-  const [medications, setMedications] = useState<Medication[]>([
-    {
-      id: '1',
-      name: 'Metformin',
-      dosage: '500mg',
-      type: 'Tablet',
-      dosageAmount: '1',
-      slot: 1,
-      frequency: 'Daily',
-      time: '08:00 AM',
-      date: 'Today',
-      status: 'Taken',
-    },
-    {
-      id: '2',
-      name: 'Lisinopril',
-      dosage: '10mg',
-      type: 'Tablet',
-      dosageAmount: '1',
-      slot: 2,
-      frequency: 'Daily',
-      time: '01:00 PM',
-      date: 'Today',
-      status: 'Taken',
-    },
-    {
-      id: '3',
-      name: 'Vitamin C',
-      dosage: '1000mg',
-      type: 'Capsule',
-      dosageAmount: '1',
-      slot: 3,
-      frequency: 'Daily',
-      time: '08:00 PM',
-      date: 'Today',
-      status: 'Pending',
-    },
-    {
-      id: '4',
-      name: 'Aspirin',
-      dosage: '81mg',
-      type: 'Tablet',
-      dosageAmount: '1',
-      slot: 4,
-      frequency: 'Daily',
-      time: '12:00 PM',
-      date: 'Today',
-      status: 'Missed',
-    },
-  ]);
+  const { user } = useAuth();
+  const [medications, setMedications] = useState<Medication[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const addMedication = (med: Medication) => {
-    setMedications((prev) => [...prev, med]);
+  // Sync with Supabase
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchMeds = async () => {
+      setIsLoading(true);
+      
+      // Fetch slots and join with medications
+      const { data, error } = await supabase
+        .from('medication_slots')
+        .select(`
+          slot_number,
+          scheduled_time,
+          is_active,
+          medications (
+            id,
+            name,
+            dosage,
+            type
+          )
+        `);
+
+      if (data) {
+        const transformed: Medication[] = data.map((item: any) => ({
+          id: item.medications?.id || Math.random().toString(),
+          name: item.medications?.name || 'Unknown',
+          dosage: item.medications?.dosage || '',
+          type: item.medications?.type || '',
+          dosageAmount: '1',
+          slot: item.slot_number,
+          frequency: 'Daily',
+          time: item.scheduled_time,
+          date: 'Today',
+          status: 'Pending', // Real logic would check adherence_logs
+        }));
+        setMedications(transformed);
+      }
+      setIsLoading(false);
+    };
+
+    fetchMeds();
+
+    // Subscribe to slot changes (The "Digital Twin" heartbeat)
+    const subscription = supabase
+      .channel('tray-sync')
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'medication_slots' 
+      }, () => {
+        fetchMeds(); // Simple re-fetch on any tray change
+      })
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [user]);
+
+  const addMedication = async (med: Medication) => {
+    if (!user) return;
+
+    try {
+      // 1. Ensure medication exists
+      const { data: medData, error: medError } = await supabase
+        .from('medications')
+        .upsert({
+          name: med.name,
+          dosage: med.dosage,
+          type: med.type,
+          patient_id: user.id, // Assuming user is caregiver and we use their ID for now or find linked patient
+        })
+        .select()
+        .single();
+
+      if (medError) throw medError;
+
+      // 2. Map to slot
+      const { error: slotError } = await supabase
+        .from('medication_slots')
+        .upsert({
+          slot_number: med.slot,
+          medication_id: medData.id,
+          scheduled_time: med.time,
+        });
+
+      if (slotError) throw slotError;
+
+      // Local state will update via real-time subscription
+    } catch (error) {
+      console.error('Error adding medication:', error);
+    }
   };
 
   const getSlotStatus = (slotId: number): MedStatus => {
