@@ -20,18 +20,21 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
 
 const { width } = Dimensions.get('window');
+const CHART_WIDTH = width - 48; // Padding from content
+const CHART_HEIGHT = 180;
 
 export default function TempDetailsScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
-  const { medications } = useMedication();
+  const { medicationList } = useMedication();
   const { user, demoPatientId } = useAuth();
   
-  const [timeRange, setTimeRange] = useState('Weekly');
-  const [currentTemp, setCurrentTemp] = useState(36.8);
-  const [highTemp, setHighTemp] = useState(37.2);
-  const [lowTemp, setLowTemp] = useState(36.5);
-  const [realHistory, setRealHistory] = useState<{ label: string; value: number }[]>([]);
+  const [timeRange, setTimeRange] = useState('Daily');
+  const [currentTemp, setCurrentTemp] = useState(0);
+  const [highTemp, setHighTemp] = useState(0);
+  const [lowTemp, setLowTemp] = useState(100);
+  const [realHistory, setRealHistory] = useState<any[]>([]);
   const [isSimulating, setIsSimulating] = useState(false);
+  const [collapsedDays, setCollapsedDays] = useState<Record<string, boolean>>({});
 
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const recAnim = useRef(new Animated.Value(1)).current;
@@ -53,55 +56,97 @@ export default function TempDetailsScreen() {
     setTimeout(() => setIsSimulating(false), 800);
   };
 
-  // Real-time vitals sync
-  useEffect(() => {
-    // 1. Fetch initial latest readings for this specific demo patient
-    const fetchVitals = async () => {
-      const { data, error } = await supabase
-        .from('vital_logs')
-        .select('*')
-        .eq('patient_id', demoPatientId)
-        .order('captured_at', { ascending: false })
-        .limit(10);
-      
-      if (data && data.length > 0) {
-        setCurrentTemp(Number(data[0].value));
-        // Simple mock trend from latest 5-10 logs for now
-        const converted = data.reverse().map((log: any) => ({
-          label: new Date(log.captured_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          value: Number(Number(log.value).toFixed(1))
-        }));
-        setRealHistory(converted);
-      }
-    };
+  // Real-time vitals sync logic
+  const fetchVitals = async () => {
+    const { data, error } = await supabase
+      .from('vital_logs')
+      .select('*')
+      .eq('patient_id', demoPatientId)
+      .order('captured_at', { ascending: false })
+      .limit(200);
+    
+    if (data && data.length > 0) {
+      const converted = data.map((log: any) => ({
+        id: log.id,
+        label: new Date(log.captured_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        dateText: new Date(log.captured_at).toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' }),
+        value: Number(Number(log.value).toFixed(1)),
+        rawDate: new Date(log.captured_at)
+      }));
+      setRealHistory(converted);
+    }
+  };
 
+  useEffect(() => {
     fetchVitals();
 
-    // 2. Subscribe to new logs for this specific demo patient
+    // 2. Subscribe to new logs
+    const channelName = `details-vitals-${Math.random()}`; // Unique name
     const subscription = supabase
-      .channel('live-vitals-detail')
+      .channel(channelName)
       .on('postgres_changes', { 
-        event: 'INSERT', 
+        event: '*', 
         schema: 'public', 
         table: 'vital_logs',
         filter: `patient_id=eq.${demoPatientId}`
       }, (payload) => {
-        const newVal = Number(payload.new.value);
-        setCurrentTemp(newVal);
-        if (newVal > highTemp) setHighTemp(newVal);
-        if (newVal < lowTemp) setLowTemp(newVal);
-        
-        setRealHistory(prev => [...prev.slice(-9), {
-          label: new Date(payload.new.captured_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          value: Number(newVal.toFixed(1))
-        }]);
+        if (payload.event === 'INSERT') {
+          const newVal = Number(payload.new.value);
+          setRealHistory(prev => [{
+            id: payload.new.id,
+            label: new Date(payload.new.captured_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            dateText: new Date(payload.new.captured_at).toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' }),
+            value: Number(newVal.toFixed(1)),
+            rawDate: new Date(payload.new.captured_at)
+          }, ...prev.slice(0, 199)]);
+        } else if (payload.event === 'UPDATE') {
+          const newVal = Number(payload.new.value);
+          setRealHistory(prev => prev.map(item => 
+            item.id === payload.new.id 
+              ? {
+                  ...item,
+                  value: Number(newVal.toFixed(1)),
+                  label: new Date(payload.new.captured_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                  dateText: new Date(payload.new.captured_at).toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' }),
+                  rawDate: new Date(payload.new.captured_at)
+                } 
+              : item
+          ));
+        } else if (payload.event === 'DELETE') {
+          setRealHistory(prev => prev.filter(item => item.id !== payload.old.id));
+        }
       })
       .subscribe();
 
     return () => {
-      subscription.unsubscribe();
+      supabase.removeChannel(subscription);
     };
   }, [demoPatientId]);
+
+  // 3. Logic Calibration Engine: derive all HUD stats from the raw array truth
+  useEffect(() => {
+    if (realHistory.length > 0) {
+      // With descending sort, the NEWEST is the FIRST item in the array
+      setCurrentTemp(realHistory[0].value);
+
+      // Today's High/Low Logic remains derived from full today's set
+      const todayString = new Date().toDateString();
+      const todayReadings = realHistory.filter(log => log.rawDate && log.rawDate.toDateString() === todayString);
+      
+      if (todayReadings.length > 0) {
+        const values = todayReadings.map(r => r.value);
+        setHighTemp(Math.max(...values));
+        setLowTemp(Math.min(...values));
+      } else {
+        // Clinical safety: reset to 0 if no readings captured today
+        setHighTemp(0);
+        setLowTemp(0);
+      }
+    } else {
+      setHighTemp(0);
+      setLowTemp(0);
+    }
+  }, [realHistory]);
 
   // Pulse animation for the "Live" indicator and REC dot
   useEffect(() => {
@@ -138,16 +183,40 @@ export default function TempDetailsScreen() {
     ).start();
   }, []);
 
+  const getCalendarWeekBounds = () => {
+    const now = new Date();
+    const day = now.getDay(); // 0-6 (Sun-Sat)
+    const diffToMonday = day === 0 ? -6 : 1 - day;
+    
+    const monday = new Date(now);
+    monday.setDate(now.getDate() + diffToMonday);
+    monday.setHours(0, 0, 0, 0);
+    
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    sunday.setHours(23, 59, 59, 999);
+    
+    return { monday, sunday };
+  };
+
+  const toggleDay = (day: string) => {
+    setCollapsedDays(prev => ({
+      ...prev,
+      [day]: !prev[day]
+    }));
+  };
+
+  useEffect(() => {
+    // Reset collapses when switching time ranges to avoid confusion
+    setCollapsedDays({});
+  }, [timeRange]);
+
   const ranges = ['Daily', 'Weekly', 'Monthly', 'Quarterly', 'Yearly'];
-  
   const trendData: Record<string, { label: string; value: number }[]> = {
-    Daily: [
-      { label: '6am', value: 36.6 },
-      { label: '10am', value: 36.8 },
-      { label: '2pm', value: 37.2 },
-      { label: '6pm', value: 36.9 },
-      { label: '10pm', value: 36.7 },
-    ],
+    Daily: Array.from({ length: 24 }, (_, i) => ({
+      label: i === 0 ? '12am' : i === 12 ? '12pm' : `${i % 12}${i < 12 ? 'am' : 'pm'}`,
+      value: 36.5 + Math.random() * 0.8 + (i > 10 && i < 18 ? 0.5 : 0),
+    })),
     Weekly: [
       { label: 'Mon', value: 36.6 },
       { label: 'Tue', value: 36.8 },
@@ -158,10 +227,10 @@ export default function TempDetailsScreen() {
       { label: 'Sun', value: 36.8 },
     ],
     Monthly: [
-      { label: 'W1', value: 36.8 },
-      { label: 'W2', value: 37.1 },
-      { label: 'W3', value: 36.8 },
-      { label: 'W4', value: 36.7 },
+      { label: 'Week 1', value: 36.8 },
+      { label: 'Week 2', value: 37.1 },
+      { label: 'Week 3', value: 36.8 },
+      { label: 'Week 4', value: 36.7 },
     ],
     Quarterly: [
       { label: 'Jan', value: 36.9 },
@@ -176,47 +245,101 @@ export default function TempDetailsScreen() {
     ],
   };
 
-  const medicineLogs = [
-    {
-      id: '1',
-      name: 'Metformin',
-      status: 'Taken',
-      time: '08:02 AM',
-      date: 'Today',
-      snapshot: 'file:///Users/mac/.gemini/antigravity/brain/47238e4b-79a1-45b7-9f28-1f37f71562f1/metformin_white_tablet_1776167059083.png',
-    },
-    {
-      id: '2',
-      name: 'Lisinopril',
-      status: 'Taken',
-      time: '01:15 PM',
-      date: 'Today',
-      snapshot: 'file:///Users/mac/.gemini/antigravity/brain/47238e4b-79a1-45b7-9f28-1f37f71562f1/lisinopril_pills_clinical_1776167073050.png',
-    },
-    {
-      id: '3',
-      name: 'Atorvastatin',
-      status: 'Missed',
-      time: '08:00 PM',
-      date: 'Yesterday',
-    },
-    {
-      id: '4',
-      name: 'Metformin',
-      status: 'Taken',
-      time: '08:05 AM',
-      date: 'Yesterday',
-      snapshot: 'file:///Users/mac/.gemini/antigravity/brain/47238e4b-79a1-45b7-9f28-1f37f71562f1/metformin_white_tablet_1776167059083.png',
-    },
-  ];
+  // 5. Data Processing Logic (Fixed Bucket Aggregation)
+  const getAggregatedTrend = () => {
+    // 5a. Define Static Buckets for each range
+    const buckets: Record<string, { label: string; values: number[] }[]> = {
+      Daily: Array.from({ length: 24 }, (_, i) => ({
+        label: i === 0 ? '12am' : i === 12 ? '12pm' : `${i % 12}${i < 12 ? 'am' : 'pm'}`,
+        values: []
+      })),
+      Weekly: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => ({
+        label: day,
+        values: []
+      })),
+      Monthly: ['Week 1', 'Week 2', 'Week 3', 'Week 4'].map(w => ({
+        label: w,
+        values: []
+      })),
+      Quarterly: [], // Will be filled dynamically below
+      Yearly: ['Q1', 'Q2', 'Q3', 'Q4'].map(q => ({
+        label: q,
+        values: []
+      })),
+    };
+
+    // Fill Quarterly Buckets with current quarter month names
+    const now = new Date();
+    const currentQ = Math.floor(now.getMonth() / 3);
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    for (let i = 0; i < 3; i++) {
+        buckets.Quarterly.push({ label: months[currentQ * 3 + i], values: [] });
+    }
+
+    if (realHistory.length === 0) {
+      return buckets[timeRange].map(b => ({ label: b.label, value: 0 }));
+    }
+
+    // 5b. Fill Buckets with Raw Data
+    realHistory.forEach(log => {
+      const date = log.rawDate || new Date();
+      
+      if (timeRange === 'Daily') {
+        const today = new Date().toDateString();
+        if (date.toDateString() === today) {
+          const hour = date.getHours(); // 0-23
+          buckets.Daily[hour].values.push(log.value);
+        }
+      } else if (timeRange === 'Weekly') {
+        const { monday, sunday } = getCalendarWeekBounds();
+        if (date >= monday && date <= sunday) {
+          const dayIdx = (date.getDay() + 6) % 7; // Mon is 0, Sun is 6
+          buckets.Weekly[dayIdx].values.push(log.value);
+        }
+      } else if (timeRange === 'Monthly') {
+        // Strict Calendar Month (Current Month)
+        const now = new Date();
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
+        
+        if (date.getMonth() === currentMonth && date.getFullYear() === currentYear) {
+           const weekIdx = Math.min(3, Math.floor((date.getDate() - 1) / 7));
+           buckets.Monthly[weekIdx].values.push(log.value);
+        }
+      } else if (timeRange === 'Quarterly') {
+        const now = new Date();
+        const currentQ = Math.floor(now.getMonth() / 3);
+        const logQ = Math.floor(date.getMonth() / 3);
+        
+        if (logQ === currentQ && date.getFullYear() === now.getFullYear()) {
+          const monthIdxInQ = date.getMonth() % 3;
+          buckets.Quarterly[monthIdxInQ].values.push(log.value);
+        }
+      } else if (timeRange === 'Yearly') {
+        const now = new Date();
+        if (date.getFullYear() === now.getFullYear()) {
+          const qIdx = Math.floor(date.getMonth() / 3);
+          buckets.Yearly[qIdx].values.push(log.value);
+        }
+      }
+    });
+
+    // 5c. Calculate Averages per Bucket
+    return buckets[timeRange].map(b => ({
+      label: b.label,
+      value: b.values.length > 0 ? b.values.reduce((a, b) => a + b, 0) / b.values.length : 0
+    }));
+  };
+
+  const chartData = getAggregatedTrend();
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Ionicons name="arrow-back" size={24} color="#0F172A" />
+          <Ionicons name="chevron-back" size={24} color="#0F172A" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Vitals & Health</Text>
+        <Text style={styles.headerTitle}>Body Temperature</Text>
         <TouchableOpacity style={styles.headerAction}>
           <Ionicons name="ellipsis-horizontal" size={24} color="#0F172A" />
         </TouchableOpacity>
@@ -227,8 +350,8 @@ export default function TempDetailsScreen() {
         <View style={styles.vitalsHud}>
           <View style={styles.hudHeader}>
             <View style={styles.probeStatus}>
-              <Ionicons name="bluetooth" size={14} color="#0463DD" />
-              <Text style={styles.probeStatusText}>PROBE CONNECTED</Text>
+              <Ionicons name="cloud-done" size={14} color="#10B981" />
+              <Text style={styles.probeStatusText}>NOOSI CONNECTED</Text>
             </View>
             <View style={styles.probeStatus}>
               <Ionicons name="battery-full" size={14} color="#0463DD" />
@@ -250,8 +373,8 @@ export default function TempDetailsScreen() {
               <Text style={styles.tempLarge}>{currentTemp.toFixed(1)}</Text>
               <Text style={styles.tempUnit}>°C</Text>
             </View>
-            <Text style={styles.hudStatus}>
-              {currentTemp > 37.5 ? 'Slight Fever Detected' : 'Normal Body Temperature'}
+            <Text style={[styles.hudStatus, { color: currentTemp > 38.5 ? '#EF4444' : currentTemp > 37.5 ? '#F59E0B' : '#10B981' }]}>
+              {currentTemp > 38.5 ? 'High Fever Alert!' : currentTemp > 37.5 ? 'Slight Fever Detected' : 'Normal Body Temperature'}
             </Text>
           </TouchableOpacity>
           <View style={styles.vitalsFooter}>
@@ -270,12 +393,15 @@ export default function TempDetailsScreen() {
         {/* History Logs Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>History Logs</Text>
+            <View>
+              <Text style={styles.sectionTitle}>Temp History</Text>
+              <Text style={styles.sectionSubtitle}>A quick look at how she's doing today</Text>
+            </View>
           </View>
 
-          <ScrollView 
-            horizontal 
-            showsHorizontalScrollIndicator={false} 
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.rangeSelector}
           >
             {ranges.map((range) => (
@@ -292,67 +418,138 @@ export default function TempDetailsScreen() {
           </ScrollView>
 
           <View style={styles.chartContainer}>
-            <View style={styles.chartBars}>
-              {(realHistory.length > 0 ? realHistory : trendData[timeRange]).map((item, index) => (
-                <View key={index} style={styles.barItem}>
-                   <View style={styles.barTrack}>
-                     <View style={[styles.barFill, { 
-                       height: `${Math.min(100, Math.max(10, ((item.value - 35) / 4) * 100))}%`,
-                       backgroundColor: item.value > 37.2 ? '#EF4444' : '#0463DD'
-                     }]} />
-                   </View>
-                   <Text style={styles.barLabel}>{item.label}</Text>
-                </View>
-              ))}
-            </View>
+            {(() => {
+              const data = chartData;
+              const isScrollable = data.length > 7;
+              
+              return (
+                <ScrollView 
+                  key={timeRange} // Force re-render to fix spacing bug on reverse clicks
+                  horizontal={isScrollable}
+                  showsHorizontalScrollIndicator={false} 
+                  contentContainerStyle={[
+                    styles.chartBars,
+                    !isScrollable && { flexGrow: 1, justifyContent: 'space-between' }
+                  ]}
+                >
+                  {data.map((item, index) => (
+                    <View key={index} style={[styles.barItem, !isScrollable ? { flex: 1 } : { width: 44 }]}>
+                      <Text style={styles.barValue}>{item.value.toFixed(1)}°</Text>
+                      <View style={styles.barTrack}>
+                        <View style={[styles.barFill, {
+                          height: item.value === 0 ? '0%' : `${Math.min(100, Math.max(10, ((item.value - 35) / 4) * 100))}%`,
+                          backgroundColor: item.value === 0 ? '#E2E8F0' : (item.value > 37.5 ? '#EF4444' : '#0463DD')
+                        }]} />
+                      </View>
+                      <Text style={[styles.barLabel, { fontSize: 10 }]}>{item.label}</Text>
+                    </View>
+                  ))}
+                </ScrollView>
+              );
+            })()}
           </View>
         </View>
 
-        {/* Medication History Section */}
+        {/* Detailed History Log Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Medication History</Text>
-          <Text style={styles.sectionSubtitle}>Visual verification from unit camera</Text>
-          
-          <View style={styles.logsList}>
-            {medicineLogs.map((log) => (
-              <View key={log.id} style={styles.logCard}>
-                <View style={styles.logHeader}>
-                  <View style={styles.logInfoLeft}>
-                    <View style={[styles.statusIndicator, { backgroundColor: log.status === 'Taken' ? '#10B981' : '#EF4444' }]} />
-                    <View>
-                      <Text style={styles.logMedName}>{log.name}</Text>
-                      <Text style={styles.logTime}>{log.time} • {log.date}</Text>
-                    </View>
-                  </View>
-                  <View style={[styles.statusBadge, { backgroundColor: log.status === 'Taken' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)' }]}>
-                    <Text style={[styles.statusBadgeText, { color: log.status === 'Taken' ? '#10B981' : '#EF4444' }]}>
-                      {log.status.toUpperCase()}
-                    </Text>
-                  </View>
-                </View>
+          {(() => {
+            const filteredLogs = realHistory.filter(log => {
+              const date = log.rawDate || new Date();
+              const diff = (new Date().getTime() - date.getTime()) / (1000 * 3600 * 24);
+              
+              if (timeRange === 'Daily') return date.toDateString() === new Date().toDateString();
+              
+              if (timeRange === 'Weekly') {
+                const { monday, sunday } = getCalendarWeekBounds();
+                return date >= monday && date <= sunday;
+              }
+              
+              if (timeRange === 'Monthly') return diff <= 30;
+              return true;
+            });
 
-                {log.snapshot && (
-                   <View style={styles.snapshotContainer}>
-                     <Image source={{ uri: log.snapshot }} style={styles.snapshotImage} />
-                     <View style={styles.snapshotOverlay}>
-                        <View style={styles.recContainer}>
-                          <Animated.View style={[styles.recDot, { opacity: recAnim }]} />
-                          <Text style={styles.recText}>[REC] MUMMY K CAM</Text>
-                        </View>
-                        <Text style={styles.timestampText}>{log.time} GMT</Text>
-                     </View>
-                   </View>
-                )}
-                
-                {log.status === 'Missed' && (
-                  <View style={styles.missedNotice}>
-                    <Ionicons name="alert-circle" size={18} color="#EF4444" />
-                    <Text style={styles.missedText}>No visual confirmation recorded.</Text>
+            // Dynamic Grouping logic
+            const grouped: Record<string, any[]> = {};
+            filteredLogs.forEach(log => {
+              const date = log.rawDate || new Date();
+              let label = '';
+              
+              if (timeRange === 'Daily') {
+                const today = new Date();
+                const dateStr = today.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+                label = `Today, ${dateStr}`;
+              } else if (timeRange === 'Weekly') {
+                label = date.toLocaleDateString('en-US', { 
+                  weekday: 'long', 
+                  day: 'numeric', 
+                  month: 'long' 
+                });
+              } else if (timeRange === 'Monthly') {
+                const dayOfMonth = date.getDate();
+                const weekNum = Math.ceil(dayOfMonth / 7);
+                label = `Week ${weekNum}`;
+              } else if (timeRange === 'Quarterly') {
+                label = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+              } else if (timeRange === 'Yearly') {
+                const qIdx = Math.floor(date.getMonth() / 3) + 1;
+                label = `Quarter ${qIdx}, ${date.getFullYear()}`;
+              } else {
+                label = date.toLocaleDateString('en-US', { year: 'numeric' });
+              }
+              
+              if (!grouped[label]) grouped[label] = [];
+              grouped[label].push(log);
+            });
+
+            const dayEntries = Object.entries(grouped);
+
+            if (dayEntries.length === 0) {
+              return (
+                <View style={styles.emptyActivity}>
+                  <View style={styles.emptyIconBg}>
+                    <Ionicons name="thermometer-outline" size={32} color="#CBD5E1" />
                   </View>
-                )}
-              </View>
-            ))}
-          </View>
+                  <Text style={styles.emptyActivityText}>No readings yet</Text>
+                  <Text style={styles.emptyActivitySubtext}>Vitals will appear here after sync</Text>
+                </View>
+              );
+            }
+
+            return dayEntries.map(([day, logs], dayIdx) => {
+              const isCollapsed = collapsedDays[day];
+              
+              return (
+                <View key={day} style={styles.daySection}>
+                  <TouchableOpacity 
+                    style={styles.dayHeaderRow} 
+                    onPress={() => toggleDay(day)}
+                    activeOpacity={0.6}
+                  >
+                    <Text style={styles.dayHeaderText}>{day}</Text>
+                    <View style={styles.dayHeaderDivider} />
+                    <Ionicons 
+                      name={isCollapsed ? "chevron-down" : "chevron-up"} 
+                      size={18} 
+                      color="#94A3B8" 
+                    />
+                  </TouchableOpacity>
+                  
+                  {!isCollapsed && (
+                    <View style={styles.logsList}>
+                      {logs.map((item, index) => (
+                        <View key={index} style={styles.gridLogItem}>
+                          <View style={[styles.logGridIndicator, { backgroundColor: item.value > 37.5 ? '#EF4444' : '#10B981' }]} />
+                          <Text style={styles.logGridValue}>{item.value.toFixed(1)}°</Text>
+                          <Text style={styles.logGridTime}>{item.label}</Text>
+                          <Text style={styles.logGridDate}>{item.dateText || 'Today'}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  )}
+                </View>
+              );
+            });
+          })()}
         </View>
 
         <View style={{ height: 40 }} />
@@ -364,7 +561,7 @@ export default function TempDetailsScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F8FAFC',
   },
   header: {
     flexDirection: 'row',
@@ -372,6 +569,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 15,
+    backgroundColor: '#F8FAFC',
   },
   headerTitle: {
     fontFamily: 'Baloo2_700Bold',
@@ -430,8 +628,11 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   hudOverlay: {
-    padding: 32,
+    width: '100%',
+    paddingVertical: 40,
+    paddingHorizontal: 24,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   liveIndicatorRow: {
     flexDirection: 'row',
@@ -441,7 +642,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
-    marginBottom: 20,
+    marginBottom: 0,
   },
   pulseDot: {
     width: 6,
@@ -458,12 +659,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'baseline',
     gap: 4,
+    marginTop: 12,
   },
   tempLarge: {
     fontFamily: 'Baloo2_700Bold',
     fontSize: 72,
     color: '#0F172A',
-    lineHeight: 80,
+    lineHeight: 90,
   },
   tempUnit: {
     fontFamily: 'Baloo2_600SemiBold',
@@ -545,59 +747,40 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   chartContainer: {
-    height: 180,
     backgroundColor: '#F8FAFC',
     borderRadius: 24,
-    padding: 20,
-    justifyContent: 'flex-end',
-    position: 'relative',
-    overflow: 'hidden',
-  },
-  refLines: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    height: '100%',
-    paddingHorizontal: 20,
-    paddingBottom: 40,
-  },
-  refLine: {
-    position: 'absolute',
-    left: 20,
-    right: 20,
-    height: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.05)',
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  refLabel: {
-    position: 'absolute',
-    right: 0,
-    fontFamily: 'Baloo2_700Bold',
-    fontSize: 8,
-    color: '#64748B',
-    backgroundColor: '#F8FAFC',
-    paddingLeft: 4,
+    paddingVertical: 24,
+    paddingHorizontal: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#F1F5F9',
   },
   chartBars: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'flex-end',
+    gap: 12,
   },
   barItem: {
     alignItems: 'center',
     gap: 8,
   },
+  barValue: {
+    fontFamily: 'Baloo2_700Bold',
+    fontSize: 10,
+    color: '#0463DD',
+    marginBottom: 4,
+  },
   barTrack: {
-    width: 12,
+    width: 24,
     height: 120,
     backgroundColor: '#E2E8F0',
-    borderRadius: 6,
+    borderRadius: 12,
     justifyContent: 'flex-end',
+    overflow: 'hidden',
   },
   barFill: {
     width: '100%',
-    borderRadius: 6,
+    borderRadius: 12,
   },
   barLabel: {
     fontFamily: 'Baloo2_500Medium',
@@ -605,7 +788,41 @@ const styles = StyleSheet.create({
     color: '#64748B',
   },
   logsList: {
-    gap: 16,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  gridLogItem: {
+    width: (Dimensions.get('window').width - 48 - 24) / 3, // 3 columns
+    backgroundColor: '#F8FAFC',
+    borderRadius: 20,
+    padding: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#F1F5F9',
+    marginBottom: 4,
+  },
+  logGridIndicator: {
+    width: 20,
+    height: 4,
+    borderRadius: 2,
+    marginBottom: 8,
+  },
+  logGridValue: {
+    fontFamily: 'Baloo2_800ExtraBold',
+    fontSize: 18,
+    color: '#0F172A',
+  },
+  logGridTime: {
+    fontFamily: 'Baloo2_700Bold',
+    fontSize: 12,
+    color: '#64748B',
+    marginTop: 2,
+  },
+  logGridDate: {
+    fontFamily: 'Baloo2_500Medium',
+    fontSize: 10,
+    color: '#94A3B8',
   },
   logCard: {
     backgroundColor: '#F8FAFC',
@@ -710,5 +927,57 @@ const styles = StyleSheet.create({
     fontFamily: 'Baloo2_500Medium',
     fontSize: 12,
     color: '#EF4444',
+  },
+  daySection: {
+    marginBottom: 32,
+  },
+  dayHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 16,
+  },
+  dayHeaderText: {
+    fontFamily: 'Baloo2_700Bold',
+    fontSize: 14,
+    color: '#94A3B8',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  dayHeaderDivider: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#F1F5F9',
+  },
+  emptyActivity: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+    paddingHorizontal: 40,
+  },
+  emptyIconBg: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#F8FAFC',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#F1F5F9',
+  },
+  emptyActivityText: {
+    fontFamily: 'Baloo2_700Bold',
+    fontSize: 16,
+    color: '#475569',
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+  emptyActivitySubtext: {
+    fontFamily: 'Baloo2_500Medium',
+    fontSize: 13,
+    color: '#94A3B8',
+    textAlign: 'center',
+    lineHeight: 18,
   },
 });

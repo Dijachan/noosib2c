@@ -25,6 +25,8 @@ import NotificationsScreen from './src/screens/alerts/NotificationsScreen';
 import { AuthProvider } from './src/context/AuthContext';
 import MedsTrayScreen from './src/screens/medications/MedsTrayScreen';
 import MedicationDetailsScreen from './src/screens/medications/MedicationDetailsScreen';
+import ActivityLogScreen from './src/screens/medications/ActivityLogScreen';
+import MedicationScheduleScreen from './src/screens/medications/MedicationScheduleScreen';
 import SearchDrugScreen from './src/screens/medications/add/SearchDrugScreen';
 import DrugDetailScreen from './src/screens/medications/add/DrugDetailScreen';
 import SlotMappingScreen from './src/screens/medications/add/SlotMappingScreen';
@@ -81,6 +83,8 @@ function AppNavigator() {
       <AppStack.Screen name="Notifications" component={NotificationsScreen} />
       <AppStack.Screen name="MedsTray" component={MedsTrayScreen} />
       <AppStack.Screen name="MedicationDetails" component={MedicationDetailsScreen} />
+      <AppStack.Screen name="ActivityLog" component={ActivityLogScreen} />
+      <AppStack.Screen name="CareSchedule" component={MedicationScheduleScreen} />
       <AppStack.Screen name="SearchDrug" component={SearchDrugScreen} />
       <AppStack.Screen name="DrugDetail" component={DrugDetailScreen} />
       <AppStack.Screen name="SlotMapping" component={SlotMappingScreen} />

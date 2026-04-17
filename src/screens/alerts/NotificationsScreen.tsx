@@ -28,7 +28,7 @@ const NotificationItem = ({
   const getIcon = () => {
     switch (type) {
       case 'alert': return 'alert-circle';
-      case 'hardware': return 'bluetooth';
+      case 'hardware': return 'cloud-circle';
       default: return 'notifications';
     }
   };
@@ -61,7 +61,7 @@ const NotificationItem = ({
 const getActiveIcon = (type: string) => {
   switch (type) {
     case 'alert': return 'alert-circle';
-    case 'hardware': return 'bluetooth';
+    case 'hardware': return 'cloud-circle';
     default: return 'notifications';
   }
 };
@@ -73,7 +73,7 @@ export default function NotificationsScreen() {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Ionicons name="arrow-back" size={24} color="#0F172A" />
+          <Ionicons name="chevron-back" size={24} color="#0F172A" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Care Alerts</Text>
         <TouchableOpacity style={styles.markReadBtn}>
@@ -137,9 +137,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
+    backgroundColor: '#F8FAFC',
   },
   backBtn: {
     width: 40,

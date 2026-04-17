@@ -15,6 +15,7 @@ interface AuthContextType {
   refreshOnboarding: () => Promise<void>;
   mockLogin: () => void;
   mockNextStep: () => void;
+  setOnboardingStatus: (status: 'not_started' | 'profile_created' | 'paired' | 'completed' | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -73,7 +74,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       unlock, 
       refreshOnboarding,
       mockLogin,
-      mockNextStep 
+      mockNextStep,
+      setOnboardingStatus
     }}>
       {children}
     </AuthContext.Provider>

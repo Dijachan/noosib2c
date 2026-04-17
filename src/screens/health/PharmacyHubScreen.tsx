@@ -13,6 +13,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import BottomNav from '../../components/navigation/BottomNav';
 
 const { width } = Dimensions.get('window');
 
@@ -60,7 +61,7 @@ export default function PharmacyHubScreen() {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Ionicons name="arrow-back" size={24} color="#0F172A" />
+          <Ionicons name="chevron-back" size={24} color="#0F172A" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Pharmacy Hub</Text>
         <TouchableOpacity style={styles.supportBtn}>
@@ -142,11 +143,7 @@ export default function PharmacyHubScreen() {
         <View style={{ height: 100 }} />
       </ScrollView>
 
-      {/* Footer Info */}
-      <View style={styles.footerInfo}>
-        <Ionicons name="shield-checkmark" size={16} color="#64748B" />
-        <Text style={styles.footerText}>Secure clinical pharmacy partner</Text>
-      </View>
+      <BottomNav activeTab="Pharmacy" />
     </SafeAreaView>
   );
 }
@@ -162,9 +159,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
+    backgroundColor: '#F8FAFC', // Match safeArea background for seamless blend
   },
   backBtn: {
     width: 40,

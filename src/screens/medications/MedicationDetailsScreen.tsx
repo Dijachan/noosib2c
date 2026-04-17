@@ -9,6 +9,7 @@ import {
   Image,
   Dimensions,
   Platform,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -21,9 +22,13 @@ export default function MedicationDetailsScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const route = useRoute<any>();
   const { medId } = route.params || {};
-  const { medications } = useMedication();
+  const { medicationList, deleteMedication } = useMedication();
+  const totalDoses = medicationList.length;
+  const takenDoses = medicationList.filter(m => m.status === 'Taken').length;
+  const missedDoses = medicationList.filter(m => m.status === 'Missed').length;
+  const pendingDoses = medicationList.filter(m => m.status === 'Pending').length;
 
-  const med = medications.find(m => m.id === medId);
+  const med = medicationList.find(m => m.id === medId);
 
   if (!med) {
     return (
@@ -50,11 +55,40 @@ export default function MedicationDetailsScreen() {
 
   const status = getStatusConfig();
 
+  const handleEdit = () => {
+    navigation.navigate('SearchDrug', { 
+      editMed: med,
+      isEditing: true
+    });
+  };
+
+  const handleDelete = () => {
+    Alert.alert(
+      'Delete Medication',
+      `Are you sure you want to remove ${med.name} from Slot ${med.slot}?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Delete', 
+          style: 'destructive',
+          onPress: async () => {
+             try {
+               await deleteMedication(med.id);
+               navigation.goBack();
+             } catch (error) {
+               Alert.alert('Error', 'Failed to delete medication.');
+             }
+          }
+        }
+      ]
+    );
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Ionicons name="arrow-back" size={24} color="#0F172A" />
+          <Ionicons name="chevron-back" size={24} color="#0F172A" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Details</Text>
         <TouchableOpacity style={styles.headerAction}>
@@ -136,8 +170,15 @@ export default function MedicationDetailsScreen() {
       </ScrollView>
 
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.editBtn}>
+        <TouchableOpacity style={styles.editBtn} onPress={handleEdit}>
           <Text style={styles.editBtnText}>Edit Schedule</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={[styles.editBtn, { marginTop: 12, backgroundColor: 'rgba(239, 68, 68, 0.05)' }]} 
+          onPress={handleDelete}
+        >
+          <Text style={[styles.editBtnText, { color: '#EF4444' }]}>Delete Medication</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -147,7 +188,7 @@ export default function MedicationDetailsScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F8FAFC',
   },
   header: {
     flexDirection: 'row',
@@ -155,6 +196,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 15,
+    backgroundColor: '#F8FAFC',
   },
   headerTitle: {
     fontFamily: 'Baloo2_700Bold',

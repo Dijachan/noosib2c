@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,16 +11,20 @@ import {
   TextInput,
   Image,
   Platform,
+  Alert,
 } from 'react-native';
+import DateTimePickerModal from '../../components/medications/DateTimePickerModal';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
 import BottomNav from '../../components/navigation/BottomNav';
-import { useMedication } from '../../context/MedicationContext';
+import { useMedication, Medication } from '../../context/MedicationContext';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../lib/supabase';
-import { useState, useEffect } from 'react';
+import MedicationDetailModal from '../../components/medications/MedicationDetailModal';
+import DeleteConfirmationModal from '../../components/medications/DeleteConfirmationModal';
 
 const { width } = Dimensions.get('window');
 
@@ -57,7 +61,7 @@ const InsightCard = ({
         <Text style={styles.insightStatus}>{status.toUpperCase()}</Text>
       </View>
       <View style={styles.insightBody}>
-        <Text style={styles.insightCardTitle}>{title}</Text>
+        <Text style={styles.insightCardTitle} numberOfLines={1}>{title}</Text>
         <View style={styles.valueRow}>
           <Text style={styles.insightValue}>{value}</Text>
           <Text style={styles.insightUnit}>{unit}</Text>
@@ -77,7 +81,7 @@ const MedicationCard = ({
   time,
   slot,
   status,
-  onPress 
+  onPress
 }: { 
   id: string;
   index: number; 
@@ -102,7 +106,7 @@ const MedicationCard = ({
       </View>
       <View style={styles.medContent}>
         <View style={styles.medTitleRow}>
-          <Text style={styles.medTitle}>{title}</Text>
+          <Text style={styles.medTitle} numberOfLines={1}>{title}</Text>
           <Text style={styles.medQuantity}> • {quantity}</Text>
         </View>
         <View style={styles.medMetaRows}>
@@ -127,14 +131,19 @@ const MedicationCard = ({
 
 export default function HomeScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
-  const { medications } = useMedication();
-  const { user } = useAuth();
+  const { medicationList, deleteMedication, addMedication } = useMedication();
+  const { user, demoPatientId } = useAuth();
   const [latestTemp, setLatestTemp] = useState('36.8');
+  
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedMed, setSelectedMed] = useState<Medication | null>(null);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   useEffect(() => {
-    if (!user) return;
-
-    const fetchLatest = async () => {
+    // 1. Fetch initial latest reading
+    const fetchInitialTemp = async () => {
       const { data } = await supabase
         .from('vital_logs')
         .select('value')
@@ -151,8 +160,9 @@ export default function HomeScreen() {
     fetchInitialTemp();
 
     // 2. Real-time subscription
+    const channelName = `home-vitals-${Math.random()}`; // Unique name to prevent collisions
     const subscription = supabase
-      .channel('home-vitals')
+      .channel(channelName)
       .on('postgres_changes', { 
         event: 'INSERT', 
         schema: 'public', 
@@ -164,11 +174,115 @@ export default function HomeScreen() {
       .subscribe();
 
     return () => {
-      subscription.unsubscribe();
+      supabase.removeChannel(subscription);
     };
   }, [demoPatientId]);
 
   const firstName = user?.user_metadata?.full_name?.split(' ')[0] || 'Dija';
+
+  const handleMedPress = (id: string) => {
+    const med = medicationList.find(m => m.id === id);
+    if (med) {
+      setSelectedMed(med);
+      setIsModalVisible(true);
+    }
+  };
+
+  const handleEditMed = (med: Medication) => {
+    setIsModalVisible(false);
+    navigation.navigate('SearchDrug', { 
+      editMed: med,
+      isEditing: true
+    });
+  };
+
+  const handleDeleteMed = (med: Medication) => {
+    setSelectedMed(med);
+    setIsModalVisible(false); // Close detail modal first
+    setTimeout(() => {
+      setIsDeleteModalVisible(true);
+    }, 100); // Small delay to allow detail modal to dismiss reliably
+  };
+
+  const cancelDelete = () => {
+    setIsDeleteModalVisible(false);
+    setTimeout(() => {
+      setIsModalVisible(true);
+    }, 100);
+  };
+
+  const confirmDelete = async () => {
+    if (selectedMed) {
+      try {
+        await deleteMedication(selectedMed.id);
+        setIsDeleteModalVisible(false);
+        setIsModalVisible(false);
+      } catch (error) {
+        Alert.alert('Error', 'Failed to delete medication.');
+      }
+    }
+  };
+
+  const getInitialTime = () => {
+    const d = new Date();
+    const timeStr = selectedMed?.time || '08:00 AM';
+    if (timeStr.includes('AM') || timeStr.includes('PM')) {
+      const [t, modifier] = timeStr.split(' ');
+      let [hours, minutes] = t.split(':');
+      let h = parseInt(hours, 10);
+      if (modifier === 'PM' && h < 12) h += 12;
+      if (modifier === 'AM' && h === 12) h = 0;
+      d.setHours(h, parseInt(minutes, 10), 0, 0);
+    }
+    return d;
+  };
+
+  const onTimeChange = async (event: any, selectedDate?: Date) => {
+    setShowTimePicker(false);
+    if (selectedDate && selectedMed) {
+      const hours = selectedDate.getHours();
+      const minutes = selectedDate.getMinutes();
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      const h = hours % 12 || 12;
+      const m = minutes.toString().padStart(2, '0');
+      const newTime = `${h.toString().padStart(2, '0')}:${m} ${ampm}`;
+      
+      try {
+        await addMedication({ ...selectedMed, time: newTime });
+        Alert.alert('Success', 'Intake time updated!');
+      } catch (error) {
+        Alert.alert('Error', 'Failed to update time.');
+      }
+    }
+  };
+
+  const onDateChange = async (event: any, selectedDate?: Date) => {
+    setShowDatePicker(false);
+    if (selectedDate && selectedMed) {
+      const today = new Date();
+      let newDateStr = '';
+      if (selectedDate.toDateString() === today.toDateString()) {
+        newDateStr = 'Today';
+      } else {
+        newDateStr = selectedDate.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+      }
+
+      try {
+        await addMedication({ ...selectedMed, date: newDateStr });
+        Alert.alert('Success', 'Intake date updated!');
+      } catch (error) {
+        Alert.alert('Error', 'Failed to update date.');
+      }
+    }
+  };
+
+  const handleTimeShortCut = (id: string) => {
+    const med = medicationList.find(m => m.id === id);
+    if (med) {
+      setSelectedMed(med);
+      setShowTimePicker(true);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -201,7 +315,6 @@ export default function HomeScreen() {
           </View>
           {/* Profile btn removed per request */}
 
-          {/* Health Insights Section */}
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Health Insights</Text>
           </View>
@@ -247,24 +360,24 @@ export default function HomeScreen() {
           {/* Care Schedule Section */}
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Care Schedule</Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('CareSchedule')}>
               <Text style={styles.seeAllText}>See all</Text>
             </TouchableOpacity>
           </View>
 
           <View style={styles.medList}>
-            {medications.length > 0 ? medications.map((med, idx) => (
+            {medicationList.length > 0 ? medicationList.map((med, index) => (
               <MedicationCard
                 key={med.id}
                 id={med.id}
-                index={idx + 1}
+                index={index + 1}
                 title={med.name}
-                quantity={med.dosage}
+                quantity={`${med.dosageAmount} ${med.type}`}
                 date={med.date}
                 time={med.time}
                 slot={med.slot.toString()}
                 status={med.status === 'Taken' ? 'Taken' : 'Pending'}
-                onPress={(id) => navigation.navigate('MedicationDetails', { medId: id })}
+                onPress={handleMedPress}
               />
             )) : (
               <View style={styles.emptySchedule}>
@@ -276,6 +389,38 @@ export default function HomeScreen() {
       </SafeAreaView>
 
       <BottomNav activeTab="Home" />
+
+      <MedicationDetailModal 
+        isVisible={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+        medication={selectedMed}
+        onEdit={handleEditMed}
+        onDelete={handleDeleteMed}
+      />
+
+      <DeleteConfirmationModal
+        isVisible={isDeleteModalVisible}
+        onClose={cancelDelete}
+        onConfirm={confirmDelete}
+        medName={selectedMed?.name || ''}
+        slot={selectedMed?.slot.toString() || ''}
+      />
+
+      <DateTimePickerModal
+        isVisible={showTimePicker}
+        onClose={() => setShowTimePicker(false)}
+        value={getInitialTime()}
+        mode="time"
+        onConfirm={(selectedDate) => onTimeChange({}, selectedDate)}
+      />
+
+      <DateTimePickerModal
+        isVisible={showDatePicker}
+        onClose={() => setShowDatePicker(false)}
+        value={new Date()}
+        mode="date"
+        onConfirm={(selectedDate) => onDateChange({}, selectedDate)}
+      />
     </View>
   );
 }

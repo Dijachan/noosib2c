@@ -11,15 +11,68 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import DateTimePickerModal from '../../../components/medications/DateTimePickerModal';
 
 export default function ScheduleScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const route = useRoute<any>();
-  const { drugData } = route.params || { drugData: { name: 'Metformin', slot: 3 } };
+  const { drugData, isEditing, editMed } = route.params || { 
+    drugData: { 
+      name: 'Metformin', 
+      dosage: '500mg', 
+      type: 'Tablet',
+      dosageAmount: '1',
+      slot: 3,
+      frequency: 'Daily',
+      time: '08:00 AM',
+      date: 'Today'
+    } 
+  };
 
-  const [frequency, setFrequency] = useState('Daily');
-  const [time, setTime] = useState('08:00 AM');
-  const [date, setDate] = useState('Today');
+  const [frequency, setFrequency] = useState(editMed?.frequency || 'Daily');
+  const [time, setTime] = useState(editMed?.time || '08:00 AM');
+  const [date, setDate] = useState(editMed?.date || 'Today');
+
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  // Parse time string for picker (e.g. "08:00 AM" -> Date object)
+  const getInitialTime = () => {
+    const d = new Date();
+    if (time.includes('AM') || time.includes('PM')) {
+      const [t, modifier] = time.split(' ');
+      let [hours, minutes] = t.split(':');
+      let h = parseInt(hours, 10);
+      if (modifier === 'PM' && h < 12) h += 12;
+      if (modifier === 'AM' && h === 12) h = 0;
+      d.setHours(h, parseInt(minutes, 10), 0, 0);
+    }
+    return d;
+  };
+
+  const onTimeChange = (event: any, selectedDate?: Date) => {
+    setShowTimePicker(false);
+    if (selectedDate) {
+      const hours = selectedDate.getHours();
+      const minutes = selectedDate.getMinutes();
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      const h = hours % 12 || 12;
+      const m = minutes.toString().padStart(2, '0');
+      setTime(`${h.toString().padStart(2, '0')}:${m} ${ampm}`);
+    }
+  };
+
+  const onDateChange = (event: any, selectedDate?: Date) => {
+    setShowDatePicker(false);
+    if (selectedDate) {
+      const today = new Date();
+      if (selectedDate.toDateString() === today.toDateString()) {
+        setDate('Today');
+      } else {
+        setDate(selectedDate.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }));
+      }
+    }
+  };
 
   const frequencies = ['Daily', 'Every 8 hours', 'Twice a day', 'Weekly'];
 
@@ -61,7 +114,7 @@ export default function ScheduleScreen() {
         <View style={styles.section}>
           <Text style={styles.label}>Intake Time and Date</Text>
           <View style={styles.pickerGroup}>
-            <TouchableOpacity style={styles.pickerBtn}>
+            <TouchableOpacity style={styles.pickerBtn} onPress={() => setShowTimePicker(true)}>
               <View style={styles.timeInfo}>
                 <Ionicons name="time-outline" size={24} color="#0463DD" />
                 <Text style={styles.timeLabel}>Reminder Time</Text>
@@ -69,7 +122,7 @@ export default function ScheduleScreen() {
               <Text style={styles.timeValue}>{time}</Text>
             </TouchableOpacity>
             
-            <TouchableOpacity style={styles.pickerBtn}>
+            <TouchableOpacity style={styles.pickerBtn} onPress={() => setShowDatePicker(true)}>
               <View style={styles.timeInfo}>
                 <Ionicons name="calendar-outline" size={24} color="#0463DD" />
                 <Text style={styles.timeLabel}>Reminder Date</Text>
@@ -78,6 +131,22 @@ export default function ScheduleScreen() {
             </TouchableOpacity>
           </View>
         </View>
+
+        <DateTimePickerModal
+          isVisible={showTimePicker}
+          onClose={() => setShowTimePicker(false)}
+          value={getInitialTime()}
+          mode="time"
+          onConfirm={(selectedDate) => onTimeChange({}, selectedDate)}
+        />
+
+        <DateTimePickerModal
+          isVisible={showDatePicker}
+          onClose={() => setShowDatePicker(false)}
+          value={new Date()}
+          mode="date"
+          onConfirm={(selectedDate) => onDateChange({}, selectedDate)}
+        />
 
         <View style={styles.tipBox}>
            <Ionicons name="notifications-outline" size={20} color="#0463DD" />
@@ -91,7 +160,9 @@ export default function ScheduleScreen() {
         <TouchableOpacity 
           style={styles.primaryBtn}
           onPress={() => navigation.navigate('ReviewSync', { 
-            finalData: { ...drugData, frequency, time, date } 
+            finalData: { ...drugData, frequency, time, date },
+            isEditing,
+            editMed
           })}
         >
           <Text style={styles.primaryBtnText}>Review & Sync</Text>

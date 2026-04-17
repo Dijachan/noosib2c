@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -13,7 +13,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import BottomNav from '../../components/navigation/BottomNav';
-import { useMedication } from '../../context/MedicationContext';
+import { useMedication, Medication } from '../../context/MedicationContext';
+
+import { Alert } from 'react-native';
+import MedicationDetailModal from '../../components/medications/MedicationDetailModal';
+import DeleteConfirmationModal from '../../components/medications/DeleteConfirmationModal';
+import DateTimePickerModal from '../../components/medications/DateTimePickerModal';
 
 const { width } = Dimensions.get('window');
 
@@ -80,12 +85,141 @@ const TraySlotBox = ({
 
 export default function MedsTrayScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
-  const { getSlotStatus, getMedicationBySlot } = useMedication();
+  const { 
+    medicationList, 
+    adherenceLogs, 
+    activityLogs, 
+    getSlotStatus, 
+    getMedicationBySlot, 
+    deleteMedication, 
+    addMedication 
+  } = useMedication();
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedMed, setSelectedMed] = useState<Medication | null>(null);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const handleSlotPress = (slotId: number) => {
     const status = getSlotStatus(slotId);
     if (status === 'Empty') {
       navigation.navigate('SearchDrug', { slot: slotId });
+    } else {
+      const med = getMedicationBySlot(slotId);
+      if (med) {
+        setSelectedMed(med);
+        setIsModalVisible(true);
+      }
+    }
+  };
+
+  const handleMedPress = (med: Medication) => {
+    setSelectedMed(med);
+    setIsModalVisible(true);
+  };
+
+  const getInitialTime = () => {
+    const d = new Date();
+    const timeStr = selectedMed?.time || '08:00 AM';
+    if (timeStr.includes('AM') || timeStr.includes('PM')) {
+      const [t, modifier] = timeStr.split(' ');
+      let [hours, minutes] = t.split(':');
+      let h = parseInt(hours, 10);
+      if (modifier === 'PM' && h < 12) h += 12;
+      if (modifier === 'AM' && h === 12) h = 0;
+      d.setHours(h, parseInt(minutes, 10), 0, 0);
+    }
+    return d;
+  };
+
+  const onTimeChange = async (event: any, selectedDate?: Date) => {
+    setShowTimePicker(false);
+    if (selectedDate && selectedMed) {
+      const hours = selectedDate.getHours();
+      const minutes = selectedDate.getMinutes();
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      const h = hours % 12 || 12;
+      const m = minutes.toString().padStart(2, '0');
+      const newTime = `${h.toString().padStart(2, '0')}:${m} ${ampm}`;
+      
+      try {
+        await addMedication({ ...selectedMed, time: newTime });
+        Alert.alert('Success', 'Intake time updated!');
+      } catch (error) {
+        Alert.alert('Error', 'Failed to update time.');
+      }
+    }
+  };
+
+  const onDateChange = async (event: any, selectedDate?: Date) => {
+    setShowDatePicker(false);
+    if (selectedDate && selectedMed) {
+      const today = new Date();
+      let newDateStr = '';
+      if (selectedDate.toDateString() === today.toDateString()) {
+        newDateStr = 'Today';
+      } else {
+        newDateStr = selectedDate.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+      }
+
+      try {
+        await addMedication({ ...selectedMed, date: newDateStr });
+        Alert.alert('Success', 'Intake date updated!');
+      } catch (error) {
+        Alert.alert('Error', 'Failed to update date.');
+      }
+    }
+  };
+
+  const handleEditMed = (med: Medication) => {
+    setIsModalVisible(false);
+    navigation.navigate('SearchDrug', { 
+      editMed: med,
+      isEditing: true
+    });
+  };
+
+  const handleDeleteMed = (med: Medication) => {
+    setSelectedMed(med);
+    setIsModalVisible(false); // Close detail modal first
+    setTimeout(() => {
+      setIsDeleteModalVisible(true);
+    }, 100);
+  };
+
+  const cancelDelete = () => {
+    setIsDeleteModalVisible(false);
+    setTimeout(() => {
+      setIsModalVisible(true);
+    }, 100);
+  };
+
+  const confirmDelete = async () => {
+    if (selectedMed) {
+      try {
+        await deleteMedication(selectedMed.id);
+        setIsDeleteModalVisible(false);
+        setIsModalVisible(false);
+      } catch (error) {
+        Alert.alert('Error', 'Failed to delete medication.');
+      }
+    }
+  };
+
+  // Consolidate and sort activities
+  const recentActivities = [
+    ...(adherenceLogs || []),
+    ...(activityLogs || [])
+  ].sort((a, b) => b.timestamp - a.timestamp).slice(0, 5);
+
+  const getActivityConfig = (type: string) => {
+    switch (type) {
+      case 'taken': return { icon: 'checkmark-circle', color: '#10B981', action: 'taken' };
+      case 'created': return { icon: 'add-circle', color: '#0463DD', action: 'added' };
+      case 'edited': return { icon: 'create', color: '#6366F1', action: 'updated' };
+      case 'deleted': return { icon: 'trash', color: '#EF4444', action: 'unlinked' };
+      default: return { icon: 'information-circle', color: '#64748B', action: 'activity' };
     }
   };
 
@@ -115,17 +249,17 @@ export default function MedsTrayScreen() {
               </View>
               <View style={styles.heroTextContainer}>
                 <Text style={styles.heroTitle} numberOfLines={1} adjustsFontSizeToFit>Mummy K ❤️ is protected</Text>
-                <Text style={styles.heroSubtitle}>She's on track with 4 doses today!</Text>
+                <Text style={styles.heroSubtitle}>She's on track with {medicationList.length} doses today!</Text>
               </View>
             </View>
             <View style={styles.progressSection}>
               <View style={styles.progressLeft}>
-                <Text style={styles.progressCount}>10/14</Text>
+                <Text style={styles.progressCount}>{medicationList.length}/14</Text>
                 <Text style={styles.progressLabel}>Filled Slots</Text>
               </View>
               <View style={styles.progressBarWrapper}>
                 <View style={styles.progressBar}>
-                  <View style={[styles.progressFill, { width: '70%' }]} />
+                  <View style={[styles.progressFill, { width: `${(medicationList.length / 14) * 100}%` }]} />
                 </View>
               </View>
             </View>
@@ -150,44 +284,82 @@ export default function MedsTrayScreen() {
                   medName={med?.name} 
                   time={med?.time}
                   date={med?.date}
-                  onPress={() => handleSlotPress(slotId)}
+                  onPress={() => med ? handleMedPress(med) : handleSlotPress(slotId)}
                 />
               );
             })}
           </View>
 
           {/* Recent Activity Timeline */}
-          <View style={styles.sectionHeader}>
+          <View style={[styles.sectionHeader, styles.sectionHeaderRow]}>
             <Text style={styles.sectionTitle}>Recent Activity</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('ActivityLog')}>
+               <Text style={styles.seeAllText}>See All</Text>
+            </TouchableOpacity>
           </View>
-
+          
           <View style={styles.timeline}>
-            <View style={styles.activityItem}>
-              <View style={[styles.activityDot, { backgroundColor: '#10B981' }]} />
-              <View style={styles.activityContent}>
-                <Text style={styles.activityTitle}>Afternoon dose taken</Text>
-                <Text style={styles.activityMeta}>Slot 2 • 1:05 PM Today</Text>
+            {recentActivities.length > 0 ? recentActivities.map((log, index) => {
+              const config = getActivityConfig(log.type);
+              return (
+                <View key={index} style={styles.activityItem}>
+                  <View style={[styles.activityIconContainer, { backgroundColor: config.color + '1A' }]}>
+                    <Ionicons name={config.icon as any} size={20} color={config.color} />
+                  </View>
+                  <View style={styles.activityContent}>
+                    <View style={styles.activityHeader}>
+                      <Text style={styles.activityTitle} numberOfLines={1}>
+                        {log.medName} <Text style={{ color: config.color }}>{config.action}</Text>
+                      </Text>
+                      <Text style={styles.activityTime}>{log.time}</Text>
+                    </View>
+                    <Text style={styles.activityMeta}>Slot {log.slot} • {log.date}</Text>
+                  </View>
+                </View>
+              );
+            }) : (
+              <View style={styles.emptyActivity}>
+                <Ionicons name="calendar-outline" size={32} color="#CBD5E1" />
+                <Text style={styles.emptyActivityText}>No recent activity recorded yet.</Text>
               </View>
-            </View>
-            <View style={styles.activityItem}>
-               <View style={[styles.activityDot, { backgroundColor: '#10B981' }]} />
-               <View style={styles.activityContent}>
-                 <Text style={styles.activityTitle}>Morning dose taken</Text>
-                 <Text style={styles.activityMeta}>Slot 1 • 8:42 AM Today</Text>
-               </View>
-            </View>
-            <View style={styles.activityItem}>
-               <View style={[styles.activityDot, { backgroundColor: '#EF4444' }]} />
-               <View style={styles.activityContent}>
-                 <Text style={styles.activityTitle}>Missed Dose Alert</Text>
-                 <Text style={styles.activityMeta}>Slot 4 • 12:00 PM Today</Text>
-               </View>
-            </View>
+            )}
           </View>
         </ScrollView>
       </SafeAreaView>
 
       <BottomNav activeTab="Meds" />
+
+      <MedicationDetailModal 
+        isVisible={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+        medication={selectedMed}
+        onEdit={handleEditMed}
+        onDelete={handleDeleteMed}
+      />
+
+      <DeleteConfirmationModal
+        isVisible={isDeleteModalVisible}
+        onClose={cancelDelete}
+        onConfirm={confirmDelete}
+        medName={selectedMed?.name || ''}
+        slot={selectedMed?.slot.toString() || ''}
+      />
+
+      <DateTimePickerModal
+        isVisible={showTimePicker}
+        onClose={() => setShowTimePicker(false)}
+        value={getInitialTime()}
+        mode="time"
+        onConfirm={(selectedDate) => onTimeChange({}, selectedDate)}
+      />
+
+      <DateTimePickerModal
+        isVisible={showDatePicker}
+        onClose={() => setShowDatePicker(false)}
+        value={new Date()}
+        mode="date"
+        onConfirm={(selectedDate) => onDateChange({}, selectedDate)}
+      />
     </View>
   );
 }
@@ -308,10 +480,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     marginBottom: 20,
   },
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   sectionTitle: {
     fontFamily: 'Baloo2_700Bold',
     fontSize: 20,
     color: '#0F172A',
+  },
+  seeAllText: {
+    fontFamily: 'Baloo2_600SemiBold',
+    fontSize: 14,
+    color: 'rgba(4, 9, 33, 0.4)',
   },
   sectionSubtitle: {
     fontFamily: 'Baloo2_400Regular',
@@ -395,27 +577,49 @@ const styles = StyleSheet.create({
     gap: 16,
     alignItems: 'flex-start',
   },
-  activityDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    marginTop: 6,
+  activityIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   activityContent: {
     flex: 1,
     paddingBottom: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
+    borderBottomColor: '#F8FAFC',
+  },
+  activityHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 2,
   },
   activityTitle: {
     fontFamily: 'Baloo2_700Bold',
-    fontSize: 16,
+    fontSize: 15,
     color: '#0F172A',
-    marginBottom: 2,
+  },
+  activityTime: {
+    fontFamily: 'Baloo2_600SemiBold',
+    fontSize: 12,
+    color: '#94A3B8',
   },
   activityMeta: {
-    fontFamily: 'Baloo2_400Regular',
+    fontFamily: 'Baloo2_500Medium',
     fontSize: 13,
     color: '#64748B',
+  },
+  emptyActivity: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+    gap: 12,
+  },
+  emptyActivityText: {
+    fontFamily: 'Baloo2_500Medium',
+    fontSize: 14,
+    color: '#94A3B8',
   },
 });

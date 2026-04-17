@@ -27,7 +27,7 @@ export default function SignInScreen() {
     password: '',
   });
 
-  const isFormValid = form.email.length > 0 && form.password.length > 0;
+  const isFormValid = true; // Bypassed for instant demo access
 
   const handleChange = (field: keyof typeof form, value: string) => {
     setForm(prev => ({ ...prev, [field]: value }));
@@ -35,11 +35,10 @@ export default function SignInScreen() {
 
   const handleSignIn = async () => {
     setIsLoading(true);
-    // Fake "Verifying" delay for demo realism
-    setTimeout(() => {
-      mockLogin();
-      setIsLoading(false);
-    }, 1500);
+    // Bypassed: Jump straight to dashboard for existing users
+    mockLogin();
+    setOnboardingStatus('completed');
+    setIsLoading(false);
   };
 
   return (

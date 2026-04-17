@@ -36,9 +36,9 @@ export default function SignUpScreen() {
 
   const handleSignUp = async () => {
     setIsLoading(true);
-    // Fake "Processing" delay for demo realism
+    // New users start onboarding sequence
     setTimeout(() => {
-      mockLogin();
+      mockLogin(); // This sets status to 'not_started'
       setIsLoading(false);
     }, 1500);
   };

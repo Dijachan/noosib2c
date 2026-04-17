@@ -19,7 +19,7 @@ export default function ReviewSyncScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const { addMedication } = useMedication();
   const route = useRoute<any>();
-  const { finalData } = route.params || { 
+  const { finalData, isEditing, editMed } = route.params || { 
     finalData: { 
       name: 'Metformin', 
       dosage: '500mg', 
@@ -35,13 +35,24 @@ export default function ReviewSyncScreen() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
+  const uuidv4 = () => {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+      const r = (Math.random() * 16) | 0;
+      const v = c === 'x' ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
+  };
+
   const handleSync = async () => {
     setIsSyncing(true);
     try {
+      // Ensure we aren't leaking a mock ID (like "1" or "2") from finalData
+      const { id: leakId, ...medData } = finalData;
+
       // 1. Save to Supabase via Context
       await addMedication({
-        id: Math.random().toString(36).substr(2, 9),
-        ...finalData,
+        id: editMed?.id || uuidv4(),
+        ...medData,
         status: 'Pending'
       });
 
@@ -143,7 +154,7 @@ export default function ReviewSyncScreen() {
             </View>
             <View style={styles.infoItem}>
               <Text style={styles.infoLabel}>Dosage</Text>
-              <Text style={styles.infoValue}>{finalData.dosageAmount} {finalData.type}(s)</Text>
+              <Text style={styles.infoValue}>{finalData.dosageAmount} {finalData.dosageUnit}(s)</Text>
             </View>
           </View>
           
@@ -173,8 +184,10 @@ export default function ReviewSyncScreen() {
             <ActivityIndicator color="#FFFFFF" />
           ) : (
             <>
-              <Text style={styles.primaryBtnText}>Sync with Hardware</Text>
-              <Ionicons name="bluetooth" size={20} color="#FFFFFF" />
+              <Text style={styles.primaryBtnText}>
+                {isEditing ? 'Update Medication' : 'Sync with Cloud'}
+              </Text>
+              <Ionicons name={isEditing ? "save-outline" : "cloud-upload"} size={20} color="#FFFFFF" />
             </>
           )}
         </TouchableOpacity>

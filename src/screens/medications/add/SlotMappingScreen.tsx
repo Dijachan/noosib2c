@@ -19,13 +19,29 @@ const { width } = Dimensions.get('window');
 export default function SlotMappingScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   const route = useRoute<any>();
-  const { medications } = useMedication();
-  const { drugData } = route.params || { drugData: { name: 'Metformin' } };
+  const { medicationList } = useMedication();
+  const { drugData, isEditing, editMed } = route.params || { drugData: { name: 'Metformin' } };
 
-  const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<number | null>(drugData?.slot || editMed?.slot || null);
+  const [hasConfirmedMove, setHasConfirmedMove] = useState(false);
+
+  const isSlotChanged = isEditing && editMed && selectedSlot !== editMed.slot;
+  const shouldShowConsent = !isEditing || isSlotChanged;
+
+  React.useEffect(() => {
+    // If editing and staying in the same slot, auto-confirm
+    if (isEditing && editMed && selectedSlot === editMed.slot) {
+      setHasConfirmedMove(true);
+    } else {
+      // For moves or new additions, require manual confirmation
+      setHasConfirmedMove(false);
+    }
+  }, [selectedSlot, isEditing, editMed]);
 
   // Derive occupied slots from real MedicationContext state
-  const occupiedSlots = medications.map(m => m.slot);
+  const occupiedSlots = medicationList
+    .filter(m => !isEditing || m.id !== editMed?.id)
+    .map(m => m.slot);
 
   const renderSlot = (id: number) => {
     const isOccupied = occupiedSlots.includes(id);
@@ -75,11 +91,7 @@ export default function SlotMappingScreen() {
         </Text>
 
         <View style={styles.grid}>
-          {Array.from({ length: 12 }, (_, i) => renderSlot(i + 1))}
-          <View style={styles.flushRow}>
-             {renderSlot(13)}
-             {renderSlot(14)}
-          </View>
+          {Array.from({ length: 14 }, (_, i) => renderSlot(i + 1))}
         </View>
 
         <View style={styles.legend}>
@@ -99,12 +111,42 @@ export default function SlotMappingScreen() {
       </ScrollView>
 
       <View style={styles.footer}>
+        {shouldShowConsent && (
+          <TouchableOpacity 
+            style={[
+              styles.ackContainer, 
+              !isEditing && styles.ackContainerNew,
+              hasConfirmedMove && (isSlotChanged ? styles.ackContainerActive : styles.ackContainerNewActive)
+            ]} 
+            onPress={() => setHasConfirmedMove(!hasConfirmedMove)}
+            activeOpacity={0.7}
+          >
+            <View style={[
+              styles.checkbox, 
+              isSlotChanged ? styles.checkboxRed : styles.checkboxBlue,
+              hasConfirmedMove && (isSlotChanged ? styles.checkboxRedActive : styles.checkboxBlueActive)
+            ]}>
+              {hasConfirmedMove && <Ionicons name="checkmark" size={16} color="#FFFFFF" />}
+            </View>
+            <Text style={[
+              styles.ackText,
+              !isEditing && styles.ackTextNew
+            ]}>
+              {isSlotChanged 
+                ? "I consent that the medication has been moved to another slot" 
+                : "I have placed the medication in the selected slot"}
+            </Text>
+          </TouchableOpacity>
+        )}
+
         <TouchableOpacity 
-          style={[styles.primaryBtn, !selectedSlot && styles.btnDisabled]}
-          disabled={!selectedSlot}
-          onPress={() => navigation.navigate('Schedule', { 
-            drugData: { ...drugData, slot: selectedSlot } 
+          style={[styles.primaryBtn, (!selectedSlot || !hasConfirmedMove) && styles.btnDisabled]}
+          onPress={() => selectedSlot && navigation.navigate('Schedule', { 
+            drugData: { ...drugData, slot: selectedSlot },
+            isEditing,
+            editMed
           })}
+          disabled={!selectedSlot || !hasConfirmedMove}
         >
           <Text style={styles.primaryBtnText}>Confirm Slot {selectedSlot}</Text>
           <Ionicons name="arrow-forward" size={20} color="#FFFFFF" />
@@ -164,14 +206,14 @@ const styles = StyleSheet.create({
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 16,
-    justifyContent: 'space-between',
-    marginBottom: 32,
+    gap: 12,
+    justifyContent: 'flex-start',
+    paddingBottom: 20,
   },
   slot: {
-    width: (width - 48 - 16) / 2, // 2 columns for 2x7 grid
-    height: 100,
-    borderRadius: 20,
+    width: (width - 48 - 12) / 2, // 2 columns for clear 14-slot layout
+    height: 72,
+    borderRadius: 16,
     backgroundColor: '#F8FAFC',
     borderWidth: 2,
     borderColor: '#E2E8F0',
@@ -189,7 +231,7 @@ const styles = StyleSheet.create({
   },
   slotId: {
     fontFamily: 'Baloo2_800ExtraBold',
-    fontSize: 24,
+    fontSize: 18,
     color: '#94A3B8',
   },
   textDisabled: {
@@ -256,5 +298,96 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 0,
     marginTop: 0,
+  },
+  warningBox: {
+    backgroundColor: 'rgba(217, 119, 6, 0.05)',
+    borderRadius: 20,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(217, 119, 6, 0.15)',
+    marginBottom: 32,
+  },
+  warningHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
+  },
+  warningTitle: {
+    fontFamily: 'Baloo2_700Bold',
+    fontSize: 14,
+    color: '#D97706',
+    textTransform: 'uppercase',
+  },
+  warningText: {
+    fontFamily: 'Baloo2_500Medium',
+    fontSize: 14,
+    color: 'rgba(180, 83, 9, 0.8)',
+    lineHeight: 20,
+  },
+  warningHighlight: {
+    fontFamily: 'Baloo2_700Bold',
+    color: '#B45309',
+    textDecorationLine: 'underline',
+  },
+  ackContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(239, 68, 68, 0.05)',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 20,
+    gap: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(239, 68, 68, 0.1)',
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 8,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+  },
+  checkboxRed: {
+    borderColor: '#EF4444',
+  },
+  checkboxBlue: {
+    borderColor: '#0463DD',
+  },
+  checkboxRedActive: {
+    backgroundColor: '#EF4444',
+    borderColor: '#EF4444',
+  },
+  checkboxBlueActive: {
+    backgroundColor: '#0463DD',
+    borderColor: '#0463DD',
+  },
+  ackText: {
+    flex: 1,
+    fontFamily: 'Baloo2_600SemiBold',
+    fontSize: 14,
+    color: '#EF4444',
+    lineHeight: 20,
+  },
+  ackTextNew: {
+    color: '#0463DD',
+  },
+  ackContainerNew: {
+    backgroundColor: 'rgba(4, 99, 221, 0.05)',
+    borderColor: 'rgba(4, 99, 221, 0.1)',
+  },
+  ackContainerActive: {
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    borderColor: 'rgba(239, 68, 68, 0.2)',
+  },
+  ackContainerNewActive: {
+    backgroundColor: 'rgba(4, 99, 221, 0.1)',
+    borderColor: 'rgba(4, 99, 221, 0.2)',
+  },
+  ackHighlight: {
+    fontFamily: 'Baloo2_800ExtraBold',
+    textDecorationLine: 'underline',
   },
 });

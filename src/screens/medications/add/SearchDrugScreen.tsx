@@ -11,7 +11,7 @@ import {
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 const MOCK_EMDEX_DRUGS = [
@@ -27,8 +27,21 @@ const MOCK_EMDEX_DRUGS = [
 
 export default function SearchDrugScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
+  const route = useRoute<any>();
+  const { isEditing, editMed } = route.params || {};
+
   const [searchQuery, setSearchQuery] = useState('');
   const [results, setResults] = useState(MOCK_EMDEX_DRUGS);
+
+  React.useEffect(() => {
+    if (isEditing && editMed) {
+      navigation.replace('DrugDetail', { 
+        drug: editMed, 
+        isEditing: true,
+        editMed: editMed 
+      });
+    }
+  }, [isEditing, editMed]);
 
   const handleSearch = (text: string) => {
     setSearchQuery(text);
@@ -77,7 +90,15 @@ export default function SearchDrugScreen() {
             renderItem={({ item }) => (
               <TouchableOpacity 
                 style={styles.drugItem}
-                onPress={() => navigation.navigate('DrugDetail', { drug: item })}
+                onPress={() => {
+                  const { id, ...drugData } = item;
+                  navigation.navigate('DrugDetail', { 
+                    drug: drugData,
+                    isEditing,
+                    editMed,
+                    slot: route.params?.slot // Forward the intent
+                  });
+                }}
               >
                 <View style={styles.drugIconContainer}>
                   <Ionicons name="medical" size={20} color="#0463DD" />
@@ -93,7 +114,13 @@ export default function SearchDrugScreen() {
               <View style={styles.emptyContent}>
                 <Ionicons name="search-outline" size={48} color="#E2E8F0" />
                 <Text style={styles.emptyText}>No drugs found for "{searchQuery}"</Text>
-                <TouchableOpacity style={styles.manualBtn}>
+                <TouchableOpacity style={styles.manualBtn} onPress={() => {
+                   navigation.navigate('DrugDetail', { 
+                     drug: null, 
+                     isEditing: false,
+                     slot: route.params?.slot // Forward the intent
+                   });
+                }}>
                    <Text style={styles.manualText}>Add drug manually</Text>
                 </TouchableOpacity>
               </View>
