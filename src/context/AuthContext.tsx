@@ -13,7 +13,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   unlock: (password: string) => Promise<void>;
   refreshOnboarding: () => Promise<void>;
-  mockLogin: () => void;
+  mockLogin: (status?: 'not_started' | 'profile_created' | 'paired' | 'completed') => void;
   mockNextStep: () => void;
   setOnboardingStatus: (status: 'not_started' | 'profile_created' | 'paired' | 'completed' | null) => void;
 }
@@ -32,13 +32,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const DEMO_PATIENT_ID = '11111111-1111-1111-1111-111111111111';
   const DEMO_DEVICE_ID = '77777777-7777-7777-7777-777777777777';
 
-  const mockLogin = () => {
+  const mockLogin = (status: 'not_started' | 'profile_created' | 'paired' | 'completed' = 'not_started') => {
     setUser({ 
       id: DEMO_USER_ID, 
       email: 'demo@noosi.com',
       user_metadata: { full_name: 'Dija' }
     } as any);
-    setOnboardingStatus('not_started');
+    setOnboardingStatus(status);
   };
 
   const mockNextStep = () => {

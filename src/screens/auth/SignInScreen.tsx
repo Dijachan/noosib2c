@@ -20,7 +20,7 @@ import { Alert, ActivityIndicator } from 'react-native';
 
 export default function SignInScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
-  const { mockLogin } = useAuth();
+  const { mockLogin, setOnboardingStatus } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [form, setForm] = useState({
     email: '',
@@ -36,8 +36,7 @@ export default function SignInScreen() {
   const handleSignIn = async () => {
     setIsLoading(true);
     // Bypassed: Jump straight to dashboard for existing users
-    mockLogin();
-    setOnboardingStatus('completed');
+    mockLogin('completed');
     setIsLoading(false);
   };
 
