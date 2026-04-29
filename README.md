@@ -6,7 +6,8 @@ Noosi is a mobile healthcare application designed to empower patients in managin
 The application solves the critical problem of medication non-adherence by replacing scattered reminders and confusing schedules with an intuitive, native mobile experience. It is built for patients who need a reliable, easy-to-use tool to stay on top of their health regimens.
 
 ## Features
-- **Secure Authentication & Onboarding:** Seamless sign-up, login, password recovery, and secure patient profile creation.
+- **Simulated Authentication & Onboarding Flow:** A fully designed, multi-step mockup of the sign-up, login, and patient profile creation process (simulated for demonstration purposes).
+- **Live Hardware Data Integration:** The dashboard displays real medication adherence and activity log data fetched directly from Supabase, syncing with physical Noosi hardware.
 - **Medication Management:** Search for drugs, add them to a personalized care schedule, and map out specific time slots.
 - **Adherence Tracking:** Visual insights into medication adherence with detailed activity logs and charts.
 - **Pharmacy Hub:** A dedicated hub to interact with pharmacy services.
@@ -25,7 +26,7 @@ The application solves the critical problem of medication non-adherence by repla
 Noosi follows a modern client-server mobile architecture:
 - **Client App:** Built with React Native and Expo, providing a native feel across iOS and Android devices.
 - **Routing State Machine:** The app uses a strict 3-tier routing architecture (`AuthNavigator` -> `OnboardingNavigator` -> `AppNavigator`) governed by a global `AuthContext` to ensure users complete required setup steps before accessing sensitive health data.
-- **Backend Services:** Supabase handles secure user authentication, session management, and database operations. State is locally managed using Zustand and React Context for fast UI updates.
+- **Backend Services & Hardware Integration:** Live dashboard data (medication adherence and activity logs) is fetched directly from our Supabase database, which syncs with physical Noosi hardware. For this demonstration, the initial user authentication and onboarding flow is simulated and locally managed using Zustand and React Context.
 
 ## Getting Started
 
