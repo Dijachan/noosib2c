@@ -82,5 +82,5 @@ Press `i` to open in the iOS simulator, or `a` to open in an Android emulator.
 - **Hardware Integrations:** Fully flesh out the `DevicePairingScreen` to sync with bluetooth-enabled health tracking devices.
 
 ## Author
-[Your Name Here]  
-[Link to your GitHub profile]
+Khadijah Arowosegbe
+https://github.com/Dijachan
