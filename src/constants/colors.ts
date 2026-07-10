@@ -47,6 +47,13 @@ export const Colors = {
   // Main with opacity (frequently used)
   mainAlpha10: 'rgba(6,86,95,0.08)',
   mainAlpha20: 'rgba(6,86,95,0.15)',
+
+  // Gradients
+  creamLime: '#F5FCE2',       // cream-lime start
+  softLime: '#ECFFB6',        // soft-lime end
 } as const;
+
+/** Cream-Lime gradient pair — use with LinearGradient colors prop */
+export const GradientCreamLime = ['#F5FCE2', '#ECFFB6'] as const;
 
 export default Colors;
