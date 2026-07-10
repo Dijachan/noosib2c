@@ -17,6 +17,29 @@ export interface Medication {
   date: string;
   instructions?: string;
   status: 'Taken' | 'Pending' | 'Missed';
+  brand?: string;
+  stock?: string;
+  daysLeft?: number;
+  priority?: 'Critical' | 'Maintenance' | 'Supplement';
+  formFactor?: 'Tablet' | 'Capsule' | 'Liquid' | 'Injection';
+  pillColor?: string;
+  isArchived?: boolean;
+  isAsNeeded?: boolean;
+  startDate?: string;
+  duration?: string;
+}
+
+export interface DoseLog {
+  id: string;
+  medicationId: string;
+  medName: string;
+  outcome: 'taken' | 'missed';
+  loggedAt: string;           // ISO timestamp (retroactive override supported)
+  loggedBy: 'caregiver' | 'elder_whatsapp' | 'system';
+  verificationMethod: 'manual' | 'photo_ai' | 'whatsapp_reply' | 'voice_ack';
+  photoVerified: boolean;
+  ndprEncrypted: boolean;     // All photo evidence encrypted under NDPR
+  notes?: string;
 }
 
 interface MedicationContextType {
@@ -27,6 +50,9 @@ interface MedicationContextType {
   getMedicationBySlot: (slotId: number) => Medication | undefined;
   adherenceLogs: any[];
   activityLogs: any[];
+  toggleMedicationStatus: (medId: string, status: 'Taken' | 'Pending' | 'Missed') => void;
+  doseLogs: DoseLog[];
+  logDose: (log: Omit<DoseLog, 'id'>) => Promise<void>;
 }
 
 const MedicationContext = createContext<MedicationContextType | undefined>(undefined);
@@ -47,6 +73,45 @@ export const MedicationProvider = ({ children }: { children: ReactNode }) => {
   const [sessionActivities, setSessionActivities] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const [doseLogs, setDoseLogs] = useState<DoseLog[]>([
+    {
+      id: 'seed-log-1',
+      medicationId: 'lisinopril-id',
+      medName: 'Lisinopril',
+      outcome: 'taken',
+      loggedAt: new Date(Date.now() - 3600000 * 4).toISOString(), // 4 hours ago
+      loggedBy: 'elder_whatsapp',
+      verificationMethod: 'photo_ai',
+      photoVerified: true,
+      ndprEncrypted: true,
+      notes: 'Photo proof verified by AI. Encrypted under NDPR.',
+    },
+    {
+      id: 'seed-log-2',
+      medicationId: 'metformin-id',
+      medName: 'Metformin',
+      outcome: 'taken',
+      loggedAt: new Date(Date.now() - 3600000 * 9).toISOString(), // 9 hours ago
+      loggedBy: 'caregiver',
+      verificationMethod: 'manual',
+      photoVerified: false,
+      ndprEncrypted: false,
+      notes: 'Logged by Nurse Temi with 5-minute delay override.',
+    },
+    {
+      id: 'seed-log-3',
+      medicationId: 'metformin-id',
+      medName: 'Metformin',
+      outcome: 'missed',
+      loggedAt: new Date(Date.now() - 3600000 * 33).toISOString(), // 33 hours ago
+      loggedBy: 'system',
+      verificationMethod: 'voice_ack',
+      photoVerified: false,
+      ndprEncrypted: false,
+      notes: 'Escalated to voice call. Reason: Patient away from home.',
+    }
+  ]);
+
   // Sync with Supabase (Digital Twin logic)
   const formatTimeForUI = (timeStr: string) => {
     if (!timeStr) return '12:00 PM';
@@ -59,11 +124,19 @@ export const MedicationProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const formatTimeForDB = (timeStr: string) => {
-    const [time, modifier] = timeStr.split(' ');
-    let [hours, minutes] = time.split(':');
-    if (hours === '12') hours = '00';
-    if (modifier === 'PM') hours = (parseInt(hours, 10) + 12).toString();
-    return `${hours.padStart(2, '0')}:${minutes}:00`;
+    if (!timeStr) return '12:00:00';
+    // Robustly extract HH:MM AM/PM even with added suffixes like ' - With Breakfast'
+    const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+    if (!match) return '12:00:00';
+    
+    let hours = parseInt(match[1], 10);
+    const minutes = match[2];
+    const modifier = match[3].toUpperCase();
+    
+    if (modifier === 'PM' && hours < 12) hours += 12;
+    if (modifier === 'AM' && hours === 12) hours = 0;
+    
+    return `${hours.toString().padStart(2, '0')}:${minutes}:00`;
   };
 
   const fetchMeds = async () => {
@@ -257,8 +330,17 @@ export const MedicationProvider = ({ children }: { children: ReactNode }) => {
       if (error) throw error;
       await fetchMeds(); 
     } catch (error) {
-      console.error('Error in unified sync:', error);
-      throw error;
+      console.warn('Network sync failed. Falling back to local state updates.', error);
+      
+      // Update local react state immediately so prototype flows are not blocked
+      setMedicationList(prev => {
+        const exists = prev.find(m => m.id === med.id);
+        if (exists) {
+          return prev.map(m => m.id === med.id ? med : m);
+        } else {
+          return [...prev, med];
+        }
+      });
     }
   };
   const deleteMedication = async (medId: string) => {
@@ -297,8 +379,9 @@ export const MedicationProvider = ({ children }: { children: ReactNode }) => {
       if (error) throw error;
       await fetchMeds();
     } catch (error) {
-      console.error('Error deleting medication:', error);
-      throw error;
+      console.warn('Network delete sync failed. Falling back to local state updates.', error);
+      // Update local react state immediately
+      setMedicationList(prev => prev.filter(m => m.id !== medId));
     }
   };
   const getSlotStatus = (slotId: number): MedStatus => {
@@ -311,6 +394,43 @@ export const MedicationProvider = ({ children }: { children: ReactNode }) => {
     return medicationList.find((m) => m.slot === slotId);
   };
 
+  const toggleMedicationStatus = (medId: string, status: 'Taken' | 'Pending' | 'Missed') => {
+    setMedicationList(prev => 
+      prev.map(m => m.id === medId ? { ...m, status } : m)
+    );
+  };
+
+  const logDose = async (log: Omit<DoseLog, 'id'>) => {
+    const newLog: DoseLog = {
+      ...log,
+      id: 'log-' + Date.now().toString(),
+    };
+    setDoseLogs(prev => [newLog, ...prev]);
+
+    // Update medication status in list
+    toggleMedicationStatus(log.medicationId, log.outcome === 'taken' ? 'Taken' : 'Missed');
+
+    // Also update Supabase tables
+    try {
+      await supabase.from('adherence_logs').insert({
+        device_id: demoDeviceId,
+        medication_id: log.medicationId,
+        status: log.outcome === 'taken' ? 'Taken' : 'Missed',
+        captured_at: log.loggedAt
+      });
+
+      await supabase.from('activity_logs').insert({
+        device_id: demoDeviceId,
+        medication_name: log.medName,
+        slot_number: 1,
+        action_type: log.outcome,
+        performed_at: log.loggedAt
+      });
+    } catch (err) {
+      console.warn('Network sync for logDose failed, continuing locally:', err);
+    }
+  };
+
   return (
     <MedicationContext.Provider value={{ 
       medicationList, 
@@ -319,7 +439,10 @@ export const MedicationProvider = ({ children }: { children: ReactNode }) => {
       getSlotStatus, 
       getMedicationBySlot, 
       adherenceLogs,
-      activityLogs 
+      activityLogs,
+      toggleMedicationStatus,
+      doseLogs,
+      logDose
     }}>
       {children}
     </MedicationContext.Provider>

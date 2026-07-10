@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,20 +9,55 @@ import {
   Platform,
   ScrollView,
   TextInput,
+  ActivityIndicator,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 export default function VerifyCodeScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
-  const [code, setCode] = useState(['', '', '', '']);
+  const route = useRoute<any>();
+
+  const isSignUpFlow = route.params?.flow === 'signup';
+  const destinationEmail = route.params?.email || 'kunle.jr@example.com';
+  const otpLength = isSignUpFlow ? 6 : 4;
+
+  const [code, setCode] = useState<string[]>(Array(otpLength).fill(''));
+  const [timeLeft, setTimeLeft] = useState(120); // 02:00
+  const [isLoading, setIsLoading] = useState(false);
   const inputs = useRef<Array<TextInput | null>>([]);
 
   const isFormValid = code.every(digit => digit.length === 1);
 
+  // Focus re-initialization if flow changes
+  useEffect(() => {
+    setCode(Array(otpLength).fill(''));
+  }, [otpLength]);
+
+  // Countdown timer
+  useEffect(() => {
+    if (timeLeft <= 0) return;
+    const interval = setInterval(() => {
+      setTimeLeft(prev => prev - 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [timeLeft]);
+
+  // Auto-submit when fully filled
+  useEffect(() => {
+    if (code.every(digit => digit.length === 1) && code.length === otpLength) {
+      handleVerify();
+    }
+  }, [code]);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
   const handleCodeChange = (text: string, index: number) => {
-    // Only allow numbers
     const newText = text.replace(/[^0-9]/g, '');
     
     if (newText.length <= 1) {
@@ -31,7 +66,7 @@ export default function VerifyCodeScreen() {
       setCode(newCode);
 
       // Move to next input if there's a character and not the last input
-      if (newText.length === 1 && index < 3) {
+      if (newText.length === 1 && index < otpLength - 1) {
         inputs.current[index + 1]?.focus();
       }
     }
@@ -39,9 +74,27 @@ export default function VerifyCodeScreen() {
 
   const handleKeyPress = (e: any, index: number) => {
     if (e.nativeEvent.key === 'Backspace' && !code[index] && index > 0) {
-      // Focus previous input if we hit backspace on an empty input
       inputs.current[index - 1]?.focus();
     }
+  };
+
+  const handleVerify = () => {
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      if (isSignUpFlow) {
+        navigation.navigate('RegionSetup');
+      } else {
+        navigation.navigate('ResetPassword');
+      }
+    }, 1500);
+  };
+
+  const handleResend = () => {
+    if (timeLeft > 0) return;
+    setTimeLeft(120); // Reset timer
+    // Mock code send
+    console.log('OTP Code resent to ' + destinationEmail);
   };
 
   return (
@@ -70,9 +123,14 @@ export default function VerifyCodeScreen() {
 
           {/* Header Section */}
           <View style={styles.header}>
-            <Text style={styles.title}>Enter Reset Code</Text>
+            <Text style={styles.title}>
+              {isSignUpFlow ? 'Verify Your Email' : 'Enter Reset Code'}
+            </Text>
             <Text style={styles.subtitle}>
-              We've sent a 4-digit code to your email.
+              {isSignUpFlow 
+                ? `We've sent a 6-digit code to:\n${destinationEmail}`
+                : `We've sent a 4-digit code to:\n${destinationEmail}`
+              }
             </Text>
           </View>
 
@@ -85,6 +143,7 @@ export default function VerifyCodeScreen() {
                   ref={(ref) => { inputs.current[index] = ref; }}
                   style={[
                     styles.otpInput,
+                    isSignUpFlow ? styles.otpInputSix : styles.otpInputFour,
                     digit ? styles.otpInputFilled : null
                   ]}
                   value={digit}
@@ -96,24 +155,47 @@ export default function VerifyCodeScreen() {
               ))}
             </View>
           </View>
+
+          {/* Countdown Timer */}
+          <View style={styles.timerContainer}>
+            <Feather name="clock" size={16} color="rgba(4,9,33,0.5)" />
+            <Text style={styles.timerText}>
+              Code expires in: <Text style={styles.timerCountdown}>{formatTime(timeLeft)}</Text>
+            </Text>
+          </View>
+
         </ScrollView>
 
         {/* Action Button (Fixed at bottom) */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity 
-            style={[styles.primaryButton, !isFormValid && styles.disabledButton]}
-            disabled={!isFormValid}
-            onPress={() => navigation.navigate('ResetPassword')}
+            style={[styles.primaryButton, (!isFormValid || isLoading) && styles.disabledButton]}
+            disabled={!isFormValid || isLoading}
+            onPress={handleVerify}
           >
-            <Text style={[styles.buttonText, !isFormValid && styles.disabledButtonText]}>Verify Code</Text>
-            <Feather name="arrow-right" size={20} color={isFormValid ? "#FFFFFF" : "#9CA3AF"} strokeWidth={3} />
+            {isLoading ? (
+              <ActivityIndicator color="#FFFFFF" />
+            ) : (
+              <>
+                <Text style={[styles.buttonText, !isFormValid && styles.disabledButtonText]}>Verify Code</Text>
+                <Feather name="arrow-right" size={20} color={isFormValid ? "#FFFFFF" : "#9CA3AF"} strokeWidth={3} />
+              </>
+            )}
           </TouchableOpacity>
 
           <View style={styles.footerContainer}>
             <View style={styles.footer}>
               <Text style={styles.footerText}>Didn't receive the code? </Text>
-              <TouchableOpacity onPress={() => console.log('Resend code')}>
-                <Text style={styles.footerLinkBlue}>Resend Code</Text>
+              <TouchableOpacity 
+                onPress={handleResend}
+                disabled={timeLeft > 0}
+              >
+                <Text style={[
+                  styles.footerLinkBlue,
+                  timeLeft > 0 && styles.footerLinkDisabled
+                ]}>
+                  Resend Code
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -184,7 +266,7 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     width: '100%',
-    marginBottom: 20,
+    marginBottom: 24,
   },
   otpContainer: {
     flexDirection: 'row',
@@ -192,26 +274,50 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   otpInput: {
-    width: 72,
-    height: 72,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: '#E5E7EB',
     backgroundColor: '#F9FAFB',
     fontFamily: 'Baloo2_700Bold',
-    fontSize: 32,
     color: 'rgba(4,9,33,0.76)',
     textAlign: 'center',
+  },
+  otpInputFour: {
+    width: 72,
+    height: 72,
+    fontSize: 32,
+  },
+  otpInputSix: {
+    width: 48,
+    height: 60,
+    fontSize: 24,
   },
   otpInputFilled: {
     borderColor: '#0463DD',
     backgroundColor: '#FFFFFF',
   },
+  timerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginBottom: 24,
+  },
+  timerText: {
+    fontFamily: 'Baloo2_400Regular',
+    fontSize: 15,
+    color: 'rgba(4,9,33,0.6)',
+  },
+  timerCountdown: {
+    fontFamily: 'Baloo2_700Bold',
+    color: '#0463DD',
+  },
+
   buttonContainer: {
     width: '100%',
     maxWidth: 361,
     paddingHorizontal: 24,
-    paddingTop: 24,
+    paddingTop: 12,
     paddingBottom: Platform.OS === 'ios' ? 40 : 24,
     gap: 16,
     alignSelf: 'center',
@@ -254,5 +360,8 @@ const styles = StyleSheet.create({
     fontFamily: 'Baloo2_600SemiBold',
     fontSize: 16,
     color: '#0463DD',
+  },
+  footerLinkDisabled: {
+    color: '#9CA3AF',
   },
 });

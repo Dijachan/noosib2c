@@ -8,17 +8,17 @@ import {
   TouchableOpacity,
   Dimensions,
   Platform,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import BottomNav from '../../components/navigation/BottomNav';
 import { useMedication, Medication } from '../../context/MedicationContext';
-
-import { Alert } from 'react-native';
 import MedicationDetailModal from '../../components/medications/MedicationDetailModal';
 import DeleteConfirmationModal from '../../components/medications/DeleteConfirmationModal';
 import DateTimePickerModal from '../../components/medications/DateTimePickerModal';
+import { useAuth } from '../../context/AuthContext';
 
 const { width } = Dimensions.get('window');
 
@@ -94,6 +94,9 @@ export default function MedsTrayScreen() {
     deleteMedication, 
     addMedication 
   } = useMedication();
+
+  const { patientProfile } = useAuth();
+  const patientName = patientProfile?.name || 'Grandpa Kunle';
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedMed, setSelectedMed] = useState<Medication | null>(null);
@@ -182,7 +185,7 @@ export default function MedsTrayScreen() {
 
   const handleDeleteMed = (med: Medication) => {
     setSelectedMed(med);
-    setIsModalVisible(false); // Close detail modal first
+    setIsModalVisible(false);
     setTimeout(() => {
       setIsDeleteModalVisible(true);
     }, 100);
@@ -226,105 +229,107 @@ export default function MedsTrayScreen() {
   return (
     <View style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-            <Ionicons name="chevron-back" size={24} color="#0F172A" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Meds Tray</Text>
-          <TouchableOpacity style={styles.configBtn}>
-             <Ionicons name="settings-outline" size={22} color="#0F172A" />
-          </TouchableOpacity>
-        </View>
-
-        <ScrollView 
-          style={styles.scrollView} 
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Caregiver Hero Section */}
-          <View style={styles.heroSection}>
-            <View style={styles.heroContent}>
-              <View style={styles.heroIconContainer}>
-                 <Ionicons name="heart" size={32} color="#FFFFFF" />
-              </View>
-              <View style={styles.heroTextContainer}>
-                <Text style={styles.heroTitle} numberOfLines={1} adjustsFontSizeToFit>Mummy K ❤️ is protected</Text>
-                <Text style={styles.heroSubtitle}>She's on track with {medicationList.length} doses today!</Text>
-              </View>
-            </View>
-            <View style={styles.progressSection}>
-              <View style={styles.progressLeft}>
-                <Text style={styles.progressCount}>{medicationList.length}/14</Text>
-                <Text style={styles.progressLabel}>Filled Slots</Text>
-              </View>
-              <View style={styles.progressBarWrapper}>
-                <View style={styles.progressBar}>
-                  <View style={[styles.progressFill, { width: `${(medicationList.length / 14) * 100}%` }]} />
-                </View>
-              </View>
-            </View>
-          </View>
-
-          {/* Meds Tray Visual Grid */}
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Tray Digital Twin</Text>
-            <Text style={styles.sectionSubtitle}>Mirrors the 14 slots in the physical device</Text>
-          </View>
-
-          <View style={styles.trayGrid}>
-            {Array.from({ length: 14 }, (_, i) => {
-              const slotId = i + 1;
-              const status = getSlotStatus(slotId);
-              const med = getMedicationBySlot(slotId);
-              return (
-                <TraySlotBox 
-                  key={slotId} 
-                  id={slotId} 
-                  status={status} 
-                  medName={med?.name} 
-                  time={med?.time}
-                  date={med?.date}
-                  onPress={() => med ? handleMedPress(med) : handleSlotPress(slotId)}
-                />
-              );
-            })}
-          </View>
-
-          {/* Recent Activity Timeline */}
-          <View style={[styles.sectionHeader, styles.sectionHeaderRow]}>
-            <Text style={styles.sectionTitle}>Recent Activity</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('ActivityLog')}>
-               <Text style={styles.seeAllText}>See All</Text>
+        <View style={styles.innerContainer}>
+          <View style={styles.header}>
+            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+              <Ionicons name="chevron-back" size={24} color="#0F172A" />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>Meds Tray</Text>
+            <TouchableOpacity style={styles.configBtn}>
+               <Ionicons name="settings-outline" size={22} color="#0F172A" />
             </TouchableOpacity>
           </View>
-          
-          <View style={styles.timeline}>
-            {recentActivities.length > 0 ? recentActivities.map((log, index) => {
-              const config = getActivityConfig(log.type);
-              return (
-                <View key={index} style={styles.activityItem}>
-                  <View style={[styles.activityIconContainer, { backgroundColor: config.color + '1A' }]}>
-                    <Ionicons name={config.icon as any} size={20} color={config.color} />
-                  </View>
-                  <View style={styles.activityContent}>
-                    <View style={styles.activityHeader}>
-                      <Text style={styles.activityTitle} numberOfLines={1}>
-                        {log.medName} <Text style={{ color: config.color }}>{config.action}</Text>
-                      </Text>
-                      <Text style={styles.activityTime}>{log.time}</Text>
-                    </View>
-                    <Text style={styles.activityMeta}>Slot {log.slot} • {log.date}</Text>
+
+          <ScrollView 
+            style={styles.scrollView} 
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Caregiver Hero Section */}
+            <View style={styles.heroSection}>
+              <View style={styles.heroContent}>
+                <View style={styles.heroIconContainer}>
+                   <Ionicons name="heart" size={32} color="#FFFFFF" />
+                </View>
+                <View style={styles.heroTextContainer}>
+                  <Text style={styles.heroTitle} numberOfLines={1} adjustsFontSizeToFit>{patientName} ❤️ is protected</Text>
+                  <Text style={styles.heroSubtitle}>They are on track with {medicationList.length} doses today!</Text>
+                </View>
+              </View>
+              <View style={styles.progressSection}>
+                <View style={styles.progressLeft}>
+                  <Text style={styles.progressCount}>{medicationList.length}/14</Text>
+                  <Text style={styles.progressLabel}>Filled Slots</Text>
+                </View>
+                <View style={styles.progressBarWrapper}>
+                  <View style={styles.progressBar}>
+                    <View style={[styles.progressFill, { width: `${(medicationList.length / 14) * 100}%` }]} />
                   </View>
                 </View>
-              );
-            }) : (
-              <View style={styles.emptyActivity}>
-                <Ionicons name="calendar-outline" size={32} color="#CBD5E1" />
-                <Text style={styles.emptyActivityText}>No recent activity recorded yet.</Text>
               </View>
-            )}
-          </View>
-        </ScrollView>
+            </View>
+
+            {/* Meds Tray Visual Grid */}
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Tray Digital Twin</Text>
+              <Text style={styles.sectionSubtitle}>Mirrors the 14 slots in the physical device</Text>
+            </View>
+
+            <View style={styles.trayGrid}>
+              {Array.from({ length: 14 }, (_, i) => {
+                const slotId = i + 1;
+                const status = getSlotStatus(slotId);
+                const med = getMedicationBySlot(slotId);
+                return (
+                  <TraySlotBox 
+                    key={slotId} 
+                    id={slotId} 
+                    status={status} 
+                    medName={med?.name} 
+                    time={med?.time}
+                    date={med?.date}
+                    onPress={() => med ? handleMedPress(med) : handleSlotPress(slotId)}
+                  />
+                );
+              })}
+            </View>
+
+            {/* Recent Activity Timeline */}
+            <View style={[styles.sectionHeader, styles.sectionHeaderRow]}>
+              <Text style={styles.sectionTitle}>Recent Activity</Text>
+              <TouchableOpacity onPress={() => navigation.navigate('ActivityLog')}>
+                 <Text style={styles.seeAllText}>See All</Text>
+              </TouchableOpacity>
+            </View>
+            
+            <View style={styles.timeline}>
+              {recentActivities.length > 0 ? recentActivities.map((log, index) => {
+                const config = getActivityConfig(log.type);
+                return (
+                  <View key={index} style={styles.activityItem}>
+                    <View style={[styles.activityIconContainer, { backgroundColor: config.color + '1A' }]}>
+                      <Ionicons name={config.icon as any} size={20} color={config.color} />
+                    </View>
+                    <View style={styles.activityContent}>
+                      <View style={styles.activityHeader}>
+                        <Text style={styles.activityTitle} numberOfLines={1}>
+                          {log.medName} <Text style={{ color: config.color }}>{config.action}</Text>
+                        </Text>
+                        <Text style={styles.activityTime}>{log.time}</Text>
+                      </View>
+                      <Text style={styles.activityMeta}>Slot {log.slot} • {log.date}</Text>
+                    </View>
+                  </View>
+                );
+              }) : (
+                <View style={styles.emptyActivity}>
+                  <Ionicons name="calendar-outline" size={32} color="#CBD5E1" />
+                  <Text style={styles.emptyActivityText}>No recent activity recorded yet.</Text>
+                </View>
+              )}
+            </View>
+          </ScrollView>
+        </View>
       </SafeAreaView>
 
       <BottomNav activeTab="Meds" />
@@ -372,6 +377,12 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
   },
+  innerContainer: {
+    flex: 1,
+    width: '100%',
+    maxWidth: 393,
+    alignSelf: 'center',
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -409,7 +420,6 @@ const styles = StyleSheet.create({
     borderRadius: 32,
     padding: 24,
     marginBottom: 32,
-    elevation: 0,
   },
   heroContent: {
     flexDirection: 'row',
@@ -445,7 +455,6 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   progressLeft: {
-    // Aligns visually with the heart icon above
     width: 64, 
     alignItems: 'center',
   },
@@ -498,29 +507,23 @@ const styles = StyleSheet.create({
   sectionSubtitle: {
     fontFamily: 'Baloo2_400Regular',
     fontSize: 14,
-    color: '#64748B',
-    marginTop: 2,
+    color: 'rgba(15, 23, 42, 0.5)',
+    marginTop: 4,
   },
   trayGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    paddingHorizontal: 24,
     justifyContent: 'space-between',
-    gap: 16,
-    marginBottom: 40,
-  },
-  traySlotRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    marginBottom: 16,
+    paddingHorizontal: 20,
+    gap: 12,
+    marginBottom: 32,
   },
   slotBox: {
-    width: (width - 48 - 16) / 2, // 2 column grid
+    width: (width - 52) / 2,
     height: 120,
     borderRadius: 24,
     borderWidth: 1.5,
-    padding: 12,
+    padding: 16,
     justifyContent: 'space-between',
   },
   slotBoxNext: {
@@ -533,14 +536,14 @@ const styles = StyleSheet.create({
   },
   slotId: {
     fontFamily: 'Baloo2_800ExtraBold',
-    fontSize: 14,
+    fontSize: 16,
   },
   slotBody: {
     gap: 2,
   },
   slotMedName: {
     fontFamily: 'Baloo2_700Bold',
-    fontSize: 13,
+    fontSize: 15,
     color: '#0F172A',
   },
   slotTime: {
@@ -549,46 +552,45 @@ const styles = StyleSheet.create({
     color: '#64748B',
   },
   slotEmptyText: {
-    fontFamily: 'Baloo2_500Medium',
-    fontSize: 12,
-    color: '#CBD5E1',
-    textAlign: 'center',
+    fontFamily: 'Baloo2_600SemiBold',
+    fontSize: 14,
+    color: '#94A3B8',
   },
   nextBadge: {
     position: 'absolute',
     top: -8,
-    right: 8,
+    right: 12,
     backgroundColor: '#0463DD',
-    paddingHorizontal: 6,
+    borderRadius: 8,
     paddingVertical: 2,
-    borderRadius: 6,
+    paddingHorizontal: 6,
   },
   nextBadgeText: {
-    fontFamily: 'Baloo2_800ExtraBold',
-    fontSize: 8,
+    fontFamily: 'Baloo2_700Bold',
+    fontSize: 9,
     color: '#FFFFFF',
   },
   timeline: {
-    paddingHorizontal: 24,
-    gap: 20,
+    marginHorizontal: 24,
+    backgroundColor: '#F8FAFC',
+    borderRadius: 24,
+    padding: 20,
+    gap: 16,
   },
   activityItem: {
     flexDirection: 'row',
-    gap: 16,
-    alignItems: 'flex-start',
+    gap: 12,
   },
   activityIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 2,
   },
   activityContent: {
     flex: 1,
-    paddingBottom: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F8FAFC',
   },
   activityHeader: {
     flexDirection: 'row',
@@ -598,28 +600,30 @@ const styles = StyleSheet.create({
   },
   activityTitle: {
     fontFamily: 'Baloo2_700Bold',
-    fontSize: 15,
+    fontSize: 14,
     color: '#0F172A',
+    flex: 1,
+    marginRight: 8,
   },
   activityTime: {
-    fontFamily: 'Baloo2_600SemiBold',
-    fontSize: 12,
-    color: '#94A3B8',
+    fontFamily: 'Baloo2_500Medium',
+    fontSize: 11,
+    color: '#64748B',
   },
   activityMeta: {
     fontFamily: 'Baloo2_500Medium',
-    fontSize: 13,
-    color: '#64748B',
+    fontSize: 11,
+    color: '#94A3B8',
   },
   emptyActivity: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 40,
-    gap: 12,
+    paddingVertical: 20,
+    gap: 8,
   },
   emptyActivityText: {
     fontFamily: 'Baloo2_500Medium',
-    fontSize: 14,
-    color: '#94A3B8',
+    fontSize: 13,
+    color: '#64748B',
   },
 });

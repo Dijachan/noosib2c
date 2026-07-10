@@ -16,6 +16,12 @@ import ResetPasswordScreen from './src/screens/auth/ResetPasswordScreen';
 import ResetSuccessScreen from './src/screens/auth/ResetSuccessScreen';
 import ConsentScreen from './src/screens/auth/ConsentScreen';
 import DevicePairingScreen from './src/screens/auth/DevicePairingScreen';
+import RegionSetupScreen from './src/screens/auth/RegionSetupScreen';
+import SubscriptionScreen from './src/screens/auth/SubscriptionScreen';
+import WhatsAppBindingScreen from './src/screens/auth/WhatsAppBindingScreen';
+import CareCircleScreen from './src/screens/auth/CareCircleScreen';
+import InviteCaregiverScreen from './src/screens/auth/InviteCaregiverScreen';
+import CaregiverOnboardingScreen from './src/screens/auth/CaregiverOnboardingScreen';
 import HomeScreen from './src/screens/home/HomeScreen';
 import AdherenceDetailsScreen from './src/screens/home/AdherenceDetailsScreen';
 import TempDetailsScreen from './src/screens/home/TempDetailsScreen';
@@ -32,6 +38,16 @@ import DrugDetailScreen from './src/screens/medications/add/DrugDetailScreen';
 import SlotMappingScreen from './src/screens/medications/add/SlotMappingScreen';
 import ScheduleScreen from './src/screens/medications/add/ScheduleScreen';
 import ReviewSyncScreen from './src/screens/medications/add/ReviewSyncScreen';
+
+import AIChatScreen from './src/screens/ai/AIChatScreen';
+import PrescriptionScannerScreen from './src/screens/ai/PrescriptionScannerScreen';
+import VoiceCommandScreen from './src/screens/ai/VoiceCommandScreen';
+import AIInsightsScreen from './src/screens/ai/AIInsightsScreen';
+import AIConflictAlertScreen from './src/screens/ai/AIConflictAlertScreen';
+import LogDoseQuickScreen from './src/screens/log/LogDoseQuickScreen';
+import PhotoProofScreen from './src/screens/log/PhotoProofScreen';
+import ProofOfLifeFeedScreen from './src/screens/log/ProofOfLifeFeedScreen';
+import AdherenceHistoryScreen from './src/screens/log/AdherenceHistoryScreen';
 import { MedicationProvider } from './src/context/MedicationContext';
 
 
@@ -56,6 +72,9 @@ function AuthNavigator() {
       <AuthStack.Screen name="VerifyCode" component={VerifyCodeScreen} />
       <AuthStack.Screen name="ResetPassword" component={ResetPasswordScreen} />
       <AuthStack.Screen name="ResetSuccess" component={ResetSuccessScreen} />
+      <AuthStack.Screen name="RegionSetup" component={RegionSetupScreen} />
+      <AuthStack.Screen name="Subscription" component={SubscriptionScreen} />
+      <AuthStack.Screen name="CaregiverOnboarding" component={CaregiverOnboardingScreen} />
     </AuthStack.Navigator>
   );
 }
@@ -65,6 +84,10 @@ function OnboardingNavigator() {
   return (
     <OnboardingStack.Navigator screenOptions={{ headerShown: false, animation: 'fade' }}>
       <OnboardingStack.Screen name="CreatePatientProfile" component={CreatePatientProfileScreen} />
+      <OnboardingStack.Screen name="WhatsAppBinding" component={WhatsAppBindingScreen} />
+      <OnboardingStack.Screen name="CareCircle" component={CareCircleScreen} />
+      <OnboardingStack.Screen name="InviteCaregiver" component={InviteCaregiverScreen} />
+      <OnboardingStack.Screen name="CaregiverOnboarding" component={CaregiverOnboardingScreen} />
       <OnboardingStack.Screen name="Consent" component={ConsentScreen} />
       <OnboardingStack.Screen name="DevicePairing" component={DevicePairingScreen} />
     </OnboardingStack.Navigator>
@@ -73,8 +96,14 @@ function OnboardingNavigator() {
 
 const AppStack = createNativeStackNavigator();
 function AppNavigator() {
+  const { user } = useAuth();
+  const isCaregiver = user?.user_metadata?.role === 'caregiver';
+
   return (
-    <AppStack.Navigator screenOptions={{ headerShown: false, animation: 'fade' }}>
+    <AppStack.Navigator 
+      screenOptions={{ headerShown: false, animation: 'fade' }}
+      initialRouteName="Home"
+    >
       <AppStack.Screen name="Home" component={HomeScreen} />
       <AppStack.Screen name="AdherenceDetails" component={AdherenceDetailsScreen} />
       <AppStack.Screen name="TempDetails" component={TempDetailsScreen} />
@@ -90,6 +119,17 @@ function AppNavigator() {
       <AppStack.Screen name="SlotMapping" component={SlotMappingScreen} />
       <AppStack.Screen name="Schedule" component={ScheduleScreen} />
       <AppStack.Screen name="ReviewSync" component={ReviewSyncScreen} />
+      <AppStack.Screen name="InviteCaregiver" component={InviteCaregiverScreen} />
+      
+      <AppStack.Screen name="AIChat" component={AIChatScreen} />
+      <AppStack.Screen name="PrescriptionScanner" component={PrescriptionScannerScreen} />
+      <AppStack.Screen name="VoiceCommand" component={VoiceCommandScreen} />
+      <AppStack.Screen name="AIInsights" component={AIInsightsScreen} />
+      <AppStack.Screen name="AIConflictAlert" component={AIConflictAlertScreen} />
+      <AppStack.Screen name="LogDoseQuick" component={LogDoseQuickScreen} />
+      <AppStack.Screen name="PhotoProof" component={PhotoProofScreen} />
+      <AppStack.Screen name="ProofOfLifeFeed" component={ProofOfLifeFeedScreen} />
+      <AppStack.Screen name="AdherenceHistory" component={AdherenceHistoryScreen} />
     </AppStack.Navigator>
   );
 }

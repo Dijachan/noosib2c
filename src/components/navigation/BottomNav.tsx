@@ -10,6 +10,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useAuth } from '../../context/AuthContext';
 
 interface BottomNavProps {
   activeTab: 'Home' | 'Meds' | 'Pharmacy' | 'Profile' | 'Hub';
@@ -17,6 +18,16 @@ interface BottomNavProps {
 
 export default function BottomNav({ activeTab }: BottomNavProps) {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
+  const { user } = useAuth();
+  const isCaregiver = user?.user_metadata?.role === 'caregiver';
+
+  const handleMedsPress = () => {
+    if (isCaregiver) {
+      navigation.navigate('MedsTray');
+    } else {
+      navigation.navigate('CareSchedule');
+    }
+  };
 
   const getActiveColor = (tab: string) => (activeTab === tab ? '#0463DD' : 'rgba(15, 23, 42, 0.4)');
 
@@ -33,17 +44,17 @@ export default function BottomNav({ activeTab }: BottomNavProps) {
           <Text style={[styles.navText, activeTab === 'Home' && styles.navTextActive]}>Home</Text>
         </TouchableOpacity>
         
-        <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('MedsTray')}>
+        <TouchableOpacity style={styles.navItem} onPress={handleMedsPress}>
           <Ionicons name={activeTab === 'Meds' ? "medical" : "medical-outline"} size={24} color={getActiveColor('Meds')} />
           <Text style={[styles.navText, activeTab === 'Meds' && styles.navTextActive]}>Meds</Text>
         </TouchableOpacity>
         
         <TouchableOpacity 
           style={styles.navFabContainer}
-          onPress={() => navigation.navigate('SearchDrug')}
+          onPress={() => navigation.navigate('AIChat')}
         >
-          <View style={styles.navFab}>
-            <Ionicons name="add" size={30} color="#FFFFFF" />
+          <View style={[styles.navFab, { backgroundColor: '#8B5CF6' }]}>
+            <Ionicons name="sparkles" size={26} color="#FFFFFF" />
           </View>
         </TouchableOpacity>
 

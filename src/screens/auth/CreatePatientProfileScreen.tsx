@@ -8,60 +8,69 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Image,
+  ActivityIndicator,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Input from '../../components/inputs/Input';
-import OnboardingBg from '../../components/OnboardingBg';
-import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
-import { Alert, ActivityIndicator } from 'react-native';
+
+const CONDITIONS = ['Hypertension', 'Type 2 Diabetes', 'Arthritis', 'Asthma'];
 
 export default function CreatePatientProfileScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
-  const { user, refreshOnboarding, mockNextStep } = useAuth();
+  const { setPatientProfile } = useAuth();
+  
+  const [fullName, setFullName] = useState('Grandpa Kunle');
+  const [age, setAge] = useState('78');
+  const [gender, setGender] = useState('Male');
+  const [phone, setPhone] = useState('+234 803 123 4567');
+  const [selectedConditions, setSelectedConditions] = useState<string[]>(['Hypertension']);
   const [isLoading, setIsLoading] = useState(false);
-  const [form, setForm] = useState({
-    fullName: '',
-    age: '',
-    gender: 'Male', // Default
-    condition: '',
-    emergencyContact: '',
-  });
 
-  const handleChange = (field: keyof typeof form, value: string) => {
-    setForm(prev => ({ ...prev, [field]: value }));
+  const toggleCondition = (condition: string) => {
+    if (selectedConditions.includes(condition)) {
+      setSelectedConditions(prev => prev.filter(c => c !== condition));
+    } else {
+      setSelectedConditions(prev => [...prev, condition]);
+    }
   };
 
-  const handleContinue = async () => {
+  const isFormValid = fullName.trim().length > 0 && age.trim().length > 0 && phone.trim().length > 0;
+
+  const handleSave = () => {
+    if (!isFormValid) return;
     setIsLoading(true);
-    // Fake processing for demo realism
+
     setTimeout(() => {
-      mockNextStep();
       setIsLoading(false);
-      navigation.navigate('Consent');
-    }, 1000);
+      setPatientProfile({
+        name: fullName,
+        age,
+        gender,
+        phone,
+        conditions: selectedConditions,
+        language: 'English'
+      });
+      navigation.navigate('WhatsAppBinding');
+    }, 1200);
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.bgContainer}>
-        <OnboardingBg width={600} height={600} />
-      </View>
-
-      <KeyboardAvoidingView 
+      <KeyboardAvoidingView
         style={styles.keyboardView}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <ScrollView 
+        <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
           bounces={false}
+          keyboardShouldPersistTaps="handled"
         >
-          {/* Custom Navigation Bar */}
+          {/* Header Bar */}
           <View style={styles.navBar}>
             <TouchableOpacity 
               style={styles.backButton} 
@@ -69,92 +78,149 @@ export default function CreatePatientProfileScreen() {
             >
               <Feather name="arrow-left" size={20} color="rgba(4,9,33,0.76)" />
             </TouchableOpacity>
+            <View style={styles.navHeaderTitleContainer}>
+              <Text style={styles.navTitle}>Patient Setup</Text>
+              <Text style={styles.navStep}>Step 1 of 3</Text>
+            </View>
             <View style={styles.navPlaceholder} />
           </View>
 
-          {/* Header Section */}
+          {/* Title */}
           <View style={styles.header}>
-            <View style={styles.headerIconContainer}>
-              <Feather name="user-plus" size={32} color="#0463DD" />
-            </View>
-            <Text style={styles.title}>Create Patient Profile</Text>
+            <Text style={styles.title}>Create Elder Profile</Text>
             <Text style={styles.subtitle}>
-              Define the profile of the patient under your care.
+              Setting up your patient's digital identity.
             </Text>
           </View>
 
-          {/* Form Fields */}
+          {/* Profile Image Picker */}
+          <View style={styles.imagePickerSection}>
+            <TouchableOpacity style={styles.dottedCircle} activeOpacity={0.8}>
+              <Feather name="camera" size={24} color="#0463DD" />
+              <Text style={styles.addPhotoText}>Add Photo</Text>
+            </TouchableOpacity>
+            <Text style={styles.imagePickerDescription}>
+              Provide a clear, recent profile photo of the elder patient.
+            </Text>
+          </View>
+
+          {/* Form Content */}
           <View style={styles.formContainer}>
-            <Input 
+            {/* Full Name */}
+            <Input
               label="Full Name"
-              placeholder="e.g. Adewale Johnson"
-              value={form.fullName}
-              onChangeText={(text) => handleChange('fullName', text)}
+              placeholder="e.g. Grandpa Kunle"
+              value={fullName}
+              onChangeText={setFullName}
             />
 
+            {/* Age & Gender in row */}
             <View style={styles.row}>
-              <View style={{ flex: 1 }}>
-                <Input 
+              <View style={styles.ageCol}>
+                <Input
                   label="Age"
-                  placeholder="65"
+                  placeholder="78"
                   keyboardType="number-pad"
-                  value={form.age}
-                  onChangeText={(text) => handleChange('age', text)}
+                  value={age}
+                  onChangeText={setAge}
                 />
               </View>
-              <View style={{ flex: 1.2 }}>
-                <Text style={styles.label}>Gender</Text>
-                <View style={styles.genderContainer}>
-                  {['Male', 'Female'].map((g) => (
-                    <TouchableOpacity
-                      key={g}
-                      style={[
-                        styles.genderBtn,
-                        form.gender === g && styles.genderBtnActive
-                      ]}
-                      onPress={() => handleChange('gender', g)}
-                    >
-                      <Text style={[
-                        styles.genderText,
-                        form.gender === g && styles.genderTextActive
-                      ]}>{g}</Text>
-                    </TouchableOpacity>
-                  ))}
+
+              <View style={styles.genderCol}>
+                <Text style={styles.fieldLabel}>Gender</Text>
+                <View style={styles.genderSegmentedControl}>
+                  {['Male', 'Female', 'Other'].map((option) => {
+                    const isActive = gender === option;
+                    return (
+                      <TouchableOpacity
+                        key={option}
+                        style={[
+                          styles.genderTab,
+                          isActive && styles.genderTabActive
+                        ]}
+                        onPress={() => setGender(option)}
+                        activeOpacity={0.8}
+                      >
+                        <Text
+                          style={[
+                            styles.genderTabText,
+                            isActive && styles.genderTabTextActive
+                          ]}
+                        >
+                          {option}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
                 </View>
               </View>
             </View>
 
-            <Input 
-              label="Primary Condition (Optional)"
-              placeholder="e.g. Hypertension"
-              value={form.condition}
-              onChangeText={(text) => handleChange('condition', text)}
+            {/* Phone Number */}
+            <Input
+              label="WhatsApp Phone Number"
+              icon="phone"
+              placeholder="e.g. +234 803 123 4567"
+              keyboardType="phone-pad"
+              value={phone}
+              onChangeText={setPhone}
             />
 
-            <Input 
-              label="Emergency Contact"
-              icon="phone"
-              placeholder="+234 800 123 4567"
-              keyboardType="phone-pad"
-              value={form.emergencyContact}
-              onChangeText={(text) => handleChange('emergencyContact', text)}
-            />
+            {/* Chronic Conditions */}
+            <View style={styles.conditionsGroup}>
+              <Text style={styles.fieldLabel}>Chronic Conditions</Text>
+              <View style={styles.conditionsGrid}>
+                {CONDITIONS.map((condition) => {
+                  const isSelected = selectedConditions.includes(condition);
+                  return (
+                    <TouchableOpacity
+                      key={condition}
+                      style={[
+                        styles.conditionPill,
+                        isSelected && styles.conditionPillActive
+                      ]}
+                      onPress={() => toggleCondition(condition)}
+                      activeOpacity={0.8}
+                    >
+                      {isSelected && (
+                        <Feather name="check" size={14} color="#FFFFFF" style={styles.pillCheck} />
+                      )}
+                      <Text
+                        style={[
+                          styles.conditionText,
+                          isSelected && styles.conditionTextActive
+                        ]}
+                      >
+                        {condition}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </View>
           </View>
         </ScrollView>
 
-        {/* Action Button (Fixed at bottom) */}
+        {/* Save Button (Fixed at Bottom) */}
         <View style={styles.buttonContainer}>
-          <TouchableOpacity 
-            style={[styles.primaryButton, isLoading && { opacity: 0.7 }]}
-            onPress={handleContinue}
-            disabled={isLoading}
+          <TouchableOpacity
+            style={[styles.primaryButton, (!isFormValid || isLoading) && styles.disabledButton]}
+            disabled={!isFormValid || isLoading}
+            onPress={handleSave}
           >
             {isLoading ? (
               <ActivityIndicator color="#FFFFFF" />
             ) : (
               <>
-                <Text style={styles.buttonText}>Continue</Text>
-                <Feather name="arrow-right" size={20} color="#FFFFFF" strokeWidth={3} />
+                <Text style={[styles.buttonText, !isFormValid && styles.disabledButtonText]}>
+                  Save & Continue
+                </Text>
+                <Feather 
+                  name="arrow-right" 
+                  size={20} 
+                  color={isFormValid ? "#FFFFFF" : "#9CA3AF"} 
+                  strokeWidth={3} 
+                />
               </>
             )}
           </TouchableOpacity>
@@ -169,16 +235,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-  bgContainer: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    width: 600,
-    height: 600,
-    marginLeft: -300,
-    marginTop: -400,
-    opacity: 0.5,
-  },
   keyboardView: {
     flex: 1,
   },
@@ -187,16 +243,16 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 60,
-    paddingBottom: 40,
+    paddingHorizontal: 16,
+    paddingTop: 20,
+    paddingBottom: 30,
     alignItems: 'center',
   },
   navBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 40,
+    marginBottom: 30,
     width: '100%',
   },
   backButton: {
@@ -208,90 +264,170 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  navHeaderTitleContainer: {
+    alignItems: 'center',
+  },
+  navTitle: {
+    fontFamily: 'Baloo2_700Bold',
+    fontSize: 20,
+    color: 'rgba(4,9,33,0.76)',
+  },
+  navStep: {
+    fontFamily: 'Baloo2_600SemiBold',
+    fontSize: 12,
+    color: '#0463DD',
+    marginTop: -2,
+  },
   navPlaceholder: {
     width: 40,
     height: 40,
   },
   header: {
-    alignItems: 'center',
-    marginBottom: 40,
-    width: '100%',
-  },
-  headerIconContainer: {
-    width: 64,
-    height: 64,
-    borderRadius: 20,
-    backgroundColor: 'rgba(4, 99, 221, 0.1)',
-    alignItems: 'center',
-    justifyContent: 'center',
     marginBottom: 24,
+    width: '100%',
+    maxWidth: 361,
   },
   title: {
     fontFamily: 'Baloo2_700Bold',
     fontSize: 28,
+    lineHeight: 36,
     color: 'rgba(4,9,33,0.76)',
-    marginBottom: 8,
-    textAlign: 'center',
+    marginBottom: 6,
   },
   subtitle: {
     fontFamily: 'Baloo2_400Regular',
-    fontSize: 16,
-    lineHeight: 24,
-    color: 'rgba(4,9,33,0.76)',
+    fontSize: 15,
+    lineHeight: 22,
+    color: 'rgba(4,9,33,0.6)',
+  },
+  imagePickerSection: {
+    alignItems: 'center',
+    marginBottom: 24,
+    width: '100%',
+    maxWidth: 361,
+  },
+  dottedCircle: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    borderWidth: 1.5,
+    borderColor: '#0463DD',
+    borderStyle: 'dashed',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(4, 99, 221, 0.04)',
+    marginBottom: 10,
+  },
+  addPhotoText: {
+    fontFamily: 'Baloo2_600SemiBold',
+    fontSize: 12,
+    color: '#0463DD',
+    marginTop: 2,
+  },
+  imagePickerDescription: {
+    fontFamily: 'Baloo2_400Regular',
+    fontSize: 12,
+    color: 'rgba(4,9,33,0.5)',
     textAlign: 'center',
-    paddingHorizontal: 10,
+    paddingHorizontal: 24,
+    lineHeight: 16,
   },
   formContainer: {
     width: '100%',
     maxWidth: 361,
-    gap: 20,
+    gap: 16,
+    marginBottom: 20,
   },
   row: {
     flexDirection: 'row',
-    gap: 16,
+    gap: 12,
     width: '100%',
   },
-  label: {
-    fontFamily: 'Baloo2_400Regular',
+  ageCol: {
+    flex: 1,
+  },
+  genderCol: {
+    flex: 2,
+    gap: 6,
+  },
+  fieldLabel: {
+    fontFamily: 'Baloo2_600SemiBold',
     fontSize: 14,
     color: 'rgba(4,9,33,0.6)',
-    marginBottom: 4,
     marginLeft: 2,
   },
-  genderContainer: {
+  genderSegmentedControl: {
     flexDirection: 'row',
-    height: 48,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#F3F4F6',
     borderRadius: 8,
-    borderWidth: 2,
-    borderColor: 'rgba(4,9,33,0.32)',
-    padding: 2,
+    padding: 3,
+    height: 48,
+    width: '100%',
   },
-  genderBtn: {
+  genderTab: {
     flex: 1,
-    height: '100%',
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 6,
   },
-  genderBtnActive: {
+  genderTabActive: {
     backgroundColor: '#0463DD',
+    shadowColor: 'rgba(4, 9, 33, 0.06)',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 1,
+    shadowRadius: 2,
+    elevation: 1,
   },
-  genderText: {
+  genderTabText: {
     fontFamily: 'Baloo2_600SemiBold',
     fontSize: 14,
     color: 'rgba(4,9,33,0.5)',
   },
-  genderTextActive: {
+  genderTabTextActive: {
+    color: '#FFFFFF',
+  },
+  conditionsGroup: {
+    width: '100%',
+    gap: 8,
+    marginTop: 4,
+  },
+  conditionsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    width: '100%',
+  },
+  conditionPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F3F4F6',
+    borderWidth: 1.5,
+    borderColor: 'rgba(4,9,33,0.06)',
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+  },
+  conditionPillActive: {
+    backgroundColor: '#0463DD',
+    borderColor: '#0463DD',
+  },
+  pillCheck: {
+    marginRight: 4,
+  },
+  conditionText: {
+    fontFamily: 'Baloo2_600SemiBold',
+    fontSize: 13,
+    color: 'rgba(4,9,33,0.6)',
+  },
+  conditionTextActive: {
     color: '#FFFFFF',
   },
   buttonContainer: {
     width: '100%',
     maxWidth: 361,
     paddingHorizontal: 24,
-    paddingTop: 24,
+    paddingTop: 12,
     paddingBottom: Platform.OS === 'ios' ? 40 : 24,
-    gap: 16,
     alignSelf: 'center',
   },
   primaryButton: {
@@ -304,9 +440,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 12,
   },
+  disabledButton: {
+    backgroundColor: '#E5E7EB',
+  },
   buttonText: {
     fontFamily: 'Baloo2_700Bold',
     fontSize: 20,
     color: '#FFFFFF',
+  },
+  disabledButtonText: {
+    color: '#9CA3AF',
   },
 });

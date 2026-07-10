@@ -22,9 +22,24 @@ const { width, height } = Dimensions.get('window');
 const CARD_WIDTH = 361;
 
 const ONBOARDING_DATA = [
-  { id: '1', title: 'Medication\nMistakes Happen.', subtitle: 'Patients miss doses,\ncaregivers struggle.', image: require('../../../assets/images/onboarding/onboarding_device_view1.jpg') },
-  { id: '2', title: 'Meet Noosi,\nYour Assistant.', subtitle: 'Automates dispensing\nand tracks in real-time.', image: require('../../../assets/images/onboarding/onboarding_device_view2.jpg') },
-  { id: '3', title: 'Safe, Secure\n& Reliable.', subtitle: 'Encrypted health data\nwith offline support.', image: require('../../../assets/images/onboarding/onboarding_device_view3.jpg') },
+  {
+    id: '1',
+    title: 'Diaspora Trust\nBridge',
+    subtitle: 'Monitor medication adherence for elderly parents back home.',
+    image: require('../../../assets/images/onboarding/new_slide1.png'),
+  },
+  {
+    id: '2',
+    title: 'AI-Verified\nConsumption',
+    subtitle: 'Smart camera Blister-Pack OCR to verify pill ingestion.',
+    image: require('../../../assets/images/onboarding/new_slide2.png'),
+  },
+  {
+    id: '3',
+    title: 'Escalation\nAlerts',
+    subtitle: 'Real-time push, WhatsApp, and interactive voice call fallbacks.',
+    image: require('../../../assets/images/onboarding/new_slide3.png'),
+  },
 ];
 
 export default function OnboardingScreen() {
@@ -262,7 +277,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     color: 'rgba(4,9,33,0.76)',
-    width: 191,
+    width: 250,
   },
   bottomSection: {
     position: 'absolute',

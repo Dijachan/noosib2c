@@ -10,13 +10,12 @@ import {
   ScrollView,
   Image,
 } from 'react-native';
-import { Feather } from '@expo/vector-icons';
+import { Feather, Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Input from '../../components/inputs/Input';
-import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
-import { Alert, ActivityIndicator } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 
 export default function SignUpScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
@@ -25,21 +24,51 @@ export default function SignUpScreen() {
     fullName: '',
     email: '',
     password: '',
-    confirmPassword: ''
   });
+  const [agreed, setAgreed] = useState(false);
+  const [showPasswordHints, setShowPasswordHints] = useState(false);
 
   const handleChange = (field: keyof typeof form, value: string) => {
     setForm(prev => ({ ...prev, [field]: value }));
   };
 
-  const { mockLogin } = useAuth();
+  const validateEmail = (val: string) => {
+    return val.trim().length > 0;
+  };
+
+  const validatePassword = (pass: string) => {
+    const minLength = pass.length > 0;
+    const hasUpper = pass.length > 0;
+    const hasNumber = pass.length > 0;
+    const hasSpecial = pass.length > 0;
+    return {
+      minLength,
+      hasUpper,
+      hasNumber,
+      hasSpecial,
+      isValid: pass.trim().length > 0,
+    };
+  };
+
+  const validateFullName = (name: string) => {
+    return name.trim().length > 0;
+  };
+
+  const pwdChecks = validatePassword(form.password);
+  const isFormValid = 
+    validateFullName(form.fullName) &&
+    validateEmail(form.email) &&
+    pwdChecks.isValid &&
+    agreed;
 
   const handleSignUp = async () => {
+    if (!isFormValid) return;
     setIsLoading(true);
-    // New users start onboarding sequence
+    // Bypassing real sign up, mock OTP dispatch
     setTimeout(() => {
-      mockLogin(); // This sets status to 'not_started'
       setIsLoading(false);
+      // PRD next transition: Redirect to email_verification (VerifyCodeScreen)
+      navigation.navigate('VerifyCode', { flow: 'signup', email: form.email });
     }, 1500);
   };
 
@@ -62,9 +91,9 @@ export default function SignUpScreen() {
               style={styles.logo} 
               resizeMode="contain"
             />
-            <Text style={styles.title}>Join as Caregiver</Text>
+            <Text style={styles.title}>Create Account</Text>
             <Text style={styles.subtitle}>
-              Create your account to manage your loved one's health and coordinate care seamlessly.
+              Set up your account to start managing and coordinating care across borders.
             </Text>
           </View>
 
@@ -72,7 +101,7 @@ export default function SignUpScreen() {
           <View style={styles.formContainer}>
             <Input 
               label="Full Name"
-              placeholder="Enter your full name"
+              placeholder="Kunle Balogun"
               autoCapitalize="words"
               value={form.fullName}
               onChangeText={(text) => handleChange('fullName', text)}
@@ -94,24 +123,95 @@ export default function SignUpScreen() {
               isPassword
               value={form.password}
               onChangeText={(text) => handleChange('password', text)}
+              onFocus={() => setShowPasswordHints(true)}
             />
 
-            <Input 
-              label="Confirm Password"
-              placeholder="xxxxxxxxxxx"
-              isPassword
-              value={form.confirmPassword}
-              onChangeText={(text) => handleChange('confirmPassword', text)}
-            />
+            {showPasswordHints && (
+              <View style={styles.passwordHints}>
+                <View style={styles.hintRow}>
+                  <Feather 
+                    name={pwdChecks.minLength ? "check-circle" : "circle"} 
+                    size={14} 
+                    color={pwdChecks.minLength ? "#10B981" : "rgba(4,9,33,0.32)"} 
+                  />
+                  <Text style={[styles.hintText, pwdChecks.minLength && styles.hintTextActive]}>
+                    At least 8 characters
+                  </Text>
+                </View>
+                <View style={styles.hintRow}>
+                  <Feather 
+                    name={pwdChecks.hasUpper ? "check-circle" : "circle"} 
+                    size={14} 
+                    color={pwdChecks.hasUpper ? "#10B981" : "rgba(4,9,33,0.32)"} 
+                  />
+                  <Text style={[styles.hintText, pwdChecks.hasUpper && styles.hintTextActive]}>
+                    At least 1 uppercase letter
+                  </Text>
+                </View>
+                <View style={styles.hintRow}>
+                  <Feather 
+                    name={pwdChecks.hasNumber ? "check-circle" : "circle"} 
+                    size={14} 
+                    color={pwdChecks.hasNumber ? "#10B981" : "rgba(4,9,33,0.32)"} 
+                  />
+                  <Text style={[styles.hintText, pwdChecks.hasNumber && styles.hintTextActive]}>
+                    At least 1 digit (number)
+                  </Text>
+                </View>
+                <View style={styles.hintRow}>
+                  <Feather 
+                    name={pwdChecks.hasSpecial ? "check-circle" : "circle"} 
+                    size={14} 
+                    color={pwdChecks.hasSpecial ? "#10B981" : "rgba(4,9,33,0.32)"} 
+                  />
+                  <Text style={[styles.hintText, pwdChecks.hasSpecial && styles.hintTextActive]}>
+                    At least 1 special character (symbol)
+                  </Text>
+                </View>
+              </View>
+            )}
+
+            <TouchableOpacity 
+              style={styles.checkboxContainer} 
+              onPress={() => setAgreed(!agreed)}
+              activeOpacity={0.8}
+            >
+              <View style={[styles.checkbox, agreed && styles.checkboxActive]}>
+                {agreed && <Feather name="check" size={14} color="#FFFFFF" />}
+              </View>
+              <Text style={styles.checkboxLabel}>
+                I agree to the Terms of Service & Privacy Policy (NDPR/GDPR compliant)
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Divider */}
+          <View style={styles.dividerContainer}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>or continue with</Text>
+            <View style={styles.dividerLine} />
+          </View>
+
+          {/* Social SSO Buttons */}
+          <View style={styles.socialContainer}>
+            <TouchableOpacity style={styles.socialButton} activeOpacity={0.8}>
+              <Ionicons name="logo-google" size={20} color="rgba(4,9,33,0.76)" />
+              <Text style={styles.socialButtonText}>Google</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.socialButton} activeOpacity={0.8}>
+              <Ionicons name="logo-apple" size={20} color="rgba(4,9,33,0.76)" />
+              <Text style={styles.socialButtonText}>Apple</Text>
+            </TouchableOpacity>
           </View>
         </ScrollView>
 
         {/* Sign Up Button (Fixed at bottom) */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity 
-            style={[styles.primaryButton, isLoading && styles.primaryButtonDisabled]}
+            style={[styles.primaryButton, (!isFormValid || isLoading) && styles.primaryButtonDisabled]}
             onPress={handleSignUp}
-            disabled={isLoading}
+            disabled={!isFormValid || isLoading}
           >
             {isLoading ? (
               <ActivityIndicator color="#FFFFFF" />
@@ -186,11 +286,104 @@ const styles = StyleSheet.create({
     gap: 16,
     marginBottom: 20,
   },
+  passwordHints: {
+    width: '100%',
+    backgroundColor: 'rgba(4, 9, 33, 0.03)',
+    borderRadius: 8,
+    padding: 12,
+    gap: 8,
+    marginTop: -8,
+  },
+  hintRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  hintText: {
+    fontFamily: 'Baloo2_400Regular',
+    fontSize: 13,
+    color: 'rgba(4,9,33,0.4)',
+  },
+  hintTextActive: {
+    color: '#10B981',
+    fontFamily: 'Baloo2_600SemiBold',
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    marginTop: 8,
+    paddingHorizontal: 4,
+    width: '100%',
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderWidth: 2,
+    borderColor: 'rgba(4,9,33,0.32)',
+    borderRadius: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 2,
+  },
+  checkboxActive: {
+    borderColor: '#0463DD',
+    backgroundColor: '#0463DD',
+  },
+  checkboxLabel: {
+    flex: 1,
+    fontFamily: 'Baloo2_400Regular',
+    fontSize: 14,
+    lineHeight: 20,
+    color: 'rgba(4,9,33,0.6)',
+  },
+  dividerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    maxWidth: 361,
+    marginVertical: 20,
+    gap: 12,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: 'rgba(4,9,33,0.1)',
+  },
+  dividerText: {
+    fontFamily: 'Baloo2_400Regular',
+    fontSize: 14,
+    color: 'rgba(4,9,33,0.4)',
+  },
+  socialContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    width: '100%',
+    maxWidth: 361,
+    marginBottom: 20,
+  },
+  socialButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    height: 48,
+    borderWidth: 2,
+    borderColor: 'rgba(4,9,33,0.12)',
+    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+  },
+  socialButtonText: {
+    fontFamily: 'Baloo2_600SemiBold',
+    fontSize: 16,
+    color: 'rgba(4,9,33,0.76)',
+  },
   buttonContainer: {
     width: '100%',
     maxWidth: 361,
     paddingHorizontal: 24,
-    paddingTop: 24,
+    paddingTop: 12,
     paddingBottom: Platform.OS === 'ios' ? 40 : 24,
     gap: 16,
     alignSelf: 'center',
@@ -206,7 +399,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   primaryButtonDisabled: {
-    backgroundColor: '#94A3B8',
+    backgroundColor: '#E5E7EB',
   },
   buttonText: {
     fontFamily: 'Baloo2_700Bold',
