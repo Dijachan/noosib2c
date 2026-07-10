@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   primaryButton: {
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     width: '100%',
     height: 64,
     borderRadius: 32,

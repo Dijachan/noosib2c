@@ -32,7 +32,7 @@ export default function ResetSuccessScreen() {
       >
         <View style={styles.content}>
           <View style={styles.iconContainer}>
-            <Feather name="check-circle" size={80} color="#0463DD" />
+            <Feather name="check-circle" size={80} color="#06565F" />
           </View>
 
           <View style={styles.header}>
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     maxWidth: 361,
   },
   primaryButton: {
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     width: '100%',
     height: 64,
     borderRadius: 32,

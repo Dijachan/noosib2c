@@ -118,7 +118,7 @@ export default function VoiceCommandScreen() {
                   styles.waveBar,
                   {
                     height: anim,
-                    backgroundColor: isListening ? '#0463DD' : '#D1D5DB',
+                    backgroundColor: isListening ? '#06565F' : '#D1D5DB',
                   },
                 ]}
               />
@@ -291,10 +291,10 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#0463DD',
+    shadowColor: '#06565F',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.3,
     shadowRadius: 10,

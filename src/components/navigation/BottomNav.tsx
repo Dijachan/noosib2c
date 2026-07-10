@@ -29,7 +29,7 @@ export default function BottomNav({ activeTab }: BottomNavProps) {
     }
   };
 
-  const getActiveColor = (tab: string) => (activeTab === tab ? '#0463DD' : 'rgba(15, 23, 42, 0.4)');
+  const getActiveColor = (tab: string) => (activeTab === tab ? '#06565F' : 'rgba(15, 23, 42, 0.4)');
 
   return (
     <View style={styles.container}>
@@ -53,8 +53,8 @@ export default function BottomNav({ activeTab }: BottomNavProps) {
           style={styles.navFabContainer}
           onPress={() => navigation.navigate('AIChat')}
         >
-          <View style={[styles.navFab, { backgroundColor: '#8B5CF6' }]}>
-            <Ionicons name="sparkles" size={26} color="#FFFFFF" />
+          <View style={[styles.navFab, { backgroundColor: '#06565F' }]}>
+            <Ionicons name="sparkles" size={26} color="#D6FB00" />
           </View>
         </TouchableOpacity>
 
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     color: 'rgba(15, 23, 42, 0.4)',
   },
   navTextActive: {
-    color: '#0463DD',
+    color: '#06565F',
   },
   navFabContainer: {
     flex: 1,
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     width: 58,
     height: 58,
     borderRadius: 29,
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     marginTop: -25,
     alignItems: 'center',
     justifyContent: 'center',

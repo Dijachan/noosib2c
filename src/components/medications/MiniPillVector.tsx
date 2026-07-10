@@ -13,7 +13,7 @@ export default function MiniPillVector({
   pillColor,
   size = 20,
 }: MiniPillVectorProps) {
-  const color = pillColor || '#3B82F6';
+  const color = pillColor || '#06565F';
 
   switch (formFactor) {
     case 'Capsule':
@@ -29,7 +29,7 @@ export default function MiniPillVector({
       );
     case 'Injection':
       return (
-        <Ionicons name="eyedropper-outline" size={size} color={color} />
+        <Ionicons name="eyedrop-outline" size={size} color={color} />
       );
     default: // Tablet
       return (

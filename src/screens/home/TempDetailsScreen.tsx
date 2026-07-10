@@ -354,7 +354,7 @@ export default function TempDetailsScreen() {
               <Text style={styles.probeStatusText}>NOOSI CONNECTED</Text>
             </View>
             <View style={styles.probeStatus}>
-              <Ionicons name="battery-full" size={14} color="#0463DD" />
+              <Ionicons name="battery-full" size={14} color="#06565F" />
               <Text style={styles.probeStatusText}>98%</Text>
             </View>
           </View>
@@ -366,14 +366,14 @@ export default function TempDetailsScreen() {
             activeOpacity={0.9}
           >
             <View style={styles.liveIndicatorRow}>
-              <Animated.View style={[styles.pulseDot, { transform: [{ scale: pulseAnim }], backgroundColor: '#0463DD' }]} />
+              <Animated.View style={[styles.pulseDot, { transform: [{ scale: pulseAnim }], backgroundColor: '#06565F' }]} />
               <Text style={styles.liveText}>{isSimulating ? 'SYNCING...' : 'REAL-TIME'}</Text>
             </View>
             <View style={styles.tempRow}>
               <Text style={styles.tempLarge}>{currentTemp.toFixed(1)}</Text>
               <Text style={styles.tempUnit}>°C</Text>
             </View>
-            <Text style={[styles.hudStatus, { color: currentTemp > 38.5 ? '#EF4444' : currentTemp > 37.5 ? '#F59E0B' : '#10B981' }]}>
+            <Text style={[styles.hudStatus, { color: currentTemp > 38.5 ? '#FF6F61' : currentTemp > 37.5 ? '#F59E0B' : '#10B981' }]}>
               {currentTemp > 38.5 ? 'High Fever Alert!' : currentTemp > 37.5 ? 'Slight Fever Detected' : 'Normal Body Temperature'}
             </Text>
           </TouchableOpacity>
@@ -438,7 +438,7 @@ export default function TempDetailsScreen() {
                       <View style={styles.barTrack}>
                         <View style={[styles.barFill, {
                           height: item.value === 0 ? '0%' : `${Math.min(100, Math.max(10, ((item.value - 35) / 4) * 100))}%`,
-                          backgroundColor: item.value === 0 ? '#E2E8F0' : (item.value > 37.5 ? '#EF4444' : '#0463DD')
+                          backgroundColor: item.value === 0 ? '#E2E8F0' : (item.value > 37.5 ? '#FF6F61' : '#06565F')
                         }]} />
                       </View>
                       <Text style={[styles.barLabel, { fontSize: 10 }]}>{item.label}</Text>
@@ -538,7 +538,7 @@ export default function TempDetailsScreen() {
                     <View style={styles.logsList}>
                       {logs.map((item, index) => (
                         <View key={index} style={styles.gridLogItem}>
-                          <View style={[styles.logGridIndicator, { backgroundColor: item.value > 37.5 ? '#EF4444' : '#10B981' }]} />
+                          <View style={[styles.logGridIndicator, { backgroundColor: item.value > 37.5 ? '#FF6F61' : '#10B981' }]} />
                           <Text style={styles.logGridValue}>{item.value.toFixed(1)}°</Text>
                           <Text style={styles.logGridTime}>{item.label}</Text>
                           <Text style={styles.logGridDate}>{item.dateText || 'Today'}</Text>
@@ -624,7 +624,7 @@ const styles = StyleSheet.create({
   probeStatusText: {
     fontFamily: 'Baloo2_700Bold',
     fontSize: 10,
-    color: '#0463DD',
+    color: '#06565F',
     letterSpacing: 0.5,
   },
   hudOverlay: {
@@ -652,7 +652,7 @@ const styles = StyleSheet.create({
   liveText: {
     fontFamily: 'Baloo2_800ExtraBold',
     fontSize: 12,
-    color: '#0463DD',
+    color: '#06565F',
     letterSpacing: 1,
   },
   tempRow: {
@@ -670,7 +670,7 @@ const styles = StyleSheet.create({
   tempUnit: {
     fontFamily: 'Baloo2_600SemiBold',
     fontSize: 28,
-    color: '#0463DD',
+    color: '#06565F',
   },
   hudStatus: {
     fontFamily: 'Baloo2_600SemiBold',
@@ -736,7 +736,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F1F5F9',
   },
   rangeItemSelected: {
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
   },
   rangeText: {
     fontFamily: 'Baloo2_600SemiBold',
@@ -767,7 +767,7 @@ const styles = StyleSheet.create({
   barValue: {
     fontFamily: 'Baloo2_700Bold',
     fontSize: 10,
-    color: '#0463DD',
+    color: '#06565F',
     marginBottom: 4,
   },
   barTrack: {
@@ -901,7 +901,7 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#EF4444',
+    backgroundColor: '#FF6F61',
   },
   recText: {
     fontFamily: 'Baloo2_700Bold',
@@ -926,7 +926,7 @@ const styles = StyleSheet.create({
   missedText: {
     fontFamily: 'Baloo2_500Medium',
     fontSize: 12,
-    color: '#EF4444',
+    color: '#FF6F61',
   },
   daySection: {
     marginBottom: 32,

@@ -22,8 +22,8 @@ export default function CareCircleScreen() {
   const getAvatarBg = (name: string) => {
     const char = name.trim().charAt(0).toUpperCase();
     const colors = [
-      '#EF4444', '#F59E0B', '#10B981', '#3B82F6', 
-      '#6366F1', '#8B5CF6', '#EC4899', '#14B8A6'
+      '#FF6F61', '#F59E0B', '#10B981', '#06565F', 
+      '#D6FB00', '#D6FB00', '#FF6F61', '#06565F'
     ];
     const code = char.charCodeAt(0) || 0;
     return colors[code % colors.length];
@@ -115,7 +115,7 @@ export default function CareCircleScreen() {
           activeOpacity={0.8}
         >
           <View style={styles.addIconContainer}>
-            <Feather name="user-plus" size={18} color="#0463DD" />
+            <Feather name="user-plus" size={18} color="#06565F" />
           </View>
           <View style={styles.addTextContainer}>
             <Text style={styles.addTitle}>Invite a Caregiver</Text>
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
   navStep: {
     fontFamily: 'Baloo2_600SemiBold',
     fontSize: 12,
-    color: '#0463DD',
+    color: '#06565F',
     marginTop: -2,
   },
   navPlaceholder: {
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
   roleBadgeText: {
     fontFamily: 'Baloo2_600SemiBold',
     fontSize: 10,
-    color: '#0463DD',
+    color: '#06565F',
   },
   memberPhone: {
     fontFamily: 'Baloo2_400Regular',
@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
   addTitle: {
     fontFamily: 'Baloo2_700Bold',
     fontSize: 15,
-    color: '#0463DD',
+    color: '#06565F',
     marginBottom: 2,
   },
   addSublabel: {
@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   primaryButton: {
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     width: '100%',
     height: 64,
     borderRadius: 32,

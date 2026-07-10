@@ -12,20 +12,20 @@ export default function OnboardingBg(props: any) {
       </G>
       <Defs>
         <LinearGradient id="paint0_linear_1343_867" x1="300" y1="0" x2="300" y2="600" gradientUnits="userSpaceOnUse">
-          <Stop stopColor="#15F597"/>
-          <Stop offset="1" stopColor="#0463DD"/>
+          <Stop stopColor="#D6FB00"/>
+          <Stop offset="1" stopColor="#06565F"/>
         </LinearGradient>
         <LinearGradient id="paint1_linear_1343_867" x1="300" y1="0" x2="300" y2="600" gradientUnits="userSpaceOnUse">
-          <Stop stopColor="#15F597"/>
-          <Stop offset="1" stopColor="#0463DD"/>
+          <Stop stopColor="#D6FB00"/>
+          <Stop offset="1" stopColor="#06565F"/>
         </LinearGradient>
         <LinearGradient id="paint2_linear_1343_867" x1="300" y1="0" x2="300" y2="600" gradientUnits="userSpaceOnUse">
-          <Stop stopColor="#15F597"/>
-          <Stop offset="1" stopColor="#0463DD"/>
+          <Stop stopColor="#D6FB00"/>
+          <Stop offset="1" stopColor="#06565F"/>
         </LinearGradient>
         <LinearGradient id="paint3_linear_1343_867" x1="300" y1="0" x2="300" y2="600" gradientUnits="userSpaceOnUse">
-          <Stop stopColor="#15F597"/>
-          <Stop offset="1" stopColor="#0463DD"/>
+          <Stop stopColor="#D6FB00"/>
+          <Stop offset="1" stopColor="#06565F"/>
         </LinearGradient>
       </Defs>
     </Svg>

@@ -149,7 +149,7 @@ export default function SearchDrugScreen() {
                       Brand: {item.brand} • {item.nafdac}
                     </Text>
                   </View>
-                  <Feather name="plus-circle" size={20} color="#0463DD" />
+                  <Feather name="plus-circle" size={20} color="#06565F" />
                 </TouchableOpacity>
               )}
               ListEmptyComponent={
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
   headerStep: {
     fontFamily: 'Baloo2_600SemiBold',
     fontSize: 12,
-    color: '#0463DD',
+    color: '#06565F',
     marginTop: -2,
   },
   navPlaceholder: {
@@ -256,9 +256,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   modeTabActive: {
-    backgroundColor: '#EBF5FF',
+    backgroundColor: '#E6F3F4',
     borderWidth: 1,
-    borderColor: '#0463DD',
+    borderColor: '#06565F',
   },
   modeText: {
     fontFamily: 'Baloo2_700Bold',
@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
     color: 'rgba(4,9,33,0.5)',
   },
   modeTextActive: {
-    color: '#0463DD',
+    color: '#06565F',
   },
   content: {
     flex: 1,
@@ -389,7 +389,7 @@ const styles = StyleSheet.create({
     paddingBottom: Platform.OS === 'ios' ? 40 : 24,
   },
   primaryBtn: {
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     width: '100%',
     height: 60,
     borderRadius: 30,

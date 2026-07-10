@@ -23,6 +23,7 @@ import { useMedication, Medication } from '../../context/MedicationContext';
 import { useAuth } from '../../context/AuthContext';
 import MedicationDetailModal from '../../components/medications/MedicationDetailModal';
 import DeleteConfirmationModal from '../../components/medications/DeleteConfirmationModal';
+import { LinearGradient } from 'expo-linear-gradient';
 import CustomAlertModal from '../../components/medications/CustomAlertModal';
 import MiniPillVector from '../../components/medications/MiniPillVector';
 import { supabase } from '../../lib/supabase';
@@ -32,7 +33,8 @@ export default function HomeScreen() {
   const { 
     medicationList, 
     deleteMedication,
-    toggleMedicationStatus 
+    toggleMedicationStatus,
+    doseLogs
   } = useMedication();
   
   const { 
@@ -388,7 +390,7 @@ export default function HomeScreen() {
               >
                 <View style={styles.vitalsLeft}>
                   <View style={styles.vitalsIconContainer}>
-                    <Ionicons name="activity" size={24} color="#0463DD" />
+                    <Feather name="activity" size={24} color="#06565F" />
                   </View>
                   <View>
                     <Text style={styles.vitalsTitle}>Log Vitals Shortcut</Text>
@@ -413,7 +415,7 @@ export default function HomeScreen() {
                           <View style={styles.pillIconContainer}>
                             <MiniPillVector 
                               formFactor={med.formFactor || 'Tablet'} 
-                              pillColor={med.pillColor || '#3B82F6'} 
+                              pillColor={med.pillColor || '#06565F'} 
                             />
                           </View>
                           <View style={styles.medTextGroup}>
@@ -482,7 +484,7 @@ export default function HomeScreen() {
                 style={styles.hubActionBtn}
                 onPress={() => navigation.navigate('Notifications')}
               >
-                <Ionicons name="notifications-outline" size={26} color="#0463DD" />
+                <Ionicons name="notifications-outline" size={26} color="#06565F" />
                 {alertActive && <View style={styles.hubBadge} />}
               </TouchableOpacity>
             </View>
@@ -490,7 +492,7 @@ export default function HomeScreen() {
             {/* Timezone Indicator Card */}
             <View style={styles.timezoneIndicatorCard}>
               <View style={styles.timezoneRow}>
-                <Feather name="home" size={12} color="#0463DD" />
+                <Feather name="home" size={12} color="#06565F" />
                 <Text style={styles.timezoneText} numberOfLines={1}>YOU: {clocks.admin}</Text>
               </View>
               <View style={styles.timezoneRow}>
@@ -501,10 +503,16 @@ export default function HomeScreen() {
 
             {/* Adherence Summary Card */}
             <TouchableOpacity 
-              style={styles.summaryCard}
+              style={[styles.summaryCard, { backgroundColor: 'transparent', overflow: 'hidden' }]}
               onPress={() => navigation.navigate('AdherenceHistory')}
               activeOpacity={0.9}
             >
+              <LinearGradient
+                colors={['#F5FCE2', '#ECFFB6']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={StyleSheet.absoluteFill}
+              />
               <View style={styles.summaryTextSection}>
                 <Text style={styles.summaryLabel}>TODAY'S ADHERENCE RATE</Text>
                 <Text style={styles.summaryValue}>94%</Text>
@@ -512,22 +520,9 @@ export default function HomeScreen() {
               </View>
               <View style={styles.summaryChartSection}>
                 <View style={styles.chartCircle}>
-                  <Ionicons name="trending-up" size={32} color="#0463DD" />
+                  <Ionicons name="trending-up" size={32} color="#06565F" />
                 </View>
               </View>
-            </TouchableOpacity>
-
-            {/* Proof of Life Feed Quick CTA */}
-            <TouchableOpacity 
-              style={styles.adminFeedBtn}
-              onPress={() => navigation.navigate('ProofOfLifeFeed')}
-              activeOpacity={0.8}
-            >
-              <View style={styles.adminFeedLeft}>
-                <Feather name="shield" size={18} color="#8B5CF6" />
-                <Text style={styles.adminFeedText}>View Proof of Life Feed</Text>
-              </View>
-              <Feather name="chevron-right" size={18} color="rgba(4,9,33,0.3)" />
             </TouchableOpacity>
 
             {/* Critical Missed Dose Banner (Conditional) */}
@@ -606,7 +601,7 @@ export default function HomeScreen() {
                             <Feather 
                               name={isTaken ? "check-circle" : "clock"} 
                               size={12} 
-                              color={isTaken ? '#10B981' : '#0463DD'} 
+                              color={isTaken ? '#10B981' : '#06565F'} 
                             />
                             <Text style={[
                               styles.stripTimeText,
@@ -638,9 +633,9 @@ export default function HomeScreen() {
                 onPress={() => navigation.navigate('SearchDrug')}
                 activeOpacity={0.8}
               >
-                <View style={[styles.actionIconContainer, { backgroundColor: 'rgba(4,99,221,0.08)' }]}>
-                  <Feather name="plus" size={20} color="#0463DD" />
-                </View>
+                <LinearGradient colors={['#F5FCE2', '#ECFFB6']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.actionIconContainer}>
+                  <Feather name="plus" size={20} color="#06565F" />
+                </LinearGradient>
                 <Text style={styles.actionLabel}>Add Med</Text>
               </TouchableOpacity>
 
@@ -649,9 +644,9 @@ export default function HomeScreen() {
                 onPress={() => navigation.navigate('InviteCaregiver')}
                 activeOpacity={0.8}
               >
-                <View style={[styles.actionIconContainer, { backgroundColor: 'rgba(16,185,129,0.08)' }]}>
-                  <Feather name="users" size={20} color="#10B981" />
-                </View>
+                <LinearGradient colors={['#F5FCE2', '#ECFFB6']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.actionIconContainer}>
+                  <Feather name="users" size={20} color="#06565F" />
+                </LinearGradient>
                 <Text style={styles.actionLabel}>Invite Care</Text>
               </TouchableOpacity>
 
@@ -660,9 +655,9 @@ export default function HomeScreen() {
                 onPress={() => navigation.navigate('AIChat')}
                 activeOpacity={0.8}
               >
-                <View style={[styles.actionIconContainer, { backgroundColor: 'rgba(139,92,246,0.08)' }]}>
-                  <Feather name="message-square" size={20} color="#8B5CF6" />
-                </View>
+                <LinearGradient colors={['#F5FCE2', '#ECFFB6']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.actionIconContainer}>
+                  <Feather name="message-square" size={20} color="#06565F" />
+                </LinearGradient>
                 <Text style={styles.actionLabel}>Chat AI</Text>
               </TouchableOpacity>
             </View>
@@ -670,13 +665,13 @@ export default function HomeScreen() {
             <View style={[styles.actionsGrid, { marginTop: -8 }]}>
               <TouchableOpacity 
                 style={styles.actionItem} 
-                onPress={() => navigation.navigate('PrescriptionScanner')}
+                onPress={() => navigation.navigate('ProofOfLifeFeed')}
                 activeOpacity={0.8}
               >
-                <View style={[styles.actionIconContainer, { backgroundColor: 'rgba(236,72,153,0.08)' }]}>
-                  <Feather name="camera" size={20} color="#EC4899" />
-                </View>
-                <Text style={styles.actionLabel}>Scan Rx</Text>
+                <LinearGradient colors={['#F5FCE2', '#ECFFB6']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.actionIconContainer}>
+                  <Feather name="shield" size={20} color="#06565F" />
+                </LinearGradient>
+                <Text style={styles.actionLabel}>Proof Feed</Text>
               </TouchableOpacity>
 
               <TouchableOpacity 
@@ -684,9 +679,9 @@ export default function HomeScreen() {
                 onPress={() => navigation.navigate('VoiceCommand')}
                 activeOpacity={0.8}
               >
-                <View style={[styles.actionIconContainer, { backgroundColor: 'rgba(245,158,11,0.08)' }]}>
-                  <Feather name="mic" size={20} color="#F59E0B" />
-                </View>
+                <LinearGradient colors={['#F5FCE2', '#ECFFB6']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.actionIconContainer}>
+                  <Feather name="mic" size={20} color="#06565F" />
+                </LinearGradient>
                 <Text style={styles.actionLabel}>Voice Cmd</Text>
               </TouchableOpacity>
 
@@ -695,9 +690,9 @@ export default function HomeScreen() {
                 onPress={() => navigation.navigate('AIInsights')}
                 activeOpacity={0.8}
               >
-                <View style={[styles.actionIconContainer, { backgroundColor: 'rgba(59,130,246,0.08)' }]}>
-                  <Feather name="bar-chart-2" size={20} color="#3B82F6" />
-                </View>
+                <LinearGradient colors={['#F5FCE2', '#ECFFB6']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.actionIconContainer}>
+                  <Feather name="bar-chart-2" size={20} color="#06565F" />
+                </LinearGradient>
                 <Text style={styles.actionLabel}>Insights</Text>
               </TouchableOpacity>
             </View>
@@ -705,32 +700,43 @@ export default function HomeScreen() {
             {/* Activity Feed */}
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Activity Feed</Text>
+              <TouchableOpacity onPress={() => navigation.navigate('ActivityLog')}>
+                <Text style={styles.seeAllText}>See all</Text>
+              </TouchableOpacity>
             </View>
 
             <View style={styles.feedContainer}>
-              <View style={styles.feedItem}>
-                <View style={[styles.feedIconContainer, { backgroundColor: 'rgba(16,185,129,0.1)' }]}>
-                  <Feather name="check" size={16} color="#10B981" />
+              {doseLogs.slice(0, 5).map(log => {
+                const isMissed = log.outcome === 'missed';
+                return (
+                  <View key={log.id} style={styles.feedItem}>
+                    <View style={[
+                      styles.feedIconContainer, 
+                      { backgroundColor: isMissed ? 'rgba(255,111,97,0.1)' : 'rgba(16,185,129,0.1)' }
+                    ]}>
+                      <Feather 
+                        name={isMissed ? "alert-triangle" : "check"} 
+                        size={16} 
+                        color={isMissed ? "#FF6F61" : "#10B981"} 
+                      />
+                    </View>
+                    <View style={styles.feedContent}>
+                      <Text style={styles.feedTime}>
+                        {new Date(log.loggedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </Text>
+                      <Text style={styles.feedDescription}>
+                        <Text style={styles.boldText}>{log.medName} {log.outcome === 'taken' ? 'taken' : 'missed'}</Text>
+                        {'. '}{log.notes}
+                      </Text>
+                    </View>
+                  </View>
+                );
+              })}
+              {doseLogs.length === 0 && (
+                <View style={styles.emptyContainer}>
+                  <Text style={styles.emptyText}>No recent activity logs.</Text>
                 </View>
-                <View style={styles.feedContent}>
-                  <Text style={styles.feedTime}>1:30 PM</Text>
-                  <Text style={styles.feedDescription}>
-                    <Text style={styles.boldText}>Lisinopril Taken</Text> (Logged by Nurse Temi. Photo proof verified via AI).
-                  </Text>
-                </View>
-              </View>
-
-              <View style={styles.feedItem}>
-                <View style={[styles.feedIconContainer, { backgroundColor: 'rgba(239,68,68,0.1)' }]}>
-                  <Feather name="alert-triangle" size={16} color="#EF4444" />
-                </View>
-                <View style={styles.feedContent}>
-                  <Text style={styles.feedTime}>8:00 AM</Text>
-                  <Text style={styles.feedDescription}>
-                    <Text style={styles.boldText}>Metformin Missed</Text> (Escalated to Voice Call. Elder acknowledged but did not take).
-                  </Text>
-                </View>
-              </View>
+              )}
             </View>
           </ScrollView>
         )}
@@ -929,7 +935,7 @@ const styles = StyleSheet.create({
   monitoringText: {
     fontFamily: 'Baloo2_600SemiBold',
     fontSize: 13,
-    color: '#0463DD',
+    color: '#06565F',
   },
   hubActionBtn: {
     width: 48,
@@ -949,7 +955,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#EF4444',
+    backgroundColor: '#FF6F61',
   },
   timezoneIndicatorCard: {
     flexDirection: 'row',
@@ -975,7 +981,7 @@ const styles = StyleSheet.create({
   },
   summaryCard: {
     flexDirection: 'row',
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#ECFFB6',
     borderRadius: 16,
     padding: 16,
     marginHorizontal: 16,
@@ -1001,7 +1007,7 @@ const styles = StyleSheet.create({
   summarySublabel: {
     fontFamily: 'Baloo2_500Medium',
     fontSize: 12,
-    color: '#0463DD',
+    color: '#06565F',
     marginTop: 2,
   },
   summaryChartSection: {
@@ -1020,7 +1026,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#7F1D1D',
+    backgroundColor: '#7F2218',
     borderRadius: 12,
     paddingVertical: 14,
     paddingHorizontal: 16,
@@ -1094,7 +1100,7 @@ const styles = StyleSheet.create({
   seeAllText: {
     fontFamily: 'Baloo2_600SemiBold',
     fontSize: 14,
-    color: '#0463DD',
+    color: '#06565F',
   },
   horizontalScroll: {
     width: '100%',
@@ -1121,7 +1127,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   stripCardPending: {
-    borderLeftColor: '#0463DD',
+    borderLeftColor: '#06565F',
   },
   stripCardTaken: {
     borderLeftColor: '#10B981',
@@ -1145,7 +1151,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   stripTimeTextPending: {
-    color: '#0463DD',
+    color: '#06565F',
   },
   stripTimeTextTaken: {
     color: '#10B981',
@@ -1258,7 +1264,7 @@ const styles = StyleSheet.create({
   headerSubtitle: {
     fontFamily: 'Baloo2_600SemiBold',
     fontSize: 12,
-    color: '#0463DD',
+    color: '#06565F',
     marginTop: -2,
   },
   offlineToggleRow: {
@@ -1387,10 +1393,15 @@ const styles = StyleSheet.create({
   medTextGroup: {
     flex: 1,
   },
+  medName: {
+    fontFamily: 'Baloo2_700Bold',
+    fontSize: 15,
+    color: 'rgba(4,9,33,0.76)',
+  },
   medDetails: {
     fontFamily: 'Baloo2_600SemiBold',
     fontSize: 12,
-    color: '#0463DD',
+    color: '#06565F',
     marginBottom: 2,
   },
   medInstructions: {
@@ -1429,7 +1440,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     alignItems: 'center',
     justifyContent: 'center',
     ...Platform.select({
@@ -1505,7 +1516,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   painPillActive: {
-    borderColor: '#0463DD',
+    borderColor: '#06565F',
     backgroundColor: 'rgba(4, 99, 221, 0.05)',
   },
   painPillText: {
@@ -1514,10 +1525,10 @@ const styles = StyleSheet.create({
     color: 'rgba(4,9,33,0.6)',
   },
   painPillTextActive: {
-    color: '#0463DD',
+    color: '#06565F',
   },
   modalSubmitButton: {
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     height: 56,
     borderRadius: 28,
     alignItems: 'center',

@@ -178,7 +178,7 @@ export default function RegionSetupScreen() {
               </View>
 
               <View style={styles.syncIconContainer}>
-                <Feather name="refresh-cw" size={16} color="#0463DD" />
+                <Feather name="refresh-cw" size={16} color="#06565F" />
               </View>
 
               <View style={styles.clockColumn}>
@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
   navStep: {
     fontFamily: 'Baloo2_600SemiBold',
     fontSize: 12,
-    color: '#0463DD',
+    color: '#06565F',
     marginTop: -2,
   },
   navPlaceholder: {
@@ -323,7 +323,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   pickerSegmentActive: {
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     shadowColor: 'rgba(4, 9, 33, 0.06)',
     shadowOffset: {
       width: 0,
@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
   clockColumnLabel: {
     fontFamily: 'Baloo2_700Bold',
     fontSize: 11,
-    color: '#0463DD',
+    color: '#06565F',
     letterSpacing: 0.5,
     marginBottom: 2,
   },
@@ -398,7 +398,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   primaryButton: {
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     width: '100%',
     height: 64,
     borderRadius: 32,

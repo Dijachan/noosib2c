@@ -119,7 +119,7 @@ export default function DropdownSelector({
                           style={[
                             styles.iconWrapper,
                             isSelected && {
-                              backgroundColor: 'rgba(4,99,221,0.08)',
+                              backgroundColor: 'rgba(6,86,95,0.08)',
                             },
                           ]}
                         >
@@ -128,7 +128,7 @@ export default function DropdownSelector({
                             size={16}
                             color={
                               isSelected
-                                ? '#0463DD'
+                                ? '#06565F'
                                 : item.iconColor || 'rgba(4,9,33,0.5)'
                             }
                           />
@@ -151,7 +151,7 @@ export default function DropdownSelector({
                       </View>
                     </View>
                     {isSelected && (
-                      <Feather name="check" size={18} color="#0463DD" />
+                      <Feather name="check" size={18} color="#06565F" />
                     )}
                   </TouchableOpacity>
                 );
@@ -253,8 +253,8 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(4,9,33,0.03)',
   },
   optionItemActive: {
-    backgroundColor: '#EBF5FF',
-    borderColor: '#0463DD',
+    backgroundColor: '#E6F3F4',
+    borderColor: '#06565F',
   },
   optionLeft: {
     flexDirection: 'row',
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     color: '#0F172A',
   },
   optionLabelActive: {
-    color: '#0463DD',
+    color: '#06565F',
   },
   optionDescription: {
     fontFamily: 'Baloo2_500Medium',

@@ -104,7 +104,7 @@ export default function SlotMappingScreen() {
             <Text style={styles.legendText}>Occupied</Text>
           </View>
           <View style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: '#0463DD' }]} />
+            <View style={[styles.legendDot, { backgroundColor: '#06565F' }]} />
             <Text style={styles.legendText}>Selected</Text>
           </View>
         </View>
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
   stepIndicator: {
     fontFamily: 'Baloo2_600SemiBold',
     fontSize: 14,
-    color: '#0463DD',
+    color: '#06565F',
     backgroundColor: 'rgba(4, 99, 221, 0.08)',
     paddingHorizontal: 12,
     paddingVertical: 4,
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   drugHighlight: {
-    color: '#0463DD',
+    color: '#06565F',
     fontFamily: 'Baloo2_700Bold',
   },
   grid: {
@@ -226,8 +226,8 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(239, 68, 68, 0.1)',
   },
   slotSelected: {
-    backgroundColor: '#0463DD',
-    borderColor: '#0463DD',
+    backgroundColor: '#06565F',
+    borderColor: '#06565F',
   },
   slotId: {
     fontFamily: 'Baloo2_800ExtraBold',
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#F1F5F9',
   },
   primaryBtn: {
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     height: 56,
     borderRadius: 28,
     flexDirection: 'row',
@@ -351,28 +351,28 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   checkboxRed: {
-    borderColor: '#EF4444',
+    borderColor: '#FF6F61',
   },
   checkboxBlue: {
-    borderColor: '#0463DD',
+    borderColor: '#06565F',
   },
   checkboxRedActive: {
-    backgroundColor: '#EF4444',
-    borderColor: '#EF4444',
+    backgroundColor: '#FF6F61',
+    borderColor: '#FF6F61',
   },
   checkboxBlueActive: {
-    backgroundColor: '#0463DD',
-    borderColor: '#0463DD',
+    backgroundColor: '#06565F',
+    borderColor: '#06565F',
   },
   ackText: {
     flex: 1,
     fontFamily: 'Baloo2_600SemiBold',
     fontSize: 14,
-    color: '#EF4444',
+    color: '#FF6F61',
     lineHeight: 20,
   },
   ackTextNew: {
-    color: '#0463DD',
+    color: '#06565F',
   },
   ackContainerNew: {
     backgroundColor: 'rgba(4, 99, 221, 0.05)',

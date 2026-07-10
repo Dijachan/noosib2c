@@ -148,8 +148,8 @@ export default function LogDoseQuickScreen() {
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           {/* Medication Summary Header Card */}
           <View style={styles.summaryCard}>
-            <View style={[styles.pillIconBg, { backgroundColor: selectedMed.pillColor || '#0463DD' + '15' }]}>
-              <Ionicons name="medical" size={24} color={selectedMed.pillColor || '#0463DD'} />
+            <View style={[styles.pillIconBg, { backgroundColor: selectedMed.pillColor || '#06565F' + '15' }]}>
+              <Ionicons name="medical" size={24} color={selectedMed.pillColor || '#06565F'} />
             </View>
             <View style={styles.summaryInfo}>
               <Text style={styles.drugName}>{selectedMed.name}</Text>
@@ -179,7 +179,7 @@ export default function LogDoseQuickScreen() {
             activeOpacity={0.8}
           >
             <View style={styles.photoIconWrapper}>
-              <Feather name="camera" size={20} color="#0463DD" />
+              <Feather name="camera" size={20} color="#06565F" />
             </View>
             <View style={styles.photoTextWrapper}>
               <Text style={styles.photoProofTitle}>Add Photo Verification Proof</Text>
@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
   doseContext: {
     fontFamily: 'Baloo2_600SemiBold',
     fontSize: 13,
-    color: '#0463DD',
+    color: '#06565F',
     marginTop: 4,
   },
   primaryLogBtn: {
@@ -352,7 +352,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(4,99,221,0.08)',
+    backgroundColor: 'rgba(6,86,95,0.08)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -409,7 +409,7 @@ const styles = StyleSheet.create({
   missedLinkText: {
     fontFamily: 'Baloo2_700Bold',
     fontSize: 15,
-    color: '#EF4444',
+    color: '#FF6F61',
     textDecorationLine: 'underline',
   },
   errorContainer: {
@@ -426,7 +426,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   backBtn: {
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 24,

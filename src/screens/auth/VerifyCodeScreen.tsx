@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
   },
   otpInputFilled: {
-    borderColor: '#0463DD',
+    borderColor: '#06565F',
     backgroundColor: '#FFFFFF',
   },
   timerContainer: {
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
   },
   timerCountdown: {
     fontFamily: 'Baloo2_700Bold',
-    color: '#0463DD',
+    color: '#06565F',
   },
 
   buttonContainer: {
@@ -323,7 +323,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   primaryButton: {
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     width: '100%',
     height: 64,
     borderRadius: 32,
@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
   footerLinkBlue: {
     fontFamily: 'Baloo2_600SemiBold',
     fontSize: 16,
-    color: '#0463DD',
+    color: '#06565F',
   },
   footerLinkDisabled: {
     color: '#9CA3AF',

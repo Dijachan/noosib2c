@@ -35,8 +35,8 @@ const NotificationItem = ({
 
   const getIconColor = () => {
     switch (type) {
-      case 'alert': return '#EF4444';
-      case 'hardware': return '#0463DD';
+      case 'alert': return '#FF6F61';
+      case 'hardware': return '#06565F';
       default: return '#64748B';
     }
   };
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
   },
   notiItemUnread: {
     borderColor: 'rgba(4, 99, 221, 0.1)',
-    backgroundColor: '#F0F7FF',
+    backgroundColor: '#E6F3F4',
   },
   iconContainer: {
     width: 48,
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     marginLeft: 8,
   },
 });

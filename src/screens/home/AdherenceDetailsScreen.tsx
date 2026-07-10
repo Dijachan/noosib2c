@@ -119,12 +119,12 @@ export default function AdherenceDetailsScreen() {
              <Text style={styles.detailLabel}>Taken</Text>
           </View>
           <View style={[styles.detailItem, { backgroundColor: 'rgba(239, 68, 68, 0.05)' }]}>
-             <Ionicons name="close-circle" size={28} color="#EF4444" />
+             <Ionicons name="close-circle" size={28} color="#FF6F61" />
              <Text style={styles.detailCount}>{missedDoses}</Text>
              <Text style={styles.detailLabel}>Missed</Text>
           </View>
-          <View style={[styles.detailItem, { backgroundColor: 'rgba(99, 102, 241, 0.05)' }]}>
-             <Ionicons name="time" size={28} color="#6366F1" />
+          <View style={[styles.detailItem, { backgroundColor: 'rgba(6,86,95,0.05)' }]}>
+             <Ionicons name="time" size={28} color="#06565F" />
              <Text style={styles.detailCount}>{pendingDoses}</Text>
              <Text style={styles.detailLabel}>Pending</Text>
           </View>
@@ -133,7 +133,7 @@ export default function AdherenceDetailsScreen() {
         {/* Caregiver Insights */}
         <View style={styles.insightBox}>
           <View style={styles.insightIconBg}>
-            <Ionicons name="sparkles" size={20} color="#0463DD" />
+            <Ionicons name="sparkles" size={20} color="#06565F" />
           </View>
           <View style={styles.insightTextContainer}>
             <Text style={styles.insightTitle}>Noosi Insight</Text>
@@ -166,14 +166,14 @@ export default function AdherenceDetailsScreen() {
               <View key={log.id} style={styles.logCard}>
                 <View style={styles.logHeader}>
                   <View style={styles.logInfoLeft}>
-                    <View style={[styles.statusIndicator, { backgroundColor: log.status === 'Taken' ? '#10B981' : '#EF4444' }]} />
+                    <View style={[styles.statusIndicator, { backgroundColor: log.status === 'Taken' ? '#10B981' : '#FF6F61' }]} />
                     <View>
                       <Text style={styles.logMedName}>{log.name}</Text>
                       <Text style={styles.logTime}>{log.time} • {log.date}</Text>
                     </View>
                   </View>
                   <View style={[styles.statusBadge, { backgroundColor: log.status === 'Taken' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)' }]}>
-                    <Text style={[styles.statusBadgeText, { color: log.status === 'Taken' ? '#10B981' : '#EF4444' }]}>
+                    <Text style={[styles.statusBadgeText, { color: log.status === 'Taken' ? '#10B981' : '#FF6F61' }]}>
                       {log.status.toUpperCase()}
                     </Text>
                   </View>
@@ -194,7 +194,7 @@ export default function AdherenceDetailsScreen() {
 
                 {log.status === 'Missed' && (
                   <View style={styles.missedNotice}>
-                    <Ionicons name="alert-circle" size={18} color="#EF4444" />
+                    <Ionicons name="alert-circle" size={18} color="#FF6F61" />
                     <Text style={styles.missedText}>No visual confirmation recorded.</Text>
                   </View>
                 )}
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   statsCard: {
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     borderRadius: 32,
     padding: 24,
     marginVertical: 20,
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F1F5F9',
   },
   rangeItemSelected: {
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
   },
   rangeText: {
     fontFamily: 'Baloo2_600SemiBold',
@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
   seeMore: {
     fontFamily: 'Baloo2_600SemiBold',
     fontSize: 14,
-    color: '#0463DD',
+    color: '#06565F',
   },
   chartContainer: {
     backgroundColor: '#F8FAFC',
@@ -416,7 +416,7 @@ const styles = StyleSheet.create({
   insightTitle: {
     fontFamily: 'Baloo2_700Bold',
     fontSize: 16,
-    color: '#0463DD',
+    color: '#06565F',
     marginBottom: 4,
   },
   insightText: {
@@ -529,7 +529,7 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#EF4444',
+    backgroundColor: '#FF6F61',
   },
   recText: {
     fontFamily: 'Baloo2_700Bold',
@@ -554,7 +554,7 @@ const styles = StyleSheet.create({
   missedText: {
     fontFamily: 'Baloo2_500Medium',
     fontSize: 12,
-    color: '#EF4444',
+    color: '#FF6F61',
   },
   sectionSubtitle: {
     fontFamily: 'Baloo2_500Medium',

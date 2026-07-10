@@ -147,7 +147,7 @@ export default function SignInScreen() {
               onPress={handleBiometricLogin}
               activeOpacity={0.8}
             >
-              <Ionicons name="finger-print" size={20} color="#0463DD" />
+              <Ionicons name="finger-print" size={20} color="#06565F" />
               <Text style={styles.biometricText}>
                 Quick Sign-In with Touch ID / Face ID
               </Text>
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   roleTabActive: {
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     shadowColor: 'rgba(4, 9, 33, 0.06)',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 1,
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
   biometricText: {
     fontFamily: 'Baloo2_600SemiBold',
     fontSize: 14,
-    color: '#0463DD',
+    color: '#06565F',
   },
   ssoContainer: {
     width: '100%',
@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   primaryButton: {
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     width: '100%',
     height: 64,
     borderRadius: 32,
@@ -413,6 +413,6 @@ const styles = StyleSheet.create({
   footerLinkBlue: {
     fontFamily: 'Baloo2_600SemiBold',
     fontSize: 16,
-    color: '#0463DD',
+    color: '#06565F',
   },
 });

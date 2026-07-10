@@ -45,9 +45,9 @@ export default function MedicationScheduleScreen() {
 
   const getPriorityColor = (priority?: string) => {
     switch (priority) {
-      case 'Critical': return { bg: 'rgba(239, 68, 68, 0.08)', text: '#EF4444' };
+      case 'Critical': return { bg: 'rgba(239, 68, 68, 0.08)', text: '#FF6F61' };
       case 'Supplement': return { bg: 'rgba(16, 185, 129, 0.08)', text: '#10B981' };
-      default: return { bg: 'rgba(4, 99, 221, 0.08)', text: '#0463DD' }; // Maintenance
+      default: return { bg: 'rgba(4, 99, 221, 0.08)', text: '#06565F' }; // Maintenance
     }
   };
 
@@ -69,7 +69,7 @@ export default function MedicationScheduleScreen() {
             style={styles.addIconBtn}
             onPress={() => navigation.navigate('SearchDrug')}
           >
-            <Feather name="plus" size={22} color="#0463DD" />
+            <Feather name="plus" size={22} color="#06565F" />
           </TouchableOpacity>
         </View>
 
@@ -116,7 +116,7 @@ export default function MedicationScheduleScreen() {
                         <View style={styles.pillIconBg}>
                           <MiniPillVector 
                             formFactor={med.formFactor || 'Tablet'} 
-                            pillColor={med.pillColor || '#3B82F6'} 
+                            pillColor={med.pillColor || '#06565F'} 
                           />
                         </View>
                         <View>
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
   headerSubtitle: {
     fontFamily: 'Baloo2_600SemiBold',
     fontSize: 12,
-    color: '#0463DD',
+    color: '#06565F',
     marginTop: -2,
   },
   addIconBtn: {
@@ -237,8 +237,8 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(4,9,33,0.04)',
   },
   tabActive: {
-    backgroundColor: '#0463DD',
-    borderColor: '#0463DD',
+    backgroundColor: '#06565F',
+    borderColor: '#06565F',
   },
   tabText: {
     fontFamily: 'Baloo2_700Bold',
@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
     color: 'rgba(4,9,33,0.5)',
   },
   stockWarningText: {
-    color: '#EF4444',
+    color: '#FF6F61',
     fontFamily: 'Baloo2_700Bold',
   },
   emptyContainer: {
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
     color: 'rgba(4,9,33,0.4)',
   },
   primaryButton: {
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     width: '100%',
     maxWidth: 361,
     height: 56,

@@ -30,10 +30,10 @@ const SEVERITY_MAP = {
   },
   severe: {
     label: 'High Risk',
-    color: '#DC2626',
-    bgColor: '#FFF1F2',
-    borderColor: '#FECDD3',
-    iconColor: '#DC2626',
+    color: '#FF6F61',
+    bgColor: '#FFF1EE',
+    borderColor: '#FFD5CF',
+    iconColor: '#FF6F61',
   },
 };
 
@@ -90,7 +90,7 @@ export default function AIConflictAlertScreen() {
             {/* New Drug */}
             <View style={[styles.drugBox, { borderColor: s.borderColor }]}>
               <Text style={styles.drugBoxLabel}>NEW</Text>
-              <View style={[styles.drugPill, { backgroundColor: '#EF4444' }]} />
+              <View style={[styles.drugPill, { backgroundColor: '#FF6F61' }]} />
               <Text style={styles.drugName}>{conflictingDrug}</Text>
             </View>
 
@@ -102,7 +102,7 @@ export default function AIConflictAlertScreen() {
             {/* Existing Drug */}
             <View style={[styles.drugBox, { borderColor: '#E5E7EB' }]}>
               <Text style={styles.drugBoxLabel}>IN MEDS</Text>
-              <View style={[styles.drugPill, { backgroundColor: '#3B82F6' }]} />
+              <View style={[styles.drugPill, { backgroundColor: '#06565F' }]} />
               <Text style={styles.drugName}>{existingDrug}</Text>
             </View>
           </View>
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontFamily: 'Baloo2_500Medium',
     fontSize: 14,
-    color: '#065F46',
+    color: '#06565F',
     lineHeight: 20,
   },
   boldText: {

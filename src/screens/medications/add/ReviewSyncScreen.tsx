@@ -123,7 +123,7 @@ export default function ReviewSyncScreen() {
         <View style={styles.reviewCard}>
           <View style={styles.reviewHeader}>
             <View style={styles.drugBadge}>
-              <Ionicons name="medical" size={20} color="#0463DD" />
+              <Ionicons name="medical" size={20} color="#06565F" />
             </View>
             <View>
               <Text style={styles.reviewDrugName}>{finalData.name}</Text>
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
   stepIndicator: {
     fontFamily: 'Baloo2_600SemiBold',
     fontSize: 14,
-    color: '#0463DD',
+    color: '#06565F',
     backgroundColor: 'rgba(4, 99, 221, 0.08)',
     paddingHorizontal: 12,
     paddingVertical: 4,
@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
     color: '#0F172A',
   },
   slotBadge: {
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 6,
@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#F1F5F9',
   },
   primaryBtn: {
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     height: 56,
     borderRadius: 28,
     flexDirection: 'row',

@@ -116,7 +116,7 @@ export default function InviteCaregiverScreen() {
                     <Feather 
                       name="edit-3" 
                       size={18} 
-                      color={role === 'Full Caregiver' ? '#0463DD' : 'rgba(4,9,33,0.5)'} 
+                      color={role === 'Full Caregiver' ? '#06565F' : 'rgba(4,9,33,0.5)'} 
                     />
                     <Text style={styles.roleCardTitle}>Full Caregiver</Text>
                   </View>
@@ -146,7 +146,7 @@ export default function InviteCaregiverScreen() {
                     <Feather 
                       name="bell" 
                       size={18} 
-                      color={role === 'Observer' ? '#0463DD' : 'rgba(4,9,33,0.5)'} 
+                      color={role === 'Observer' ? '#06565F' : 'rgba(4,9,33,0.5)'} 
                     />
                     <Text style={styles.roleCardTitle}>Observer</Text>
                   </View>
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   roleCardActive: {
-    borderColor: '#0463DD',
+    borderColor: '#06565F',
     backgroundColor: 'rgba(4, 99, 221, 0.03)',
   },
   roleCardHeader: {
@@ -311,13 +311,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   radioCircleActive: {
-    borderColor: '#0463DD',
+    borderColor: '#06565F',
   },
   radioInner: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
   },
   roleCardDescription: {
     fontFamily: 'Baloo2_400Regular',
@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   primaryButton: {
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     width: '100%',
     height: 64,
     borderRadius: 32,

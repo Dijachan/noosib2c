@@ -37,7 +37,7 @@ const SettingItem = ({
 }) => (
   <TouchableOpacity style={styles.settingItem} onPress={onPress} activeOpacity={0.7}>
     <View style={[styles.settingIconContainer, type === 'danger' && styles.settingIconContainerDanger]}>
-      <Ionicons name={icon as any} size={22} color={type === 'danger' ? '#EF4444' : '#0463DD'} />
+      <Ionicons name={icon as any} size={22} color={type === 'danger' ? '#FF6F61' : '#06565F'} />
     </View>
     <View style={styles.settingTextContainer}>
       <Text style={[styles.settingTitle, type === 'danger' && styles.settingTitleDanger]}>{title}</Text>
@@ -98,7 +98,7 @@ export default function ProfileScreen() {
               </View>
             </View>
             <TouchableOpacity style={styles.editBtn}>
-              <Ionicons name="pencil-sharp" size={18} color="#0463DD" />
+              <Ionicons name="pencil-sharp" size={18} color="#06565F" />
             </TouchableOpacity>
           </View>
 
@@ -129,7 +129,7 @@ export default function ProfileScreen() {
           <View style={styles.hubCard}>
             <View style={styles.hubInfo}>
               <View style={styles.hubIconContainer}>
-                <Ionicons name="cloud" size={24} color="#0463DD" />
+                <Ionicons name="cloud" size={24} color="#06565F" />
               </View>
               <View>
                 <Text style={styles.hubTitle}>{deviceInfo.status ? 'Noosi Smart Hub v2' : 'Hub Offline'}</Text>
@@ -138,14 +138,14 @@ export default function ProfileScreen() {
             </View>
             <View style={styles.hubStats}>
               <View style={styles.hubStat}>
-                <Ionicons name="cellular" size={16} color={deviceInfo.status ? "#10B981" : "#EF4444"} />
-                <Text style={[styles.hubStatText, !deviceInfo.status && { color: '#EF4444' }]}>
+                <Ionicons name="cellular" size={16} color={deviceInfo.status ? "#10B981" : "#FF6F61"} />
+                <Text style={[styles.hubStatText, !deviceInfo.status && { color: '#FF6F61' }]}>
                   {deviceInfo.status ? 'Strong' : 'No Signal'}
                 </Text>
               </View>
               <View style={styles.hubStat}>
-                <Ionicons name="battery-full" size={16} color={deviceInfo.battery > 20 ? "#10B981" : "#EF4444"} />
-                <Text style={[styles.hubStatText, deviceInfo.battery <= 20 && { color: '#EF4444' }]}>{deviceInfo.battery}%</Text>
+                <Ionicons name="battery-full" size={16} color={deviceInfo.battery > 20 ? "#10B981" : "#FF6F61"} />
+                <Text style={[styles.hubStatText, deviceInfo.battery <= 20 && { color: '#FF6F61' }]}>{deviceInfo.battery}%</Text>
               </View>
             </View>
           </View>
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
   roleText: {
     fontFamily: 'Baloo2_700Bold',
     fontSize: 10,
-    color: '#0463DD',
+    color: '#06565F',
     letterSpacing: 0.5,
   },
   editBtn: {
@@ -475,7 +475,7 @@ const styles = StyleSheet.create({
     color: '#0F172A',
   },
   settingTitleDanger: {
-    color: '#EF4444',
+    color: '#FF6F61',
   },
   settingSubtitle: {
     fontFamily: 'Baloo2_500Medium',

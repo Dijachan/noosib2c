@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
     zIndex: 20,
   },
   nextButton: {
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     width: CARD_WIDTH,
     height: 64,
     borderRadius: 32,

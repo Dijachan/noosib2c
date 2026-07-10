@@ -93,8 +93,8 @@ export default function MedicationDetailModal({
   const getStatusConfig = () => {
     switch (medication.status) {
       case 'Taken': return { color: '#10B981', bg: 'rgba(16, 185, 129, 0.1)', text: 'Taken' };
-      case 'Missed': return { color: '#EF4444', bg: 'rgba(239, 68, 68, 0.1)', text: 'Missed' };
-      default: return { color: '#6366F1', bg: 'rgba(99, 102, 241, 0.1)', text: 'Pending' };
+      case 'Missed': return { color: '#FF6F61', bg: 'rgba(239, 68, 68, 0.1)', text: 'Missed' };
+      default: return { color: '#D6FB00', bg: 'rgba(99, 102, 241, 0.1)', text: 'Pending' };
     }
   };
 
@@ -127,7 +127,7 @@ export default function MedicationDetailModal({
           <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
             <View style={styles.heroSection}>
               <View style={styles.medIconContainer}>
-                <Ionicons name="medical" size={40} color="#0463DD" />
+                <Ionicons name="medical" size={40} color="#06565F" />
               </View>
               <Text style={styles.medName}>{medication.name}</Text>
               <Text style={styles.medDosage}>
@@ -142,7 +142,7 @@ export default function MedicationDetailModal({
             <View style={styles.detailsGrid}>
               <View style={styles.detailCard}>
                 <View style={styles.detailIconBg}>
-                  <Ionicons name="time-outline" size={24} color="#0463DD" />
+                  <Ionicons name="time-outline" size={24} color="#06565F" />
                 </View>
                 <View>
                   <Text style={styles.detailLabel}>Time</Text>
@@ -152,7 +152,7 @@ export default function MedicationDetailModal({
 
               <View style={styles.detailCard}>
                 <View style={styles.detailIconBg}>
-                  <Ionicons name="calendar-outline" size={24} color="#0463DD" />
+                  <Ionicons name="calendar-outline" size={24} color="#06565F" />
                 </View>
                 <View>
                   <Text style={styles.detailLabel}>Date</Text>
@@ -162,7 +162,7 @@ export default function MedicationDetailModal({
 
               <View style={styles.detailCard}>
                 <View style={styles.detailIconBg}>
-                  <Ionicons name="cube-outline" size={24} color="#6366F1" />
+                  <Ionicons name="cube-outline" size={24} color="#D6FB00" />
                 </View>
                 <View>
                   <Text style={styles.detailLabel}>Tray Slot</Text>
@@ -172,7 +172,7 @@ export default function MedicationDetailModal({
 
               <View style={styles.detailCard}>
                 <View style={styles.detailIconBg}>
-                  <Ionicons name="repeat-outline" size={24} color="#0463DD" />
+                  <Ionicons name="repeat-outline" size={24} color="#06565F" />
                 </View>
                 <View>
                   <Text style={styles.detailLabel}>Frequency</Text>
@@ -207,7 +207,7 @@ export default function MedicationDetailModal({
                   onDelete(medication);
                 }}
               >
-                <Ionicons name="trash-outline" size={20} color="#EF4444" />
+                <Ionicons name="trash-outline" size={20} color="#FF6F61" />
                 <Text style={styles.deleteBtnText}>Delete Medication</Text>
               </TouchableOpacity>
             </View>
@@ -387,7 +387,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 20,
     borderLeftWidth: 4,
-    borderLeftColor: '#0463DD',
+    borderLeftColor: '#06565F',
   },
   instructionText: {
     fontFamily: 'Baloo2_500Medium',
@@ -424,6 +424,6 @@ const styles = StyleSheet.create({
   deleteBtnText: {
     fontFamily: 'Baloo2_700Bold',
     fontSize: 16,
-    color: '#EF4444',
+    color: '#FF6F61',
   },
 });

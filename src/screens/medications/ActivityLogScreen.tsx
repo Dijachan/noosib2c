@@ -40,9 +40,9 @@ export default function ActivityLogScreen() {
   const getActivityConfig = (type: string) => {
     switch (type) {
       case 'taken': return { icon: 'checkmark-circle', color: '#10B981', action: 'taken' };
-      case 'created': return { icon: 'add-circle', color: '#0463DD', action: 'added' };
-      case 'edited': return { icon: 'create', color: '#6366F1', action: 'updated' };
-      case 'deleted': return { icon: 'trash', color: '#EF4444', action: 'unlinked' };
+      case 'created': return { icon: 'add-circle', color: '#06565F', action: 'added' };
+      case 'edited': return { icon: 'create', color: '#06565F', action: 'updated' };
+      case 'deleted': return { icon: 'trash', color: '#FF6F61', action: 'unlinked' };
       default: return { icon: 'information-circle', color: '#64748B', action: 'activity' };
     }
   };
@@ -186,8 +186,8 @@ const styles = StyleSheet.create({
     borderColor: '#F1F5F9',
   },
   filterChipActive: {
-    backgroundColor: '#0463DD',
-    borderColor: '#0463DD',
+    backgroundColor: '#06565F',
+    borderColor: '#06565F',
   },
   filterText: {
     fontFamily: 'Baloo2_600SemiBold',

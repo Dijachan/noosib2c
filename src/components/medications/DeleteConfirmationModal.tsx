@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 56,
     borderRadius: 16,
-    backgroundColor: '#EF4444', // Clinical Delete Red
+    backgroundColor: '#FF6F61', // Clinical Delete Red
     alignItems: 'center',
     justifyContent: 'center',
   },

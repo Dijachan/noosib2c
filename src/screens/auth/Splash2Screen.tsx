@@ -12,7 +12,7 @@ export default function Splash2Screen() {
   // Visual-only splash. Timing handled by App.tsx.
   return (
     <LinearGradient
-      colors={['#0563DD', '#15F597']}
+      colors={['#06565F', '#D6FB00']}
       start={{ x: 0.1, y: 0.2 }}
       end={{ x: 0.9, y: 0.8 }}
       style={styles.container}

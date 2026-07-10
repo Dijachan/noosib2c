@@ -327,8 +327,8 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   checkboxActive: {
-    borderColor: '#0463DD',
-    backgroundColor: '#0463DD',
+    borderColor: '#06565F',
+    backgroundColor: '#06565F',
   },
   checkboxLabel: {
     flex: 1,
@@ -389,7 +389,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   primaryButton: {
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     width: '100%',
     height: 64,
     borderRadius: 32,
@@ -419,7 +419,7 @@ const styles = StyleSheet.create({
   footerLink: {
     fontFamily: 'Baloo2_600SemiBold',
     fontSize: 16,
-    color: '#0463DD',
+    color: '#06565F',
     textDecorationLine: 'underline',
   },
 });

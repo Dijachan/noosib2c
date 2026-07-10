@@ -129,7 +129,7 @@ export default function AIChatScreen() {
       daysLeft: 60,
       priority: 'Maintenance' as const,
       formFactor: 'Tablet' as const,
-      pillColor: '#3B82F6',
+      pillColor: '#06565F',
     };
 
     if (hasConflict) {
@@ -219,7 +219,7 @@ export default function AIChatScreen() {
                 {msg.plan && (
                   <View style={styles.planCard}>
                     <View style={styles.planHeader}>
-                      <Ionicons name="clipboard" size={18} color="#0463DD" />
+                      <Ionicons name="clipboard" size={18} color="#06565F" />
                       <Text style={styles.planTitle}>Extracted Action Plan</Text>
                     </View>
                     <View style={styles.planBody}>
@@ -267,7 +267,7 @@ export default function AIChatScreen() {
                 <Ionicons name="sparkles" size={16} color="#FFFFFF" />
               </View>
               <View style={[styles.bubble, styles.aiBubble, styles.typingBubble]}>
-                <ActivityIndicator size="small" color="#0463DD" />
+                <ActivityIndicator size="small" color="#06565F" />
                 <Text style={styles.typingText}>Typing...</Text>
               </View>
             </View>
@@ -326,7 +326,7 @@ export default function AIChatScreen() {
             activeOpacity={0.8}
             disabled={!inputText.trim()}
           >
-            <Feather name="send" size={18} color="#FFFFFF" />
+            <Feather name="send" size={18} color="#D6FB00" />
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
@@ -392,7 +392,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 2,
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   userBubble: {
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     alignSelf: 'flex-end',
   },
   aiBubble: {
@@ -435,7 +435,7 @@ const styles = StyleSheet.create({
   typingText: {
     fontFamily: 'Baloo2_500Medium',
     fontSize: 14,
-    color: '#0463DD',
+    color: '#06565F',
   },
   planCard: {
     backgroundColor: '#FFFFFF',
@@ -459,7 +459,7 @@ const styles = StyleSheet.create({
   planTitle: {
     fontFamily: 'Baloo2_700Bold',
     fontSize: 14,
-    color: '#0463DD',
+    color: '#06565F',
   },
   planBody: {
     gap: 6,
@@ -501,7 +501,7 @@ const styles = StyleSheet.create({
     flex: 2,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -565,7 +565,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#8B5CF6',
+    backgroundColor: '#06565F',
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -40,19 +40,19 @@ const CLASSIFICATION_OPTIONS = [
     value: 'Maintenance',
     description: 'Daily routine medications. Generates standard daily reminders.',
     icon: 'activity',
-    iconColor: '#0463DD',
+    iconColor: '#06565F',
   },
   {
     label: 'Critical',
     value: 'Critical',
     description: 'Life-essential medications. Bypasses delay alerts, triggers calls if missed.',
     icon: 'alert-triangle',
-    iconColor: '#EF4444',
+    iconColor: '#FF6F61',
   },
 ];
 
 const DURATION_OPTIONS = [
-  { label: 'Ongoing Schedule', value: 'Ongoing', icon: 'repeat', iconColor: '#0463DD' },
+  { label: 'Ongoing Schedule', value: 'Ongoing', icon: 'repeat', iconColor: '#06565F' },
   { label: '7 Days', value: '7 Days', icon: 'calendar', iconColor: '#64748B' },
   { label: '14 Days', value: '14 Days', icon: 'calendar', iconColor: '#64748B' },
   { label: '30 Days', value: '30 Days', icon: 'calendar', iconColor: '#64748B' },
@@ -69,7 +69,7 @@ export default function ScheduleScreen() {
       brand: 'Glucophage',
       strength: '500mg', 
       formFactor: 'Tablet',
-      pillColor: '#3B82F6',
+      pillColor: '#06565F',
       instructions: '',
     } 
   };
@@ -86,7 +86,7 @@ export default function ScheduleScreen() {
     
     const parts = editMed.time.split(' - ');
     const timesPart = parts[0] || defaultTime;
-    const timesArray = timesPart.split(', ').map(t => t.trim());
+    const timesArray = timesPart.split(', ').map((t: string) => t.trim());
     return {
       times: timesArray.length > 0 ? timesArray : [defaultTime],
       anchor: parts[1] || 'No Meal Anchor'
@@ -354,7 +354,7 @@ export default function ScheduleScreen() {
                   }}
                   activeOpacity={0.8}
                 >
-                  <Feather name="clock" size={20} color="#0463DD" />
+                  <Feather name="clock" size={20} color="#06565F" />
                   <Text style={styles.timePickerButtonText}>
                     Dose {idx + 1}: {doseTimes[idx] || 'Select Time'}
                   </Text>
@@ -374,7 +374,7 @@ export default function ScheduleScreen() {
               }}
               activeOpacity={0.8}
             >
-              <Feather name="clock" size={20} color="#0463DD" />
+              <Feather name="clock" size={20} color="#06565F" />
               <Text style={styles.timePickerButtonText}>
                 As Needed (PRN)
               </Text>
@@ -445,7 +445,7 @@ export default function ScheduleScreen() {
           onPress={() => setShowStartDatePicker(true)}
           activeOpacity={0.8}
         >
-          <Feather name="calendar" size={16} color="#0463DD" />
+          <Feather name="calendar" size={16} color="#06565F" />
           <Text style={styles.datePickerButtonText}>
             {startDate.toLocaleDateString([], { month: 'short', day: 'numeric' })}
           </Text>
@@ -544,7 +544,7 @@ const styles = StyleSheet.create({
   headerStep: {
     fontFamily: 'Baloo2_600SemiBold',
     fontSize: 12,
-    color: '#0463DD',
+    color: '#06565F',
     marginTop: -2,
   },
   navPlaceholder: {
@@ -600,7 +600,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   freqTabActive: {
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
   },
   freqTabText: {
     fontFamily: 'Baloo2_700Bold',
@@ -626,7 +626,7 @@ const styles = StyleSheet.create({
   timePickerButtonText: {
     fontFamily: 'Baloo2_700Bold',
     fontSize: 18,
-    color: '#0463DD',
+    color: '#06565F',
     flex: 1,
     marginLeft: 12,
   },
@@ -646,8 +646,8 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   mealChipActive: {
-    backgroundColor: '#EBF5FF',
-    borderColor: '#0463DD',
+    backgroundColor: '#E6F3F4',
+    borderColor: '#06565F',
   },
   mealChipText: {
     fontFamily: 'Baloo2_700Bold',
@@ -655,7 +655,7 @@ const styles = StyleSheet.create({
     color: 'rgba(4,9,33,0.5)',
   },
   mealChipTextActive: {
-    color: '#0463DD',
+    color: '#06565F',
   },
   inputContainer: {
     flexDirection: 'row',
@@ -699,19 +699,19 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   priorityCardCritical: {
-    backgroundColor: '#FFF5F5',
-    borderColor: 'rgba(239,68,68,0.1)',
+    backgroundColor: '#FFF1EE',
+    borderColor: 'rgba(255,111,97,0.1)',
   },
   priorityCardSupplementActive: {
     borderColor: '#10B981',
     backgroundColor: 'rgba(16, 185, 129, 0.02)',
   },
   priorityCardMaintenanceActive: {
-    borderColor: '#0463DD',
+    borderColor: '#06565F',
     backgroundColor: 'rgba(4, 99, 221, 0.02)',
   },
   priorityCardCriticalActive: {
-    borderColor: '#EF4444',
+    borderColor: '#FF6F61',
     backgroundColor: 'rgba(239, 68, 68, 0.04)',
   },
   priorityCardHeader: {
@@ -757,7 +757,7 @@ const styles = StyleSheet.create({
     paddingBottom: Platform.OS === 'ios' ? 40 : 24,
   },
   primaryBtn: {
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     width: '100%',
     height: 60,
     borderRadius: 30,
@@ -786,7 +786,7 @@ const styles = StyleSheet.create({
   datePickerButtonText: {
     fontFamily: 'Baloo2_700Bold',
     fontSize: 14,
-    color: '#0463DD',
+    color: '#06565F',
     marginLeft: 8,
   },
   durationGrid: {
@@ -806,8 +806,8 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   durationChipActive: {
-    backgroundColor: '#EBF5FF',
-    borderColor: '#0463DD',
+    backgroundColor: '#E6F3F4',
+    borderColor: '#06565F',
   },
   durationChipText: {
     fontFamily: 'Baloo2_700Bold',
@@ -815,6 +815,6 @@ const styles = StyleSheet.create({
     color: 'rgba(4,9,33,0.5)',
   },
   durationChipTextActive: {
-    color: '#0463DD',
+    color: '#06565F',
   },
 });

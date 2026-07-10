@@ -57,7 +57,7 @@ const OrderStep = ({
       <View style={[
         styles.stepDot, 
         status === 'completed' && { backgroundColor: '#10B981' },
-        status === 'current' && { backgroundColor: '#0463DD', borderWidth: 2, borderColor: '#FFFFFF' }
+        status === 'current' && { backgroundColor: '#06565F', borderWidth: 2, borderColor: '#FFFFFF' }
       ]}>
         {status === 'completed' && <Ionicons name="checkmark" size={12} color="#FFFFFF" />}
       </View>
@@ -65,7 +65,7 @@ const OrderStep = ({
     </View>
     <Text style={[
       styles.stepLabel, 
-      status === 'current' && { color: '#0463DD', fontFamily: 'Baloo2_700Bold' }
+      status === 'current' && { color: '#06565F', fontFamily: 'Baloo2_700Bold' }
     ]}>{label}</Text>
   </View>
 );
@@ -133,16 +133,16 @@ export default function PharmacyHubScreen() {
           </View>
           
           <View style={styles.actionGrid}>
-            <QuickAction title="Upload Prescription" icon="cloud-upload-outline" color="#0463DD" />
+            <QuickAction title="Upload Prescription" icon="cloud-upload-outline" color="#06565F" />
             <QuickAction title="Refill Medication" icon="refresh-outline" color="#10B981" />
             <QuickAction title="Talk to Pharmacist" icon="chatbubbles-outline" color="#F59E0B" />
-            <QuickAction title="Medical History" icon="medical-outline" color="#6366F1" />
+            <QuickAction title="Medical History" icon="medical-outline" color="#06565F" />
           </View>
 
           {/* Inventory Alert - Restyled */}
           <TouchableOpacity style={styles.premiumAlert}>
             <View style={styles.alertIconBg}>
-              <Ionicons name="alert-circle" size={28} color="#EF4444" />
+              <Ionicons name="alert-circle" size={28} color="#FF6F61" />
             </View>
             <View style={styles.alertTextContainer}>
               <Text style={styles.alertTitle}>Inventory Alert!</Text>
@@ -163,12 +163,12 @@ export default function PharmacyHubScreen() {
               <Text style={styles.careTitle}>Consult with a Doctor</Text>
               <Text style={styles.careDesc}>Schedule a 10-minute video call for new prescription renewals.</Text>
               <View style={styles.drRow}>
-                <Ionicons name="videocam" size={16} color="#0463DD" />
+                <Ionicons name="videocam" size={16} color="#06565F" />
                 <Text style={styles.drText}>Doctors online (2-min wait)</Text>
               </View>
             </View>
             <View style={styles.careGraphic}>
-               <Ionicons name="person-outline" size={40} color="#0463DD" />
+               <Ionicons name="person-outline" size={40} color="#06565F" />
             </View>
           </TouchableOpacity>
 
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
   heroContainer: {
     height: 290,
     width: '100%',
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     position: 'relative',
   },
   heroImage: {
@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
   viewAll: {
     fontFamily: 'Baloo2_600SemiBold',
     fontSize: 14,
-    color: '#0463DD',
+    color: '#06565F',
   },
   trackerCard: {
     backgroundColor: '#FFFFFF',
@@ -387,13 +387,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(239, 68, 68, 0.1)',
     borderLeftWidth: 4,
-    borderLeftColor: '#EF4444',
+    borderLeftColor: '#FF6F61',
   },
   alertIconBg: {
     width: 48,
     height: 48,
     borderRadius: 12,
-    backgroundColor: '#FEF2F2',
+    backgroundColor: '#FFF1EE',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -404,15 +404,15 @@ const styles = StyleSheet.create({
   alertTitle: {
     fontFamily: 'Baloo2_700Bold',
     fontSize: 16,
-    color: '#991B1B',
+    color: '#7F2218',
   },
   alertSub: {
     fontFamily: 'Baloo2_500Medium',
     fontSize: 13,
-    color: '#EF4444',
+    color: '#FF6F61',
   },
   alertActionBtn: {
-    backgroundColor: '#EF4444',
+    backgroundColor: '#FF6F61',
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 10,
@@ -423,7 +423,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
   },
   careCard: {
-    backgroundColor: '#F0F7FF',
+    backgroundColor: '#E6F3F4',
     borderRadius: 24,
     padding: 20,
     flexDirection: 'row',
@@ -437,7 +437,7 @@ const styles = StyleSheet.create({
   careTitle: {
     fontFamily: 'Baloo2_700Bold',
     fontSize: 18,
-    color: '#0463DD',
+    color: '#06565F',
     marginBottom: 4,
   },
   careDesc: {
@@ -455,7 +455,7 @@ const styles = StyleSheet.create({
   drText: {
     fontFamily: 'Baloo2_600SemiBold',
     fontSize: 12,
-    color: '#0463DD',
+    color: '#06565F',
   },
   careGraphic: {
     width: 64,

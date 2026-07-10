@@ -78,7 +78,7 @@ export default function MedicationDetailsScreen() {
 
   const priority = med.priority || 'Maintenance';
   const formFactor = med.formFactor || 'Tablet';
-  const pillColor = med.pillColor || '#3B82F6';
+  const pillColor = med.pillColor || '#06565F';
   const brand = med.brand || 'Generic';
   const stock = med.stock ? parseInt(med.stock) : 24;
   const qty = med.dosageAmount ? parseFloat(med.dosageAmount) : 1;
@@ -123,7 +123,7 @@ export default function MedicationDetailsScreen() {
         );
       case 'Injection':
         return (
-          <Ionicons name="eyedropper-outline" size={60} color={pillColor} />
+          <Ionicons name="eyedrop-outline" size={60} color={pillColor} />
         );
       default: // Tablet
         return (
@@ -228,7 +228,7 @@ export default function MedicationDetailsScreen() {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Medication Details</Text>
         <TouchableOpacity style={styles.headerAction} onPress={handleDelete}>
-          <Feather name="trash-2" size={20} color="#EF4444" />
+          <Feather name="trash-2" size={20} color="#FF6F61" />
         </TouchableOpacity>
       </View>
 
@@ -259,7 +259,7 @@ export default function MedicationDetailsScreen() {
         {/* AI Warning Interaction Banner */}
         {hasInteraction() && (
           <View style={styles.aiWarningBanner}>
-            <Feather name="alert-triangle" size={20} color="#991B1B" />
+            <Feather name="alert-triangle" size={20} color="#7F2218" />
             <View style={styles.warningTextContainer}>
               <Text style={styles.warningTitle}>⚠️ AI warning: Interacts with {getInteractionPartner()}</Text>
               <Text style={styles.warningSubtitle}>
@@ -282,7 +282,7 @@ export default function MedicationDetailsScreen() {
               styles.progressBarFill, 
               { 
                 width: `${Math.min(100, (stock / 60) * 100)}%`,
-                backgroundColor: daysLeft < 5 ? '#EF4444' : '#0463DD'
+                backgroundColor: daysLeft < 5 ? '#FF6F61' : '#06565F'
               }
             ]} />
           </View>
@@ -365,7 +365,7 @@ export default function MedicationDetailsScreen() {
           onPress={handleEdit}
           activeOpacity={0.8}
         >
-          <Feather name="edit-2" size={18} color="#0463DD" />
+          <Feather name="edit-2" size={18} color="#06565F" />
           <Text style={styles.editButtonText}>Edit Schedule</Text>
         </TouchableOpacity>
         <TouchableOpacity 
@@ -373,7 +373,7 @@ export default function MedicationDetailsScreen() {
           onPress={handleArchive}
           activeOpacity={0.8}
         >
-          <Feather name="archive" size={18} color="#EF4444" />
+          <Feather name="archive" size={18} color="#FF6F61" />
           <Text style={styles.archiveButtonText}>
             {med.isArchived ? 'Reactivate' : 'Archive'}
           </Text>
@@ -516,7 +516,7 @@ const styles = StyleSheet.create({
   priorityText: {
     fontFamily: 'Baloo2_700Bold',
     fontSize: 11,
-    color: '#0463DD',
+    color: '#06565F',
   },
   formBadge: {
     backgroundColor: 'rgba(4,9,33,0.06)',
@@ -531,7 +531,7 @@ const styles = StyleSheet.create({
   },
   aiWarningBanner: {
     flexDirection: 'row',
-    backgroundColor: '#FFF5F5',
+    backgroundColor: '#FFF1EE',
     borderWidth: 1.5,
     borderColor: 'rgba(239, 68, 68, 0.1)',
     borderRadius: 16,
@@ -545,7 +545,7 @@ const styles = StyleSheet.create({
   warningTitle: {
     fontFamily: 'Baloo2_700Bold',
     fontSize: 14,
-    color: '#991B1B',
+    color: '#7F2218',
     marginBottom: 2,
   },
   warningSubtitle: {
@@ -577,10 +577,10 @@ const styles = StyleSheet.create({
   stockLabel: {
     fontFamily: 'Baloo2_700Bold',
     fontSize: 13,
-    color: '#0463DD',
+    color: '#06565F',
   },
   stockWarningLabel: {
-    color: '#EF4444',
+    color: '#FF6F61',
   },
   progressBarBg: {
     height: 12,
@@ -595,7 +595,7 @@ const styles = StyleSheet.create({
   lowStockWarning: {
     fontFamily: 'Baloo2_600SemiBold',
     fontSize: 11,
-    color: '#EF4444',
+    color: '#FF6F61',
     marginTop: 8,
   },
   legend: {
@@ -620,7 +620,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   gridCellMissed: {
-    borderColor: '#EF4444',
+    borderColor: '#FF6F61',
     borderStyle: 'dashed',
   },
   cellText: {
@@ -632,7 +632,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   cellTextMissed: {
-    color: '#EF4444',
+    color: '#FF6F61',
   },
   instructionsText: {
     fontFamily: 'Baloo2_500Medium',
@@ -653,7 +653,7 @@ const styles = StyleSheet.create({
     height: 52,
     borderRadius: 26,
     borderWidth: 1.5,
-    borderColor: '#0463DD',
+    borderColor: '#06565F',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -662,14 +662,14 @@ const styles = StyleSheet.create({
   editButtonText: {
     fontFamily: 'Baloo2_700Bold',
     fontSize: 14,
-    color: '#0463DD',
+    color: '#06565F',
   },
   archiveButton: {
     flex: 1.1,
     height: 52,
     borderRadius: 26,
     borderWidth: 1.5,
-    borderColor: '#EF4444',
+    borderColor: '#FF6F61',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -678,7 +678,7 @@ const styles = StyleSheet.create({
   archiveButtonText: {
     fontFamily: 'Baloo2_700Bold',
     fontSize: 14,
-    color: '#EF4444',
+    color: '#FF6F61',
   },
   errorContainer: {
     flex: 1,

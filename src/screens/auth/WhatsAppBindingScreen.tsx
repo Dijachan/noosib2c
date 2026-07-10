@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
   navStep: {
     fontFamily: 'Baloo2_600SemiBold',
     fontSize: 12,
-    color: '#0463DD',
+    color: '#06565F',
     marginTop: -2,
   },
   navPlaceholder: {
@@ -297,14 +297,14 @@ const styles = StyleSheet.create({
   infoTitle: {
     fontFamily: 'Baloo2_700Bold',
     fontSize: 15,
-    color: '#065F46',
+    color: '#06565F',
     marginBottom: 2,
   },
   infoDescription: {
     fontFamily: 'Baloo2_400Regular',
     fontSize: 13,
     lineHeight: 18,
-    color: '#047857',
+    color: '#06565F',
   },
   formContainer: {
     width: '100%',
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   otpInputFilled: {
-    borderColor: '#0463DD',
+    borderColor: '#06565F',
     backgroundColor: '#FFFFFF',
   },
   otpInputBypassed: {
@@ -359,8 +359,8 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   checkboxBoxSelected: {
-    borderColor: '#0463DD',
-    backgroundColor: '#0463DD',
+    borderColor: '#06565F',
+    backgroundColor: '#06565F',
   },
   checkboxTextContainer: {
     flex: 1,
@@ -387,7 +387,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   primaryButton: {
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     width: '100%',
     height: 64,
     borderRadius: 32,
@@ -414,7 +414,7 @@ const styles = StyleSheet.create({
   skipLinkText: {
     fontFamily: 'Baloo2_600SemiBold',
     fontSize: 15,
-    color: '#0463DD',
+    color: '#06565F',
     textDecorationLine: 'underline',
   },
 });

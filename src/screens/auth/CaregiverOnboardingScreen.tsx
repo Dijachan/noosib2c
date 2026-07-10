@@ -25,6 +25,6 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFFFFF' },
   content: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
-  button: { backgroundColor: '#0463DD', padding: 16, borderRadius: 8 },
+  button: { backgroundColor: '#06565F', padding: 16, borderRadius: 8 },
   buttonText: { color: '#FFFFFF', fontWeight: 'bold' }
 });

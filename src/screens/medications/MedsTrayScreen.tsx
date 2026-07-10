@@ -40,9 +40,9 @@ const TraySlotBox = ({
 }) => {
   const getStatusColors = () => {
     switch (status) {
-      case 'Next': return { bg: '#F5F3FF', border: '#0463DD', text: '#0463DD', icon: 'time' };
+      case 'Next': return { bg: '#ECFFB6', border: '#06565F', text: '#06565F', icon: 'time' };
       case 'Occupied': return { bg: '#F8FAFC', border: '#E2E8F0', text: '#0F172A', icon: 'medical' };
-      case 'Missed': return { bg: 'rgba(239, 68, 68, 0.05)', border: '#EF4444', text: '#EF4444', icon: 'alert-circle' };
+      case 'Missed': return { bg: 'rgba(239, 68, 68, 0.05)', border: '#FF6F61', text: '#FF6F61', icon: 'alert-circle' };
       default: return { bg: '#FFFFFF', border: '#F1F5F9', text: '#94A3B8', icon: 'add-circle-outline' };
     }
   };
@@ -219,9 +219,9 @@ export default function MedsTrayScreen() {
   const getActivityConfig = (type: string) => {
     switch (type) {
       case 'taken': return { icon: 'checkmark-circle', color: '#10B981', action: 'taken' };
-      case 'created': return { icon: 'add-circle', color: '#0463DD', action: 'added' };
-      case 'edited': return { icon: 'create', color: '#6366F1', action: 'updated' };
-      case 'deleted': return { icon: 'trash', color: '#EF4444', action: 'unlinked' };
+      case 'created': return { icon: 'add-circle', color: '#06565F', action: 'added' };
+      case 'edited': return { icon: 'create', color: '#06565F', action: 'updated' };
+      case 'deleted': return { icon: 'trash', color: '#FF6F61', action: 'unlinked' };
       default: return { icon: 'information-circle', color: '#64748B', action: 'activity' };
     }
   };
@@ -416,7 +416,7 @@ const styles = StyleSheet.create({
   heroSection: {
     marginHorizontal: 20,
     marginTop: 10,
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     borderRadius: 32,
     padding: 24,
     marginBottom: 32,
@@ -560,7 +560,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -8,
     right: 12,
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     borderRadius: 8,
     paddingVertical: 2,
     paddingHorizontal: 6,

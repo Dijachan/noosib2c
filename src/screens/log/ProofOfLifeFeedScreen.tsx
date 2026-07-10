@@ -26,12 +26,12 @@ export default function ProofOfLifeFeedScreen() {
 
   const getBadgeStyle = (log: DoseLog) => {
     if (log.outcome === 'missed') {
-      return { bg: 'rgba(239, 68, 68, 0.08)', text: '#EF4444', label: 'Missed ✗' };
+      return { bg: 'rgba(239, 68, 68, 0.08)', text: '#FF6F61', label: 'Missed ✗' };
     }
     if (log.verificationMethod === 'photo_ai') {
       return { bg: 'rgba(16, 185, 129, 0.08)', text: '#10B981', label: 'WhatsApp Photo ✓' };
     }
-    return { bg: 'rgba(4, 99, 221, 0.08)', text: '#0463DD', label: 'Caregiver Manual' };
+    return { bg: 'rgba(4, 99, 221, 0.08)', text: '#06565F', label: 'Caregiver Manual' };
   };
 
   const formatLogTime = (isoString: string) => {
@@ -64,7 +64,7 @@ export default function ProofOfLifeFeedScreen() {
             onPress={() => navigation.navigate('AdherenceHistory')}
             style={styles.historyBtn}
           >
-            <Feather name="calendar" size={20} color="#0463DD" />
+            <Feather name="calendar" size={20} color="#06565F" />
           </TouchableOpacity>
         </View>
 
@@ -97,7 +97,7 @@ export default function ProofOfLifeFeedScreen() {
                 <View key={log.id} style={styles.logCard}>
                   <View style={styles.cardHeader}>
                     <View style={styles.cardHeaderLeft}>
-                      <View style={[styles.statusIndicator, { backgroundColor: log.outcome === 'missed' ? '#EF4444' : '#10B981' }]}>
+                      <View style={[styles.statusIndicator, { backgroundColor: log.outcome === 'missed' ? '#FF6F61' : '#10B981' }]}>
                         <Feather 
                           name={log.outcome === 'missed' ? "x" : "check"} 
                           size={12} 
@@ -204,8 +204,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   filterTabActive: {
-    backgroundColor: '#0463DD',
-    borderColor: '#0463DD',
+    backgroundColor: '#06565F',
+    borderColor: '#06565F',
   },
   filterText: {
     fontFamily: 'Baloo2_700Bold',

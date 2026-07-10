@@ -15,13 +15,13 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 const COLORS = [
-  { name: 'Red', hex: '#EF4444' },
+  { name: 'Red', hex: '#FF6F61' },
   { name: 'Orange', hex: '#F59E0B' },
   { name: 'Yellow', hex: '#FBBF24' },
   { name: 'Green', hex: '#10B981' },
-  { name: 'Blue', hex: '#3B82F6' },
-  { name: 'Purple', hex: '#8B5CF6' },
-  { name: 'Pink', hex: '#EC4899' },
+  { name: 'Blue', hex: '#06565F' },
+  { name: 'Purple', hex: '#D6FB00' },
+  { name: 'Pink', hex: '#FF6F61' },
   { name: 'Grey', hex: '#9CA3AF' },
 ];
 
@@ -77,7 +77,7 @@ export default function DrugDetailScreen() {
       case 'Injection':
         return (
           <View style={styles.previewLiquidContainer}>
-            <Ionicons name="eyedropper-outline" size={72} color={selectedColor} />
+            <Ionicons name="eyedrop-outline" size={72} color={selectedColor} />
           </View>
         );
       default: // Tablet
@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
   headerStep: {
     fontFamily: 'Baloo2_600SemiBold',
     fontSize: 12,
-    color: '#0463DD',
+    color: '#06565F',
     marginTop: -2,
   },
   navPlaceholder: {
@@ -361,7 +361,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   formTabActive: {
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
   },
   formTabDisabled: {
     backgroundColor: '#E5E7EB',
@@ -398,7 +398,7 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   colorCircleActive: {
-    borderColor: '#0463DD',
+    borderColor: '#06565F',
     transform: [{ scale: 1.08 }],
   },
   noteInput: {
@@ -420,7 +420,7 @@ const styles = StyleSheet.create({
     paddingBottom: Platform.OS === 'ios' ? 40 : 24,
   },
   primaryBtn: {
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     width: '100%',
     height: 60,
     borderRadius: 30,

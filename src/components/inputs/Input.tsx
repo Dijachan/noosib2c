@@ -20,7 +20,7 @@ export default function Input({ label, icon, isPassword, ...props }: InputProps)
           <Feather 
             name={icon} 
             size={20} 
-            color={isFocused ? '#0463DD' : 'rgba(4,9,33,0.32)'} 
+            color={isFocused ? '#06565F' : 'rgba(4,9,33,0.32)'} 
             style={styles.inputIcon} 
           />
         )}
@@ -37,7 +37,7 @@ export default function Input({ label, icon, isPassword, ...props }: InputProps)
             <Feather 
               name={showPassword ? "eye" : "eye-off"} 
               size={20} 
-              color={isFocused ? '#0463DD' : 'rgba(4,9,33,0.32)'} 
+              color={isFocused ? '#06565F' : 'rgba(4,9,33,0.32)'} 
             />
           </TouchableOpacity>
         )}
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     marginLeft: 2,
   },
   labelFocused: {
-    color: '#0463DD',
+    color: '#06565F',
     fontFamily: 'Baloo2_700Bold',
   },
   inputWrapper: {
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   inputWrapperFocused: {
-    borderColor: '#0463DD',
+    borderColor: '#06565F',
     backgroundColor: 'rgba(4, 99, 221, 0.05)',
   },
   input: {

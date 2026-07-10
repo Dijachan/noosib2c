@@ -187,8 +187,8 @@ export const MedicationProvider = ({ children }: { children: ReactNode }) => {
         status: log.status,
         time: new Date(log.captured_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         date: new Date(log.captured_at).toLocaleDateString([], { weekday: 'short', day: 'numeric' }),
-        medName: log.medication?.name || 'Medication',
-        slot: log.medication?.slot_number,
+        medName: (log.medication as any)?.name || 'Medication',
+        slot: (log.medication as any)?.slot_number,
         timestamp: new Date(log.captured_at).getTime()
       })));
     }

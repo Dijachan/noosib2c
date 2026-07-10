@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
   navStep: {
     fontFamily: 'Baloo2_600SemiBold',
     fontSize: 12,
-    color: '#0463DD',
+    color: '#06565F',
     marginTop: -2,
   },
   navPlaceholder: {
@@ -269,14 +269,14 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   planCardActive: {
-    borderColor: '#0463DD',
+    borderColor: '#06565F',
     backgroundColor: 'rgba(4, 99, 221, 0.03)',
   },
   badgeContainer: {
     position: 'absolute',
     top: 12,
     right: 16,
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     borderRadius: 12,
     paddingVertical: 3,
     paddingHorizontal: 8,
@@ -327,13 +327,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   selectCircleActive: {
-    borderColor: '#0463DD',
+    borderColor: '#06565F',
   },
   selectCircleInner: {
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
   },
   cardDivider: {
     height: 1,
@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   primaryButton: {
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     width: '100%',
     height: 64,
     borderRadius: 32,

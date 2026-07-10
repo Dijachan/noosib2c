@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(4, 99, 221, 0.1)',
     backgroundColor: '#FFFFFF',
     overflow: 'hidden',
-    shadowColor: '#0463DD',
+    shadowColor: '#06565F',
     shadowOffset: { width: 0, height: 20 },
     shadowOpacity: 0.1,
     shadowRadius: 30,
@@ -303,14 +303,14 @@ const styles = StyleSheet.create({
     left: '10%',
     width: '80%',
     height: 2,
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     zIndex: 1,
   },
   corner: {
     position: 'absolute',
     width: 32,
     height: 32,
-    borderColor: '#0463DD',
+    borderColor: '#06565F',
     zIndex: 20,
   },
   topLeft: {
@@ -372,7 +372,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   primaryButton: {
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     width: '100%',
     height: 64,
     borderRadius: 32,
@@ -403,7 +403,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   permissionBtn: {
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 20,

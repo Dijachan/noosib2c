@@ -58,7 +58,7 @@ export default function AIInsightsScreen() {
       >
         {/* Insights Query Input */}
         <View style={styles.searchBox}>
-          <Ionicons name="sparkles" size={20} color="#0463DD" />
+          <Ionicons name="sparkles" size={20} color="#06565F" />
           <TextInput
             style={styles.searchInput}
             placeholder="Ask about Grandpa's health..."
@@ -70,7 +70,7 @@ export default function AIInsightsScreen() {
           />
           {query.length > 0 && (
             <TouchableOpacity onPress={handleSearch}>
-              <Feather name="send" size={20} color="#0463DD" />
+              <Feather name="send" size={20} color="#06565F" />
             </TouchableOpacity>
           )}
         </View>
@@ -118,7 +118,7 @@ export default function AIInsightsScreen() {
                       styles.chartBar,
                       {
                         height: barH,
-                        backgroundColor: isMissed ? '#EF4444' : '#0463DD',
+                        backgroundColor: isMissed ? '#FF6F61' : '#06565F',
                       },
                     ]}
                   />
@@ -130,11 +130,11 @@ export default function AIInsightsScreen() {
 
           <View style={styles.legend}>
             <View style={styles.legendItem}>
-              <View style={[styles.legendDot, { backgroundColor: '#0463DD' }]} />
+              <View style={[styles.legendDot, { backgroundColor: '#06565F' }]} />
               <Text style={styles.legendText}>On track ≥80%</Text>
             </View>
             <View style={styles.legendItem}>
-              <View style={[styles.legendDot, { backgroundColor: '#EF4444' }]} />
+              <View style={[styles.legendDot, { backgroundColor: '#FF6F61' }]} />
               <Text style={styles.legendText}>Below target</Text>
             </View>
           </View>
@@ -157,9 +157,9 @@ export default function AIInsightsScreen() {
           <Text style={styles.cardTitle}>Quick Summary</Text>
           {[
             { label: 'Total doses logged', value: '28 of 30', color: '#10B981' },
-            { label: 'Doses missed', value: '2 doses', color: '#EF4444' },
-            { label: 'Most consistent time', value: '1:00 PM', color: '#0463DD' },
-            { label: 'Longest streak', value: '7 days', color: '#8B5CF6' },
+            { label: 'Doses missed', value: '2 doses', color: '#FF6F61' },
+            { label: 'Most consistent time', value: '1:00 PM', color: '#06565F' },
+            { label: 'Longest streak', value: '7 days', color: '#06565F' },
           ].map((item, i) => (
             <View key={i} style={styles.breakdownRow}>
               <Text style={styles.breakdownLabel}>{item.label}</Text>
@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
     color: 'rgba(4,9,33,0.6)',
   },
   summaryCard: {
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     borderRadius: 20,
     padding: 20,
   },

@@ -132,7 +132,7 @@ export default function AdherenceHistoryScreen() {
             onPress={() => setAlertVisible(true)}
             activeOpacity={0.9}
           >
-            <Feather name="download" size={20} color="#FFFFFF" />
+            <Feather name="download" size={20} color="#D6FB00" />
             <Text style={styles.exportBtnText}>Export Monthly PDF Report</Text>
           </TouchableOpacity>
         </ScrollView>
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
   streakText: {
     fontFamily: 'Baloo2_700Bold',
     fontSize: 12,
-    color: '#F97316',
+    color: '#C94A3D',
   },
   divider: {
     height: 1.5,
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
   cellMissed: {
     backgroundColor: '#FFFFFF',
     borderWidth: 1.5,
-    borderColor: '#EF4444',
+    borderColor: '#FF6F61',
   },
   cellFuture: {
     backgroundColor: '#F1F5F9',
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   cellTextMissed: {
-    color: '#EF4444',
+    color: '#FF6F61',
   },
   cellTextFuture: {
     color: '#94A3B8',
@@ -330,22 +330,22 @@ const styles = StyleSheet.create({
     color: 'rgba(4,9,33,0.5)',
   },
   exportBtn: {
-    backgroundColor: '#8B5CF6',
+    backgroundColor: '#06565F',
     flexDirection: 'row',
     height: 52,
     borderRadius: 26,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 10,
-    shadowColor: '#8B5CF6',
+    shadowColor: '#06565F',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
+    shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 4,
   },
   exportBtnText: {
     fontFamily: 'Baloo2_700Bold',
     fontSize: 15,
-    color: '#FFFFFF',
+    color: '#D6FB00',
   },
 });

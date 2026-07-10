@@ -68,7 +68,7 @@ export default function ConsentScreen() {
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>Data Collection & Usage</Text>
-                <Feather name="file-text" size={18} color="#0463DD" />
+                <Feather name="file-text" size={18} color="#06565F" />
               </View>
               <Text style={styles.consentText}>
                 The Noosi ecosystem collects health data, including medication schedules, dosages, adherence logs, and biometric vitals. This data is used solely for care coordination and health monitoring.
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(226, 232, 240, 0.8)',
     overflow: 'hidden',
-    shadowColor: '#0463DD',
+    shadowColor: '#06565F',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.05,
     shadowRadius: 20,
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(4, 99, 221, 0.1)',
     borderLeftWidth: 4,
-    borderLeftColor: '#0463DD',
+    borderLeftColor: '#06565F',
     marginTop: 8,
   },
   auditHeader: {
@@ -287,11 +287,11 @@ const styles = StyleSheet.create({
   auditTitle: {
     fontFamily: 'Baloo2_700Bold',
     fontSize: 12,
-    color: '#0463DD',
+    color: '#06565F',
     letterSpacing: 2,
   },
   badge: {
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 4,
@@ -344,8 +344,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   checkboxChecked: {
-    backgroundColor: '#0463DD',
-    borderColor: '#0463DD',
+    backgroundColor: '#06565F',
+    borderColor: '#06565F',
   },
   checkboxLabel: {
     flex: 1,
@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
     color: 'rgba(4,9,33,0.6)',
   },
   primaryButton: {
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     width: '100%',
     height: 64,
     borderRadius: 32,

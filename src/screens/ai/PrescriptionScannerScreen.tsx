@@ -34,7 +34,7 @@ export default function PrescriptionScannerScreen() {
         brand: 'Norvasc',
         strength: '5mg',
         formFactor: 'Tablet',
-        pillColor: '#3B82F6',
+        pillColor: '#06565F',
         instructions: 'Take once daily in the morning.',
       },
     });
@@ -92,7 +92,7 @@ export default function PrescriptionScannerScreen() {
       {scanState === 'scanning' && (
         <View style={styles.scanningContainer}>
           <View style={styles.scanningCard}>
-            <ActivityIndicator size="large" color="#0463DD" />
+            <ActivityIndicator size="large" color="#06565F" />
             <Text style={styles.scanningTitle}>Reading prescription...</Text>
             <Text style={styles.scanningSubtitle}>
               AI is extracting drug details from the label
@@ -128,7 +128,7 @@ export default function PrescriptionScannerScreen() {
           ].map((field, index) => (
             <View key={index} style={styles.reviewField}>
               <View style={styles.reviewFieldIcon}>
-                <Feather name={field.icon as any} size={18} color="#0463DD" />
+                <Feather name={field.icon as any} size={18} color="#06565F" />
               </View>
               <View style={styles.reviewFieldContent}>
                 <Text style={styles.reviewFieldLabel}>{field.label}</Text>
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: 30,
     height: 30,
-    borderColor: '#0463DD',
+    borderColor: '#06565F',
     borderWidth: 3,
   },
   cornerTL: { top: -1, left: -1, borderRightWidth: 0, borderBottomWidth: 0, borderTopLeftRadius: 10 },
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 4,
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 12,
-    backgroundColor: 'rgba(4,99,221,0.08)',
+    backgroundColor: 'rgba(6,86,95,0.08)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -383,7 +383,7 @@ const styles = StyleSheet.create({
     flex: 2,
     height: 52,
     borderRadius: 26,
-    backgroundColor: '#0463DD',
+    backgroundColor: '#06565F',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
