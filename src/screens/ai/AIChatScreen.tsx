@@ -326,7 +326,7 @@ export default function AIChatScreen() {
             activeOpacity={0.8}
             disabled={!inputText.trim()}
           >
-            <Feather name="send" size={18} color="#D6FB00" />
+            <Feather name="send" size={18} color={inputText.trim() ? "#D6FB00" : "rgba(6, 86, 95, 0.4)"} />
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
@@ -570,6 +570,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   sendBtnDisabled: {
-    backgroundColor: '#E2E8F0',
+    backgroundColor: 'rgba(6, 86, 95, 0.08)',
   },
 });
